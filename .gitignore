@@ -1,0 +1,13 @@
+# Archivos de configuración de VS Code
+.vscode/
+
+# Archivos temporales y logs
+*.log
+*.tmp
+
+# Archivos específicos de bases de datos que no queremos en el repo
+*.mdf
+*.ldf
+
+# Si llegas a usar carpetas de dependencias (como node_modules si usaras JS)
+node_modules/
