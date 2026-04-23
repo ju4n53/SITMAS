@@ -96,12 +96,29 @@ namespace API_SITMAS.Controllers
         //public void Borrar(int id)
         //{
 
-        //    Carreras oCarrera = new Carreras();
-        //    oCarrera.IdCarrera = id;
+        //    Empleado oEmpleado = new Empleado();
+        //    oEmpleado.Id = id;
 
-        //    oCarrera.Delete();
+        //    oEmpleado.Borrar();
 
         //}
+
+
+        [HttpGet]
+        public List<Empleado> ListarVista()
+        {
+            Empleado oEmpleado = new Empleado();
+
+            var dt = oEmpleado.VistalistadoEmpleados();
+
+            var ListaJsom = JsonConvert.SerializeObject(dt);
+
+            var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
+            return Lista;
+
+
+        }
+
 
     }
 }

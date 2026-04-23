@@ -180,10 +180,12 @@ namespace API_SITMAS.Models
         }
 
 
-        //public void Delete()
+        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
+
+        //public void Borrar()
         //{
 
-        //    string sqlSentencia = "SP_DeleteMateria";
+        //    string sqlSentencia = "sp_EliminarEmpleado";
 
 
         //    SqlConnection sqlCnn = new SqlConnection();
@@ -195,7 +197,7 @@ namespace API_SITMAS.Models
         //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
         //    sqlCom.CommandType = CommandType.StoredProcedure;
 
-        //    sqlCom.Parameters.Add("@IdMateria", SqlDbType.Int).Value = IdMateria;
+        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
 
 
         //    sqlCnn.Open();
@@ -210,38 +212,38 @@ namespace API_SITMAS.Models
         //}
 
 
-        //public DataTable VistaSelectAll()
-        //{
+        public DataTable VistalistadoEmpleados()
+        {
 
 
-        //    string sqlSentencia = "SP_GetVistaMateria";
+            string sqlSentencia = "sp_ListarEmpleadosDetallados";
 
 
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
+            SqlConnection sqlCnn = new SqlConnection();
+            sqlCnn.ConnectionString = conectionString;
 
 
-        //    sqlCnn.Open();
+            sqlCnn.Open();
 
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
+            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+            sqlCom.CommandType = CommandType.StoredProcedure;
 
-        //    DataSet ds = new DataSet();
+            DataSet ds = new DataSet();
 
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-
-
-        //    sqlCnn.Close();
-
-
-        //    return ds.Tables[0];
+            SqlDataAdapter da = new SqlDataAdapter();
+            da.SelectCommand = sqlCom;
+            da.Fill(ds);
 
 
 
-        //}
+            sqlCnn.Close();
+
+
+            return ds.Tables[0];
+
+
+
+        }
 
 
         #endregion
