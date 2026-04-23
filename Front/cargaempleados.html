@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Planta de Reciclaje</title>
+    <link rel="stylesheet" href="styleABM.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+    </script>
+    <script src="listado_empleado.js"></script>
+    <script src="Buscar_IdEmpleado.js"></script>
+    <script src="insertar_empleado.js"></script>
+    <script src="modificar_empleado.js"></script>
+
+</head>
+
+<body>
+
+    <header class="main-header">
+        <div class="nombre-sistema">
+            <span id="fecha-hora">
+                <H2>SITMAS</H2>
+            </span>
+        </div>
+        <div class="info-right">
+            <span>Usuario: <span class="data">---</span></span>
+            <span>Rol: <span class="data">---</span></span>
+            <div class="role-icon"></div>
+        </div>
+    </header>
+
+    <div class="main-layout">
+
+        <aside class="sidebar-vertical">
+            <ul class="nav-list">
+                <li><a href="landingestructura.html">INICIO</a></li>
+
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE PERSONAL</a>
+                    <div class="dropdown-content">
+                        <a href="cargaempleados.html">Empleados</a>
+                        <a href="#">Usuarios</a>
+                        <a href="#">Roles y permisos C</a>
+                    </div>
+                </li>
+
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">GESTIÓN LOGÍSTICA</a>
+                    <div class="dropdown-content">
+                        <a href="#">Vehículos</a>
+                        <a href="#">Hojas de ruta</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE TRAZABILIDAD</a>
+                    <div class="dropdown-content">
+                        <a href="#">Ingreso de material</a>
+                        <a href="#">Clasificación</a>
+                    </div>
+                </li>
+
+                <li><a href="#">CONFIGURACIÓN</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-body-content">
+            <nav class="navbar">
+                <button class="btn-nav btn-verde">Acción1</button>
+                <button class="btn-nav btn-verde">Acción2</button>
+                <button class="btn-nav btn-azul">Acción3</button>
+                <button class="btn-nav btn-azul">Acción4</button>
+                <button class="btn-nav btn-amarillo">Acción5</button>
+                <button class="btn-nav btn-amarillo">Acción6</button>
+            </nav>
+
+            <div class="info-bar">
+                <span>Panel de Administración > Gestión de Empleados</span>
+            </div>
+
+            <main class="content-wrapper">
+                <section class="card-section">
+                    <div class="card accordion-item">
+                        <div class="accordion-header" id="toggleForm">
+                            <h2>Registrar Nuevo Empleado</h2>
+                            <span class="icon-arrow">▼</span>
+                        </div>
+                        <div class="accordion-content" id="formContent">
+                            <form class="grid-form" onsubmit="alert('Datos enviados'); return false;">
+                                <div class="form-group">
+                                    <label>Apellido</label>
+                                    <input type="text" id="apellido" required placeholder="Ej: Pérez">
+                                </div>
+                                <div class="form-group">
+                                    <label>Nombre</label>
+                                    <input type="text" id="nombre" required placeholder="Ej: Juan">
+                                </div>
+                                <div class="form-group">
+                                    <label>CUIL</label>
+                                    <input type="string" id="cuil" required placeholder=20-33444555-9>
+                                </div>
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="number" id="telefono" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" id="email" required placeholder="Ej: juan.perez@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha de Ingreso</label>
+                                    <input type="string" id="fecha_ingreso" required placeholder="yyyy-mm-dd">
+                                </div>
+                                <div class="form-group">
+                                    <label>Id Cargo</label>
+                                    <input type="int" id="id_cargo">
+                                </div>
+                                <div class="form-group">
+                                    <label>Id Area</label>
+                                    <input type="int" id="id_area">
+                                </div>
+                                <div class="form-group">
+                                    <label>Id Barrio</label>
+                                    <input type="int" id="id_barrio">
+                                </div>
+                                <div class="form-group">
+                                    <label>Id Estado</label>
+                                    <input type="int" id="id_estado">
+                                </div>
+
+                                <!-- <div class="form-group">
+                                    <label>Área</label>
+                                    <select id="id_area">
+                                        <option value="1">Administración</option>
+                                        <option value="2">Planta de Reciclaje</option>
+                                        <option value="3">Logística</option>
+                                    </select>
+                                </div> -->
+                                <!-- <div class="form-group">
+                                    <select id="id_cargo">
+                                        <option value="1">Operario</option>
+                                        <option value="2">Encargado</option>
+                                        <option value="3">Gerente</option>
+                                    </select>
+                                </div> -->
+                                <!-- <div class="form-group">
+                                    <select id="id_vinculacion">
+                                        <option value="1">Becario</option>
+                                        <option value="2">Empleado de planta</option>
+                                        <option value="3">Monotributista</option>
+                                    </select>
+                                </div> -->
+                                <!-- <div class="form-group">
+                                    <select id="id_estado">
+                                        <option value="1">Activo</option>
+                                        <option value="2">Inactivo</option>
+                                    </select>
+                                </div> -->
+                                <div class="form-group">
+                                    <input id="BuscarIdEmpleado" type="text" placeholder="Busqueda por Codigo">
+                                    <input type="button" value="Buscar" id="btnBuscar1" onclick="BuscarEmpleado()">
+                                </div>
+                                <div></div>
+                                <div class="form-buttons">
+                                    <button type="submit" class="btn-submit" onclick="RegistrarEmpleado()">Guardar Empleado</button>
+                                   <br> <br>
+                                    <button type="button" class="btn-submit" onclick="ModificarEmpleado()">Modificar Empleado</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Listado de Personal</h2>
+                        <div class="table-container">
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Apellido</th>
+                                        <th>Nombre</th>
+                                        <th>CUIL</th>
+                                        <th>Telefono</th>
+                                        <th>Email</th>
+                                        <th>Fecha de Ingreso</th>
+                                        <th>Id Cargo</th>
+                                        <th>Id Area</th>
+                                        <th>Id Barrio</th>
+                                        <th>Id Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody1">
+
+                                </tbody>
+
+                            </table>
+                            <!-- <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Empleado</th>
+                                <th>CUIL</th>
+                                <th>Roles</th>
+                                <th>Legajo</th>
+                                <th>E-mail</th>
+                                <th>Área</th>
+                                <th>Cargo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>101</td>
+                                <td>Pérez, Juan</td>
+                                <td>20-12345678-9</td>
+                                <td>Administrador</td>
+                                <td>13890</td>
+                                <td>juanperez@gmail.com</td>
+                                <td>Gestión</td>
+                                <td>Encargado</td>
+                            <td>
+                                <button class="btn-edit">Editar</button>
+                                <button class="btn-delete">Eliminar</button>
+                            </td>
+                            </tr>
+                            </tbody>
+                            </table> -->
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer-liston">
+        <div class="logos-container">
+            <img src=assets/biocba_sinfondo.png alt="Ente BioCórdoba" class="logo-inst">
+            <img src=assets/espacios_verdes_sinfondo.png alt="Espacios Verdes" class="logo-inst">
+            <img src=assets/ambiente_sinfondo.png alt="Secretaría de Ambiente" class="logo-inst">
+            <img src=assets/escudo1_sinfondo.png alt="Municipalidad de Córdoba" class="logo-inst">
+            <img src=assets/escudo2_contexto_sinfondo.png alt="Córdoba Capital" class="logo-inst">
+        </div>
+    </footer>
+</body>
+
+<script>
+    // src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js";
+    // src="listado_empleado.js";
+
+
+    document.querySelectorAll('.dropdown').forEach(item => {
+        item.addEventListener('click', () => {
+            // Cerramos los otros antes de abrir este (opcional)
+            // document.querySelectorAll('.dropdown').forEach(el => el.classList.remove('active'));
+
+            item.classList.toggle('active');
+        });
+    });
+
+    document.getElementById('toggleForm').addEventListener('click', function () {
+        this.parentElement.classList.toggle('active');
+    });
+</script>
+
+</html>
