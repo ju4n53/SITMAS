@@ -21,11 +21,11 @@
 
     <div class="main-layout">
         
-        <aside class="sidebar-vertical">
+         <aside class="sidebar-vertical">
             <ul class="nav-list">
                 <li><a href="#">INICIO</a></li>
-                
-                <li class="dropdown">
+
+                <li class="dropdown" id="sidebar-empleados">
                     <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE PERSONAL</a>
                     <div class="dropdown-content">
                         <a href="cargaempleados.html">Empleados</a>
@@ -34,25 +34,25 @@
                     </div>
                 </li>
 
-                <li class="dropdown">
+                <li class="dropdown" id="sidebar-logistica">
                     <a href="javascript:void(0)" class="dropbtn">GESTIÓN LOGÍSTICA</a>
                     <div class="dropdown-content">
                         <a href="#">Vehículos</a>
                         <a href="#">Hojas de ruta</a>
                     </div>
                 </li>
-                     <li class="dropdown">
+                <li class="dropdown" id="sidebar-trazabilidad">
                     <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE TRAZABILIDAD</a>
                     <div class="dropdown-content">
                         <a href="#">Ingreso de material</a>
                         <a href="#">Clasificación</a>
                     </div>
                 </li>
-                
-                <li><a href="#">CONFIGURACIÓN</a></li>
+
+                <li id="sidebar-configuracion"><a href="#">CONFIGURACIÓN</a></li>
             </ul>
         </aside>
-
+        
         <div class="main-body-content">
             <nav class="navbar">
                 <button class="btn-nav btn-verde">Acción 1</button>
@@ -115,6 +115,52 @@
 </body>
 
 <script>
+
+        //Permisos y sesiones
+    // Simulación de usuario logueado (puedes traerlo de localStorage)
+    const usuarioSesion = {
+        nombre: "Juan Perez",
+        rol: "Administrador" // Valores posibles: 'Administrador', 'Encargado', 'Operario', 'Gerente'
+    };
+
+    const configPermisos = {
+        'Operario': {
+            botonesVisibles: ['accion1', 'accion2', 'accion3'], // IDs de los botones
+            sidebarVisibles: ['sidebar-logistica', 'sidebar-trazabilidad'] // IDs del menú
+        },
+        'Administrador': {
+            botonesVisibles: ['accion1', 'accion2', 'accion3', 'accion4', 'accion5', 'accion6'],
+            sidebarVisibles: ['sidebar-empleados', 'sidebar-logistica', 'sidebar-trazabilidad', 'sidebar-configuracion']
+        }
+        // Puedes agregar más roles aquí fácilmente
+    };
+
+    // 2. Función para aplicar la visibilidad
+    function aplicarPermisos(rolUsuario) {
+        const permisos = configPermisos[rolUsuario];
+
+        if (!permisos) return; // Si el rol no existe, no hacemos nada
+
+        // Ocultar todo primero para limpiar
+        document.querySelectorAll('.btn-nav').forEach(btn => btn.style.display = 'none');
+        document.querySelectorAll('.nav-list li').forEach(item => item.style.display = 'none');
+
+        // Mostrar solo lo permitido
+        permisos.botonesVisibles.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'inline-block';
+        });
+
+        permisos.sidebarVisibles.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'block';
+        });
+    }
+
+    aplicarPermisos(usuarioSesion.rol)
+
+
+
     document.querySelectorAll('.dropdown').forEach(item => {
     item.addEventListener('click', () => {
         // Cerramos los otros antes de abrir este (opcional)

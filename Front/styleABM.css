@@ -73,11 +73,14 @@ body {
 }
 
 .nav-list a, .dropbtn {
-    display: block;
+    display: flex;            /* Activamos flexbox */
+    justify-content: space-between; /* Empuja el texto y la flecha a los extremos */
+    align-items: center;      /* Alineación vertical centrada */
     color: white;
-    padding: 15px 20px;
+    padding: 12px 20px;       /* Ajustamos padding para mayor delicadeza */
     text-decoration: none;
-    font-weight: bold;
+    font-size: 0.9rem;        /* Tamaño más pequeño y legible */
+    font-weight: 400;         /* Peso menor para un look más limpio */
     transition: background 0.3s;
     cursor: pointer;
 }
@@ -101,8 +104,9 @@ body {
 }
 
 .dropbtn::after {
-    content: " ▼";
-    display: inline-block;
+    content: "▼";
+    font-size: 0.7rem;        /* Flecha más pequeña */
+    margin-left: 10px;
     transition: transform 0.3s;
 }
 
