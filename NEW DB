@@ -1,0 +1,587 @@
+USE master;
+GO
+
+-- 🔴 ELIMINAR BASE SI EXISTE
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'GestionProyecto')
+BEGIN
+    ALTER DATABASE GestionProyecto SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE GestionProyecto;
+END
+GO
+
+-- 🟢 CREAR BASE
+CREATE DATABASE GestionProyecto;
+GO
+
+USE GestionProyecto;
+GO
+
+--------------------------------------------------
+-- 📌 TABLAS MAESTRAS
+--------------------------------------------------
+
+CREATE TABLE Estado_Empleado (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Area (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Cargo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Localidad (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Barrio (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Id_Localidad INT,
+    FOREIGN KEY (Id_Localidad) REFERENCES Localidad(Id)
+);
+
+--------------------------------------------------
+-- 👤 EMPLEADO
+--------------------------------------------------
+
+CREATE TABLE Empleado (
+    Id INT IDENTITY PRIMARY KEY,
+    Apellido VARCHAR(100),
+    Nombre VARCHAR(100),
+    Cuil VARCHAR(20),
+    Fecha_Nacimiento DATE,
+    Calle VARCHAR(100),
+    Numero INT,
+    Telefono VARCHAR(20),
+    Email VARCHAR(100),
+    Fecha_Ingreso DATE,
+    Id_Area INT,
+    Id_Cargo INT,
+    Id_Barrio INT,
+    Id_Estado_Empleado INT,
+    FOREIGN KEY (Id_Area) REFERENCES Area(Id),
+    FOREIGN KEY (Id_Cargo) REFERENCES Cargo(Id),
+    FOREIGN KEY (Id_Barrio) REFERENCES Barrio(Id),
+    FOREIGN KEY (Id_Estado_Empleado) REFERENCES Estado_Empleado(Id)
+);
+
+--------------------------------------------------
+-- 👥 USUARIOS
+--------------------------------------------------
+
+CREATE TABLE Estado_Usuario (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Usuario (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre_Usuario VARCHAR(100),
+    Password VARCHAR(100),
+    Id_Empleado INT,
+    Id_Estado_Usuario INT,
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Estado_Usuario) REFERENCES Estado_Usuario(Id)
+);
+
+CREATE TABLE Rol (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Usuario_Rol (
+    Id_Usuario INT,
+    Id_Rol INT,
+    PRIMARY KEY (Id_Usuario, Id_Rol),
+    FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id),
+    FOREIGN KEY (Id_Rol) REFERENCES Rol(Id)
+);
+
+--------------------------------------------------
+-- 🕒 ASISTENCIA
+--------------------------------------------------
+
+CREATE TABLE Turno_Laboral (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Hora_Entrada TIME,
+    Hora_Salida TIME
+);
+
+CREATE TABLE Asistencia (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Hora_Entrada_Real TIME,
+    Hora_Salida_Real TIME,
+    Id_Empleado INT,
+    Id_Turno INT,
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Turno) REFERENCES Turno_Laboral(Id)
+);
+
+--------------------------------------------------
+-- 🚛 LOGÍSTICA
+--------------------------------------------------
+
+CREATE TABLE Marca (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Modelo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Id_Marca INT,
+    FOREIGN KEY (Id_Marca) REFERENCES Marca(Id)
+);
+
+CREATE TABLE Tipo_Vehiculo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Vehiculo (
+    Id INT IDENTITY PRIMARY KEY,
+    Patente VARCHAR(20),
+    Id_Modelo INT,
+    Id_Tipo_Vehiculo INT,
+    FOREIGN KEY (Id_Modelo) REFERENCES Modelo(Id),
+    FOREIGN KEY (Id_Tipo_Vehiculo) REFERENCES Tipo_Vehiculo(Id)
+);
+
+--------------------------------------------------
+-- ♻️ MATERIALES
+--------------------------------------------------
+
+CREATE TABLE Origen (
+    Id INT IDENTITY PRIMARY KEY,
+    Descripcion VARCHAR(100)
+);
+
+CREATE TABLE Tipo_Flujo_Residuo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Tipo_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Sub_Tipo_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Id_Tipo_Material INT,
+    FOREIGN KEY (Id_Tipo_Material) REFERENCES Tipo_Material(Id)
+);
+
+CREATE TABLE Estado_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Apto_Produccion BIT
+);
+
+CREATE TABLE Ingreso_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Id_Origen INT,
+    Id_Empleado INT,
+    Id_Tipo_Flujo INT,
+    FOREIGN KEY (Id_Origen) REFERENCES Origen(Id),
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Tipo_Flujo) REFERENCES Tipo_Flujo_Residuo(Id)
+);
+
+CREATE TABLE Detalle_Ingreso (
+    Id INT IDENTITY PRIMARY KEY,
+    Id_Ingreso INT,
+    Id_SubTipoMaterial INT,
+    Peso DECIMAL(10,2),
+    Observaciones VARCHAR(200),
+    FOREIGN KEY (Id_Ingreso) REFERENCES Ingreso_Material(Id),
+    FOREIGN KEY (Id_SubTipoMaterial) REFERENCES Sub_Tipo_Material(Id)
+);
+
+CREATE TABLE Material_Clasificado (
+    Id INT IDENTITY PRIMARY KEY,
+    Peso DECIMAL(10,2),
+    Id_Empleado INT,
+    Id_Detalle_Ingreso INT,
+    Id_Estado_Material INT,
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Detalle_Ingreso) REFERENCES Detalle_Ingreso(Id),
+    FOREIGN KEY (Id_Estado_Material) REFERENCES Estado_Material(Id)
+);
+
+CREATE TABLE Tipo_Movimiento (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Movimiento_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Peso DECIMAL(10,2),
+    Id_Origen INT,
+    Id_Empleado INT,
+    Id_Material_Clasificado INT,
+    Id_Tipo_Movimiento INT,
+    FOREIGN KEY (Id_Origen) REFERENCES Origen(Id),
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Material_Clasificado) REFERENCES Material_Clasificado(Id),
+    FOREIGN KEY (Id_Tipo_Movimiento) REFERENCES Tipo_Movimiento(Id)
+);
+
+--------------------------------------------------
+-- ⚙️ STORED PROCEDURES
+--------------------------------------------------
+
+GO
+
+CREATE PROCEDURE sp_Alta_Empleado
+    @Apellido VARCHAR(100),
+    @Nombre VARCHAR(100),
+    @Cuil VARCHAR(20)
+AS
+BEGIN
+    INSERT INTO Empleado (Apellido, Nombre, Cuil)
+    VALUES (@Apellido, @Nombre, @Cuil)
+END
+GO
+
+CREATE PROCEDURE sp_Registrar_Asistencia
+    @Id_Empleado INT,
+    @Id_Turno INT,
+    @Fecha DATE,
+    @HoraEntrada TIME,
+    @HoraSalida TIME
+AS
+BEGIN
+    INSERT INTO Asistencia
+    VALUES (@Fecha, @HoraEntrada, @HoraSalida, @Id_Empleado, @Id_Turno)
+END
+GO
+
+CREATE PROCEDURE sp_Registrar_Ingreso
+    @Fecha DATE,
+    @Id_Origen INT,
+    @Id_Empleado INT,
+    @Id_TipoFlujo INT
+AS
+BEGIN
+    INSERT INTO Ingreso_Material
+    VALUES (@Fecha, @Id_Origen, @Id_Empleado, @Id_TipoFlujo)
+END
+GO
+
+CREATE PROCEDURE sp_Registrar_Movimiento
+    @Fecha DATE,
+    @IdTipo INT,
+    @IdMaterial INT,
+    @Peso DECIMAL(10,2)
+AS
+BEGIN
+    INSERT INTO Movimiento_Material
+    (Fecha, Id_Tipo_Movimiento, Id_Material_Clasificado, Peso)
+    VALUES (@Fecha, @IdTipo, @IdMaterial, @Peso)
+END
+GOUSE master;
+GO
+
+-- 🔴 ELIMINAR BASE SI EXISTE
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'GestionProyecto')
+BEGIN
+    ALTER DATABASE GestionProyecto SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE GestionProyecto;
+END
+GO
+
+-- 🟢 CREAR BASE
+CREATE DATABASE GestionProyecto;
+GO
+
+USE GestionProyecto;
+GO
+
+--------------------------------------------------
+-- 📌 TABLAS MAESTRAS
+--------------------------------------------------
+
+CREATE TABLE Estado_Empleado (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Area (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Cargo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Localidad (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Barrio (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Id_Localidad INT,
+    FOREIGN KEY (Id_Localidad) REFERENCES Localidad(Id)
+);
+
+--------------------------------------------------
+-- 👤 EMPLEADO
+--------------------------------------------------
+
+CREATE TABLE Empleado (
+    Id INT IDENTITY PRIMARY KEY,
+    Apellido VARCHAR(100),
+    Nombre VARCHAR(100),
+    Cuil VARCHAR(20),
+    Fecha_Nacimiento DATE,
+    Calle VARCHAR(100),
+    Numero INT,
+    Telefono VARCHAR(20),
+    Email VARCHAR(100),
+    Fecha_Ingreso DATE,
+    Id_Area INT,
+    Id_Cargo INT,
+    Id_Barrio INT,
+    Id_Estado_Empleado INT,
+    FOREIGN KEY (Id_Area) REFERENCES Area(Id),
+    FOREIGN KEY (Id_Cargo) REFERENCES Cargo(Id),
+    FOREIGN KEY (Id_Barrio) REFERENCES Barrio(Id),
+    FOREIGN KEY (Id_Estado_Empleado) REFERENCES Estado_Empleado(Id)
+);
+
+--------------------------------------------------
+-- 👥 USUARIOS
+--------------------------------------------------
+
+CREATE TABLE Estado_Usuario (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Usuario (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre_Usuario VARCHAR(100),
+    Password VARCHAR(100),
+    Id_Empleado INT,
+    Id_Estado_Usuario INT,
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Estado_Usuario) REFERENCES Estado_Usuario(Id)
+);
+
+CREATE TABLE Rol (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Usuario_Rol (
+    Id_Usuario INT,
+    Id_Rol INT,
+    PRIMARY KEY (Id_Usuario, Id_Rol),
+    FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id),
+    FOREIGN KEY (Id_Rol) REFERENCES Rol(Id)
+);
+
+--------------------------------------------------
+-- 🕒 ASISTENCIA
+--------------------------------------------------
+
+CREATE TABLE Turno_Laboral (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Hora_Entrada TIME,
+    Hora_Salida TIME
+);
+
+CREATE TABLE Asistencia (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Hora_Entrada_Real TIME,
+    Hora_Salida_Real TIME,
+    Id_Empleado INT,
+    Id_Turno INT,
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Turno) REFERENCES Turno_Laboral(Id)
+);
+
+--------------------------------------------------
+-- 🚛 LOGÍSTICA
+--------------------------------------------------
+
+CREATE TABLE Marca (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Modelo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Id_Marca INT,
+    FOREIGN KEY (Id_Marca) REFERENCES Marca(Id)
+);
+
+CREATE TABLE Tipo_Vehiculo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Vehiculo (
+    Id INT IDENTITY PRIMARY KEY,
+    Patente VARCHAR(20),
+    Id_Modelo INT,
+    Id_Tipo_Vehiculo INT,
+    FOREIGN KEY (Id_Modelo) REFERENCES Modelo(Id),
+    FOREIGN KEY (Id_Tipo_Vehiculo) REFERENCES Tipo_Vehiculo(Id)
+);
+
+--------------------------------------------------
+-- ♻️ MATERIALES
+--------------------------------------------------
+
+CREATE TABLE Origen (
+    Id INT IDENTITY PRIMARY KEY,
+    Descripcion VARCHAR(100)
+);
+
+CREATE TABLE Tipo_Flujo_Residuo (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Tipo_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(100)
+);
+
+CREATE TABLE Sub_Tipo_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Id_Tipo_Material INT,
+    FOREIGN KEY (Id_Tipo_Material) REFERENCES Tipo_Material(Id)
+);
+
+CREATE TABLE Estado_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Apto_Produccion BIT
+);
+
+CREATE TABLE Ingreso_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Id_Origen INT,
+    Id_Empleado INT,
+    Id_Tipo_Flujo INT,
+    FOREIGN KEY (Id_Origen) REFERENCES Origen(Id),
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Tipo_Flujo) REFERENCES Tipo_Flujo_Residuo(Id)
+);
+
+CREATE TABLE Detalle_Ingreso (
+    Id INT IDENTITY PRIMARY KEY,
+    Id_Ingreso INT,
+    Id_SubTipoMaterial INT,
+    Peso DECIMAL(10,2),
+    Observaciones VARCHAR(200),
+    FOREIGN KEY (Id_Ingreso) REFERENCES Ingreso_Material(Id),
+    FOREIGN KEY (Id_SubTipoMaterial) REFERENCES Sub_Tipo_Material(Id)
+);
+
+CREATE TABLE Material_Clasificado (
+    Id INT IDENTITY PRIMARY KEY,
+    Peso DECIMAL(10,2),
+    Id_Empleado INT,
+    Id_Detalle_Ingreso INT,
+    Id_Estado_Material INT,
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Detalle_Ingreso) REFERENCES Detalle_Ingreso(Id),
+    FOREIGN KEY (Id_Estado_Material) REFERENCES Estado_Material(Id)
+);
+
+CREATE TABLE Tipo_Movimiento (
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Movimiento_Material (
+    Id INT IDENTITY PRIMARY KEY,
+    Fecha DATE,
+    Peso DECIMAL(10,2),
+    Id_Origen INT,
+    Id_Empleado INT,
+    Id_Material_Clasificado INT,
+    Id_Tipo_Movimiento INT,
+    FOREIGN KEY (Id_Origen) REFERENCES Origen(Id),
+    FOREIGN KEY (Id_Empleado) REFERENCES Empleado(Id),
+    FOREIGN KEY (Id_Material_Clasificado) REFERENCES Material_Clasificado(Id),
+    FOREIGN KEY (Id_Tipo_Movimiento) REFERENCES Tipo_Movimiento(Id)
+);
+
+--------------------------------------------------
+-- ⚙️ STORED PROCEDURES
+--------------------------------------------------
+
+GO
+
+CREATE PROCEDURE sp_Alta_Empleado
+    @Apellido VARCHAR(100),
+    @Nombre VARCHAR(100),
+    @Cuil VARCHAR(20)
+AS
+BEGIN
+    INSERT INTO Empleado (Apellido, Nombre, Cuil)
+    VALUES (@Apellido, @Nombre, @Cuil)
+END
+GO
+
+CREATE PROCEDURE sp_Registrar_Asistencia
+    @Id_Empleado INT,
+    @Id_Turno INT,
+    @Fecha DATE,
+    @HoraEntrada TIME,
+    @HoraSalida TIME
+AS
+BEGIN
+    INSERT INTO Asistencia
+    VALUES (@Fecha, @HoraEntrada, @HoraSalida, @Id_Empleado, @Id_Turno)
+END
+GO
+
+CREATE PROCEDURE sp_Registrar_Ingreso
+    @Fecha DATE,
+    @Id_Origen INT,
+    @Id_Empleado INT,
+    @Id_TipoFlujo INT
+AS
+BEGIN
+    INSERT INTO Ingreso_Material
+    VALUES (@Fecha, @Id_Origen, @Id_Empleado, @Id_TipoFlujo)
+END
+GO
+
+CREATE PROCEDURE sp_Registrar_Movimiento
+    @Fecha DATE,
+    @IdTipo INT,
+    @IdMaterial INT,
+    @Peso DECIMAL(10,2)
+AS
+BEGIN
+    INSERT INTO Movimiento_Material
+    (Fecha, Id_Tipo_Movimiento, Id_Material_Clasificado, Peso)
+    VALUES (@Fecha, @IdTipo, @IdMaterial, @Peso)
+END
+GO
