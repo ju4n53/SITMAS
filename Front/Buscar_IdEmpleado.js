@@ -25,6 +25,11 @@ function getIdEmpleado(id) {
             const Id_Area = document.getElementById("id_area")
             const Id_Barrio = document.getElementById("id_barrio")
             const Id_Estado = document.getElementById("id_estado")
+            const Calle = document.getElementById("calle")
+            const Numero = document.getElementById("numero")
+            const Piso = document.getElementById("piso")
+            const Dpto = document.getElementById("dpto")
+            
 
             Apellido.value = data.Apellido
             Nombre.value = data.Nombre
@@ -36,6 +41,10 @@ function getIdEmpleado(id) {
             Id_Area.value = data.Id_Area
             Id_Barrio.value = data.Id_Barrio
             Id_Estado.value = data.Id_Estado_Empleado
+            Calle.value = data.Calle
+            Numero.value = data.Numero
+            Piso.value = data.Piso
+            Dpto.value = data.Dpto
 
         },
         error: function () {

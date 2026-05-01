@@ -57,11 +57,15 @@ namespace API_SITMAS.Controllers
             oEmpleado.Cuil = value.Cuil;
             oEmpleado.Telefono = value.Telefono;
             oEmpleado.Email = value.Email;
-            oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;
+            oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;           
             oEmpleado.Id_Cargo = value.Id_Cargo;
             oEmpleado.Id_Area = value.Id_Area;
             oEmpleado.Id_Barrio = value.Id_Barrio;
             oEmpleado.Id_Estado_Empleado = value.Id_Estado_Empleado;
+            oEmpleado.Calle = value.Calle;
+            oEmpleado.Numero = value.Numero;
+            oEmpleado.Piso = value.Piso;
+            oEmpleado.Dpto = value.Dpto;
 
             oEmpleado.Insertar();
         }
@@ -79,11 +83,15 @@ namespace API_SITMAS.Controllers
             oEmpleado.Cuil = value.Cuil;
             oEmpleado.Telefono = value.Telefono;
             oEmpleado.Email = value.Email;
-            oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;
+            oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;            
             oEmpleado.Id_Cargo = value.Id_Cargo;
             oEmpleado.Id_Area = value.Id_Area;
             oEmpleado.Id_Barrio = value.Id_Barrio;
             oEmpleado.Id_Estado_Empleado = value.Id_Estado_Empleado;
+            oEmpleado.Calle = value.Calle;
+            oEmpleado.Numero = value.Numero;
+            oEmpleado.Piso = value.Piso;
+            oEmpleado.Dpto = value.Dpto;
 
             oEmpleado.Modificar();
 

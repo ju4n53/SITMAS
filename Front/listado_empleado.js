@@ -1,5 +1,5 @@
 
-//GetVistaMateria()
+GetVistaMateria()
 
 
 GetAllEmpleados()
@@ -48,34 +48,42 @@ function GetAllEmpleados() {
 
 
 
-// function GetVistaMateria() {
+function GetVistaMateria() {
 
-//     $.ajax({
-//         type: "GET",
-//         dataType: "json",
-//         url: "http://localhost:57490/api/Materias/ListarVista",
-//         success: function (data) {
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "https://localhost:44325/api/Empleado/ListarVista",
+        success: function (data) {
     
-//             const tbody = document.getElementById("tbody3");
+            const tbody = document.getElementById("tbody3");
 
-//             data.forEach(o => {
-//                 let _tr = `<tr>
-//                                 <td>${o.IdMateria}</td>
-//                                 <td>${o.NombreMateria}</td>
-//                                 <td>${o.Carrera}</td>
+            data.forEach(o => {
+                let _tr = `<tr>
+                                <td>${o.Id}</td>
+                                        <td>${o.Apellido}</td>
+                                        <td>${o.Nombre}</td>
+                                        <td>${o.Cuil}</td>
+                                        <td>${o.Telefono}</td>
+                                        <td>${o.Email}</td>
+                                        <td>${o.Fecha_Ingreso}</td>
+                                        <td>${o.Cargo}</td>
+                                        <td>${o.Area}</td>
+                                        <td>${o.Barrio}</td>
+                                        <td>${o.EstadoEmpleado}</td>
                                 
-//                             </tr>`
+                            </tr>`
 
-//                 tbody.innerHTML += _tr;
-//             });
+                tbody.innerHTML += _tr;
+            });
 
 
-//         },
-//         error: function (error) {
+        },
+        error: function (error) {
 
-//             console.log(error)
-//         }
+            console.log(error)
+        }
 
-//     })
+    })
 
-// }
+}

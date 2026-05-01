@@ -28,11 +28,19 @@ namespace API_SITMAS.Models
         public string Telefono { get; set; }
         public string Email { get; set; }
         public DateTime Fecha_Ingreso { get; set; }
+        public string Calle { get; set; }
+        public string Numero { get; set; }
+        public string Piso { get; set; }
+        public string Dpto { get; set; }
         public int Id_Cargo { get; set; }
+        public string Cargo { get; set; }
         public int Id_Area { get; set; }
+        public string Area { get; set; }
         public int Id_Barrio { get; set; }
-
+        public string Barrio { get; set; }
         public int Id_Estado_Empleado { get; set; }
+        public string EstadoEmpleado { get; set; }
+
 
 
         #endregion
@@ -126,6 +134,10 @@ namespace API_SITMAS.Models
             sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
             sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
             sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
+            sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
+            sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
+            sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
+            sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
 
             sqlCnn.Open();
 
@@ -161,11 +173,15 @@ namespace API_SITMAS.Models
             sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
             sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
             sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
-            sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;
+            sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;            
             sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
             sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
             sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
             sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
+            sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
+            sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
+            sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
+            sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
 
 
             sqlCnn.Open();
