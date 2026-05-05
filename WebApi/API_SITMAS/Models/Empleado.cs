@@ -4,6 +4,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Configuration;
+
 
 
 namespace API_SITMAS.Models
@@ -14,7 +16,11 @@ namespace API_SITMAS.Models
 
         #region Atributos
 
-        string conectionString = @"Data Source=DESKTOP-N824T94;Initial Catalog=Gestion_SITMAS; Integrated Security= True ";
+        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
+        private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
+
+
+        //string conectionString = @"Data Source=DESKTOP-N824T94;Initial Catalog=Gestion_SITMAS; Integrated Security= True ";
 
         #endregion
 
