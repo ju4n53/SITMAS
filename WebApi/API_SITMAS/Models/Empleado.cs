@@ -82,8 +82,6 @@ namespace API_SITMAS.Models
 
             return ds.Tables[0];
 
-
-
         }
 
         public DataTable SelectId()
@@ -113,9 +111,7 @@ namespace API_SITMAS.Models
 
             return ds.Tables[0];
 
-
         }
-
 
         public void Insertar()
         {
