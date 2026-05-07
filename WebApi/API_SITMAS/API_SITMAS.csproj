@@ -185,9 +185,13 @@
     <Compile Include="Controllers\AreaController.cs" />
     <Compile Include="Controllers\BarrioController.cs" />
     <Compile Include="Controllers\CargoController.cs" />
+    <Compile Include="Controllers\DetalleIngresoController.cs" />
     <Compile Include="Controllers\EmpleadoController.cs" />
     <Compile Include="Controllers\EstadoEmpleadoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IngresoMaterialController.cs" />
+    <Compile Include="Controllers\MaterialClasificadoController.cs" />
+    <Compile Include="Controllers\TrazabilidadController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -196,8 +200,12 @@
     <Compile Include="Models\Areas.cs" />
     <Compile Include="Models\Barrios.cs" />
     <Compile Include="Models\Cargos.cs" />
+    <Compile Include="Models\DetalleIngreso.cs" />
     <Compile Include="Models\Empleado.cs" />
     <Compile Include="Models\Estado_Empleado.cs" />
+    <Compile Include="Models\IngresoMaterial.cs" />
+    <Compile Include="Models\MaterialClasificado.cs" />
+    <Compile Include="Models\TrazabilidadMaterial.cs" />
     <Compile Include="Models\Usuarios.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
