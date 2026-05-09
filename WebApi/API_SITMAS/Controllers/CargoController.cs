@@ -28,24 +28,71 @@ namespace API_SITMAS.Controllers
         }
 
         // GET: api/Cargo/5
-        public string Get(int id)
-        {
-            return "value";
-        }
+        //[HttpGet]
+
+        //public Empleado ListarPorId(int id)
+        //{
+        //    Empleado oEmpleado = new Empleado();
+        //    oEmpleado.Id = id;
+
+        //    DataTable dt = oEmpleado.SelectId();
+
+        //    var ListaJsom = JsonConvert.SerializeObject(dt);
+
+        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
+
+        //    return obj;
+
+        //}
 
         // POST: api/Cargo
-        public void Post([FromBody]string value)
+        [HttpPost]
+        public void Insertar([FromBody] Cargos value)
         {
+            Cargos oCargo = new Cargos();
+            oCargo.Cargo = value.Cargo;
+
+            oCargo.Insertar();
         }
 
         // PUT: api/Cargo/5
-        public void Put(int id, [FromBody]string value)
+        [HttpPut]
+        public void Modificar(int id, [FromBody] Cargos value)
         {
+
+            Cargos oCargo = new Cargos();
+            oCargo.Id = id;
+            oCargo.Cargo = value.Cargo;
+
+            oCargo.Modificar();
+
         }
 
         // DELETE: api/Cargo/5
-        public void Delete(int id)
+        [HttpDelete]
+
+        public void Borrar(int id)
         {
+
+            Cargos oCargo = new Cargos();
+            oCargo.Id = id;
+
+            oCargo.Borrar();
+
         }
+
+        //[HttpGet]
+        //public List<Empleado> ListarVista()
+        //{
+        //    Empleado oEmpleado = new Empleado();
+
+        //    var dt = oEmpleado.VistalistadoEmpleados();
+
+        //    var ListaJsom = JsonConvert.SerializeObject(dt);
+
+        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
+        //    return Lista;
+
+        //}
     }
 }

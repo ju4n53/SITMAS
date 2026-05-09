@@ -36,7 +36,6 @@ namespace API_SITMAS.Models
             SqlConnection sqlCnn = new SqlConnection();
             sqlCnn.ConnectionString = conectionString;
 
-
             sqlCnn.Open();
 
             SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
@@ -48,10 +47,7 @@ namespace API_SITMAS.Models
             da.SelectCommand = sqlCom;
             da.Fill(ds);
 
-
-
             sqlCnn.Close();
-
 
             return ds.Tables[0];
 
@@ -62,7 +58,6 @@ namespace API_SITMAS.Models
 
 
         //    string sqlSentencia = "sp_VerEmpleadoId";
-
 
         //    SqlConnection sqlCnn = new SqlConnection();
         //    sqlCnn.ConnectionString = conectionString;
@@ -91,7 +86,6 @@ namespace API_SITMAS.Models
 
             string sqlSentencia = "sp_InsertarArea";
 
-
             SqlConnection sqlCnn = new SqlConnection();
             sqlCnn.ConnectionString = conectionString;
 
@@ -114,7 +108,6 @@ namespace API_SITMAS.Models
 
 
             string sqlSentencia = "sp_ActualizarArea";
-
 
             SqlConnection sqlCnn = new SqlConnection();
             sqlCnn.ConnectionString = conectionString;
@@ -141,11 +134,8 @@ namespace API_SITMAS.Models
 
             string sqlSentencia = "sp_EliminarArea";
 
-
             SqlConnection sqlCnn = new SqlConnection();
             sqlCnn.ConnectionString = conectionString;
-
-
 
 
             SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
@@ -153,12 +143,9 @@ namespace API_SITMAS.Models
 
             sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
 
-
             sqlCnn.Open();
 
-
             var res = sqlCom.ExecuteNonQuery();
-
 
             sqlCnn.Close();
 
@@ -169,13 +156,10 @@ namespace API_SITMAS.Models
         //public DataTable VistalistadoEmpleados()
         //{
 
-
         //    string sqlSentencia = "sp_ListarEmpleadosDetallados";
-
 
         //    SqlConnection sqlCnn = new SqlConnection();
         //    sqlCnn.ConnectionString = conectionString;
-
 
         //    sqlCnn.Open();
 
@@ -188,14 +172,9 @@ namespace API_SITMAS.Models
         //    da.SelectCommand = sqlCom;
         //    da.Fill(ds);
 
-
-
         //    sqlCnn.Close();
 
-
         //    return ds.Tables[0];
-
-
 
         //}
 
