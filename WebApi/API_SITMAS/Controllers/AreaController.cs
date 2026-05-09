@@ -28,24 +28,72 @@ namespace API_SITMAS.Controllers
         }
 
         // GET: api/Area/5
-        public string Get(int id)
-        {
-            return "value";
-        }
+        //[HttpGet]
+
+        //public Empleado ListarPorId(int id)
+        //{
+        //    Empleado oEmpleado = new Empleado();
+        //    oEmpleado.Id = id;
+
+        //    DataTable dt = oEmpleado.SelectId();
+
+        //    var ListaJsom = JsonConvert.SerializeObject(dt);
+
+        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
+
+        //    return obj;
+
+        //}
 
         // POST: api/Area
-        public void Post([FromBody]string value)
+        [HttpPost]
+        public void Insertar([FromBody] AreasTrabajo value)
         {
+            AreasTrabajo oArea = new AreasTrabajo();
+            oArea.Area = value.Area;
+           
+            oArea.Insertar();
         }
 
         // PUT: api/Area/5
-        public void Put(int id, [FromBody]string value)
+        [HttpPut]
+        public void Modificar(int id, [FromBody] AreasTrabajo value)
         {
+
+            AreasTrabajo oArea = new AreasTrabajo();
+            oArea.Id = id;
+            oArea.Area = value.Area;
+
+            oArea.Modificar();
+
         }
 
         // DELETE: api/Area/5
-        public void Delete(int id)
+        [HttpDelete]
+
+        public void Borrar(int id)
         {
+
+            AreasTrabajo oArea = new AreasTrabajo();
+            oArea.Id = id;
+
+            oArea.Borrar();
+
         }
+
+        //[HttpGet]
+        //public List<Empleado> ListarVista()
+        //{
+        //    Empleado oEmpleado = new Empleado();
+
+        //    var dt = oEmpleado.VistalistadoEmpleados();
+
+        //    var ListaJsom = JsonConvert.SerializeObject(dt);
+
+        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
+        //    return Lista;
+
+        //}
+
     }
 }
