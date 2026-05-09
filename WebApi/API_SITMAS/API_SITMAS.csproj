@@ -191,6 +191,7 @@
     <Compile Include="Controllers\EstadoEmpleadoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IngresoMaterialController.cs" />
+    <Compile Include="Controllers\MarcaVehController.cs" />
     <Compile Include="Controllers\MaterialClasificadoController.cs" />
     <Compile Include="Controllers\OrigenController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -206,7 +207,9 @@
     <Compile Include="Models\Empleado.cs" />
     <Compile Include="Models\Estado_Empleado.cs" />
     <Compile Include="Models\IngresoMaterial.cs" />
+    <Compile Include="Models\MarcaVeh.cs" />
     <Compile Include="Models\MaterialClasificado.cs" />
+    <Compile Include="Models\Origen.cs" />
     <Compile Include="Models\Usuarios.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

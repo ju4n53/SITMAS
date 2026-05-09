@@ -72,11 +72,19 @@ namespace API_SITMAS.Controllers
 
             oUsuario.Modificar();
         }
-       
+
 
         // DELETE: api/Usuario/5
-        public void Delete(int id)
-        {
-        }
+        //[HttpDelete]
+
+        //public void Borrar(int id)
+        //{
+
+        //    Usuarios oUsuario = new Usuarios();
+        //    oUsuario.Id = id;
+
+        //    oUsuario.Borrar();
+
+        //}
     }
 }
