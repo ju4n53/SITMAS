@@ -1,0 +1,267 @@
+/* Importamos la fuente Maven Pro */
+@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap');
+
+:root {
+    --emec-celeste: #0099cc;
+    --emec-verde: #76bc21;
+    --emec-amarillo: #febd11;
+    --emec-naranja: #f58220;
+    --emec-rojo: #e03e2d;
+    --emec-violeta: #662d91;
+    --emec-azul: #0054a6;
+    --emec-verde-oscuro: #017c26;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Maven Pro', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Gradiente estático según tu paleta */
+    background: var(--emec-verde);
+    backdrop-filter: 30px;
+    background-attachment: fixed;
+}
+
+/* Header principal */
+.main-header {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    color: white;
+    padding: 15px;
+    display: flex;
+    text-align: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    height: 35px;
+}
+
+.nombre-sistema {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Navbar */
+.navbar {
+    padding: 10px 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.btn-nav {
+    border: none;
+    padding: 12px 25px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: transform 0.2s, background 0.3s;
+    /* Usamos el violeta para los botones como pediste */
+    background-color: var(--emec-violeta);
+}
+
+.btn-nav:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+}
+
+/* Listón de Usuario */
+.info-bar {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 8px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--emec-azul);
+    font-weight: bold;
+}
+
+.info-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.role-icon {
+    width: 30px;
+    height: 30px;
+    background-color: var(--emec-celeste);
+    border-radius: 4px;
+}
+
+/* Contenido y Formularios */
+.content {
+    flex: 1; /* Esto hace que el contenido ocupe el espacio central */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+}
+
+.form-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+form {
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.form-azul { 
+    background: rgba(0, 84, 166, 0.85); 
+    color: white;
+    border: 2px solid var(--emec-celeste);
+}
+
+.form-amarillo { 
+    background: rgba(254, 189, 17, 0.85); 
+    color: #333;
+    border: 2px solid white;
+}
+
+.grid-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+.form-buttons button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    background: white;
+    color: var(--emec-azul);
+}
+
+/* Footer Estilo Listón */
+.footer-liston {
+    background-color: rgba(255, 255, 255, 0.7); 
+    backdrop-filter: blur(10px); 
+    padding: 20px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.logos-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo-inst {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Estructura Principal */
+.main-layout {
+    display: flex;
+    flex: 1; /* Ocupa el resto del alto disponible */
+}
+
+/* Sidebar Vertical */
+.sidebar-vertical {
+    width: 15%;
+    background-color: var(--emec-verde-oscuro);
+    min-height: 100%;
+    color: white;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-list li {
+    position: relative;
+}
+
+.nav-list a, .dropbtn {
+    display: flex;            /* Activamos flexbox */
+    justify-content: space-between; /* Empuja el texto y la flecha a los extremos */
+    align-items: center;      /* Alineación vertical centrada */
+    color: white;
+    padding: 12px 20px;       /* Ajustamos padding para mayor delicadeza */
+    text-decoration: none;
+    font-size: 0.9rem;        /* Tamaño más pequeño y legible */
+    font-weight: 400;         /* Peso menor para un look más limpio */
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.nav-list a:hover, .dropdown:hover .dropbtn {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos de Desplegables */
+.dropdown-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+    background-color: #015c1d; 
+}
+
+/* 2. Cuando el menú tiene la clase 'active', se despliega */
+/* Nota: Usaremos una clase .active que dispararemos con JS */
+.dropdown.active .dropdown-content {
+    max-height: 200px; /* Un valor mayor al contenido real */
+    opacity: 1;
+    padding-bottom: 10px; /* Espaciado extra al abrirse */
+}
+
+/* Opcional: Rotar la flechita cuando se abre */
+.dropdown.active .dropbtn::after {
+    transform: rotate(180deg);
+}
+
+.dropbtn::after {
+    content: "▼";
+    font-size: 0.7rem;        /* Flecha más pequeña */
+    margin-left: 10px;
+    transition: transform 0.3s;
+}
+
+/* Contenedor del cuerpo a la derecha */
+.main-body-content {
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajustes de los elementos existentes para que no se rompan */
+.navbar {
+    padding: 10px 20px;
+    justify-content: flex-start; /* Alineado a la izquierda del contenido */
+}

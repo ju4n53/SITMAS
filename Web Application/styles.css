@@ -1,0 +1,204 @@
+:root {
+    --emec-celeste: #0099cc;
+    --emec-verde: #76bc21;
+    --emec-amarillo: #febd11;
+    --emec-naranja: #f58220;
+    --emec-rojo: #e03e2d;
+    --emec-violeta: #662d91;
+    --emec-azul: #0054a6; /* Azul Institucional */
+}
+
+/*body{}*/
+
+.gradient-bg {
+    margin: 0;
+    padding: 0;
+    font-family: 'Maven Pro', sans-serif;
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(-70deg, #662d91, #0054a6, #0099cc, #76bc21, #017c26);
+    background-size: 400% 400%;
+    animation: fluirColor 6s ease infinite;
+}
+
+
+.navbar {
+    padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-text {
+    color: white;
+    font-size: 3.5rem;
+    font-family: 'Maven Pro', sans-serif;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+#form-login {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 5px; /* Espaciado entre elementos */
+}
+
+#form-login label {
+    color: white;
+    font-size: 0.9rem;
+    margin-left: 5px;
+}
+
+/* Estilo de los Inputs solicitado */
+#form-login input {
+    padding: 8px 12px;
+    border-radius: 10px; /* Leve redondeo */
+    border: 1px solid var(--emec-violeta);
+    margin-bottom: 2px;
+    font-family: 'Maven Pro', sans-serif;
+}
+
+/* Textos de error ocultos */
+.error-msg {
+    color: #ffcccc; /* Rojo claro para legibilidad sobre el fondo */
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+    display: none; /* Ocultos por defecto */
+}
+
+/* Botón Ingresar Azul Oscuro */
+.btn-ingresar {
+    background-color: var(--emec-violeta);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 5px;
+}
+
+.btn-ingresar:hover {
+    transform: scale(1.05);
+    background-color: #003d7a; /* Un tono más oscuro al pasar el mouse */
+}
+
+.content {
+    flex: 1;
+}
+
+.footer-liston {
+    background-color: rgba(255, 255, 255, 0.7); 
+    backdrop-filter: blur(10px); 
+    padding: 20px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.logo-inst {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logos-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+@keyframes fluirColor {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* =========================
+   Responsive - Tablet/Pantallas chicas
+   ========================= */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 16px 20px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .logo-text {
+        font-size: 2.4rem;
+        line-height: 1.1;
+    }
+
+    #form-login {
+        padding: 6px 0;
+    }
+
+    .logos-container {
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .logo-inst {
+        height: 42px;
+    }
+}
+
+/* =========================
+   Responsive - Smartphones
+   ========================= */
+@media (max-width: 480px) {
+    .navbar {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+
+    .logo-text {
+        font-size: clamp(1.7rem, 9vw, 2.3rem);
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    #form-login {
+        padding: 8px 0;
+        gap: 6px;
+    }
+
+    #form-login label {
+        font-size: 0.95rem;
+        margin-left: 8px;
+    }
+
+    #form-login input {
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .btn-ingresar {
+        width: 100%;
+        padding: 12px 18px;
+        border-radius: 22px;
+    }
+
+    .logos-container {
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 0 14px;
+    }
+
+    .logo-inst {
+        height: 38px;
+    }
+}
+

@@ -167,39 +167,39 @@ namespace API_SITMAS.Models
                 sqlCnn.Close();
             }
         }
-       
+
 
 
         //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
 
-        //public void Borrar()
-        //{
+        public void Borrar()
+        {
 
-        //    string sqlSentencia = "sp_EliminarEmpleado";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
+            string sqlSentencia = "sp_EliminarUsuario";
 
 
+            SqlConnection sqlCnn = new SqlConnection();
+            sqlCnn.ConnectionString = conectionString;
 
 
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
 
 
-        //    sqlCnn.Open();
+            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+            sqlCom.CommandType = CommandType.StoredProcedure;
+
+            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
 
 
-        //    var res = sqlCom.ExecuteNonQuery();
+            sqlCnn.Open();
 
 
-        //    sqlCnn.Close();
+            var res = sqlCom.ExecuteNonQuery();
 
 
-        //}
+            sqlCnn.Close();
+
+
+        }
 
 
         //public DataTable VistalistadoEmpleados()

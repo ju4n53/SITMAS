@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SITMAS - Gestión de Cargos</title>
+    <link rel="stylesheet" href="styleABM.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="listado_cargo.js"></script>
+    <script src="insertar_cargo.js"></script>
+</head>
+<body>
+    <div class="main-layout">
+        <div class="main-body-content">
+            <main class="content-wrapper">
+                <section class="card-section">
+                    <div class="card">
+                        <h2>Registrar Nuevo Cargo</h2>
+                        <form class="grid-form">
+                            <div class="form-group">
+                                <label>Descripción del Cargo</label>
+                                <input type="text" id="desc_cargo" required>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="button" class="btn-submit" onclick="RegistrarCargo()">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h2>Listado de Cargos</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Cargo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_cargos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

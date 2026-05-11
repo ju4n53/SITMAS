@@ -1,0 +1,152 @@
+:root {
+    /* Colores institucionales según manual de marca */
+    /* Paleta EMEC y BioCórdoba integrada */
+    --emec-celeste: #0099cc;
+    --emec-verde: #76bc21;
+    --emec-amarillo: #febd11;
+    --emec-naranja: #f58220;
+    --emec-rojo: #e03e2d;
+    --emec-violeta: #662d91;
+    --emec-azul: #0054a6;
+    --emec-verde-oscuro: #017c26;
+    --verde-bio: #78BE20;
+    --verde-inst: #007A33;
+    --gris-fondo: #f4f7f6;
+    --azul-emec: #0075A1;
+    --verde-fondo-claro: #f0f7ed; /* Color sugerido para el fondo */
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    /* Adiós al scroll general */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: var(--emec-verde);
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    overflow-y: auto;
+    /* Si el contenido de la tabla es MUY largo, solo se scrollea la tabla, no la página */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--verde-fondo-claro);
+}
+
+/* Estilo de "Solapa" para el contenido */
+.tab-content-wrapper {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    /* Une visualmente con el nav */
+    border-radius: 0 0 15px 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+    border-bottom-color: white;
+    font-weight: bold;
+    color: var(--emec-blue);
+}
+
+.error-msg {
+    color: #dc3545;
+    font-size: 0.85rem;
+    display: none;
+    /* Ocultos por defecto */
+}
+
+/* Columna de carrito/detalle pequeña */
+.cart-column {
+    background: #f1f3f5;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.8rem;
+}
+
+.main-header {
+    background-color:  rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    height: 45px;
+    flex-shrink: 0;
+    z-index: 1000;
+}
+
+.role-icon {
+    width: 30px;
+    height: 30px;
+    background-color: var(--emec-celeste);
+    border-radius: 4px;
+    display: inline-block;
+}
+
+h3 {
+    color: var(--verde-inst);
+    margin-top: 0;
+    margin-left: 15px;
+    border-left: 5px solid var(--verde-bio);
+    padding-left: 15px;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.footer-liston {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+    /* Evita que el footer se aplaste */
+    padding: 10px 0 !important;
+    /* Reducimos padding para ganar espacio */
+}
+
+.logo-inst {
+    height: 35px !important;
+    /* Logos un poco más pequeños para asegurar el encuadre */
+}
+
+.data {
+    font-weight: bold;
+    color: var(--emec-celeste);
+}
+
+.table {
+    font-size: 0.9rem;
+}
+
+.table thead th {
+    background-color: var(--verde-fondo-claro);
+    color: var(--verde-inst);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--verde-bio);
+}
+
+/* Scroll personalizado para la tabla */
+.table-responsive::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--emec-verde);
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
