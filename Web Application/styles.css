@@ -8,17 +8,21 @@
     --emec-azul: #0054a6; /* Azul Institucional */
 }
 
-body {
+/*body{}*/
+
+.gradient-bg {
     margin: 0;
     padding: 0;
     font-family: 'Maven Pro', sans-serif;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     background: linear-gradient(-70deg, #662d91, #0054a6, #0099cc, #76bc21, #017c26);
     background-size: 400% 400%;
     animation: fluirColor 6s ease infinite;
 }
+
 
 .navbar {
     padding: 20px 50px;
@@ -117,3 +121,84 @@ body {
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+
+/* =========================
+   Responsive - Tablet/Pantallas chicas
+   ========================= */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 16px 20px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .logo-text {
+        font-size: 2.4rem;
+        line-height: 1.1;
+    }
+
+    #form-login {
+        padding: 6px 0;
+    }
+
+    .logos-container {
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .logo-inst {
+        height: 42px;
+    }
+}
+
+/* =========================
+   Responsive - Smartphones
+   ========================= */
+@media (max-width: 480px) {
+    .navbar {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+
+    .logo-text {
+        font-size: clamp(1.7rem, 9vw, 2.3rem);
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    #form-login {
+        padding: 8px 0;
+        gap: 6px;
+    }
+
+    #form-login label {
+        font-size: 0.95rem;
+        margin-left: 8px;
+    }
+
+    #form-login input {
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .btn-ingresar {
+        width: 100%;
+        padding: 12px 18px;
+        border-radius: 22px;
+    }
+
+    .logos-container {
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 0 14px;
+    }
+
+    .logo-inst {
+        height: 38px;
+    }
+}
+

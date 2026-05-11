@@ -5,13 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Planta de Reciclaje</title>
-    <link rel="stylesheet" href="styleABM.css">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/CSS/styleABM.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
     </script>
-    <script src="listado_empleado.js"></script>
-    <script src="Buscar_IdEmpleado.js"></script>
-    <script src="insertar_empleado.js"></script>
-    <script src="modificar_empleado.js"></script>
+    <script src="../Js/listado_empleado.js"></script>
+    <script src="../Js/Buscar_IdEmpleado.js"></script>
+    <script src="../Js/insertar_empleado.js"></script>
+    <script src="../Js/modificar_empleado.js"></script>
+    <script src="../Js/llenar_combos.js"></script>
+    <script src="../Js/filtro_tablas.js"></script>
 
 </head>
 
@@ -55,8 +58,8 @@
                 <li class="dropdown">
                     <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE TRAZABILIDAD</a>
                     <div class="dropdown-content">
-                        <a href="#">Ingreso de material</a>
-                        <a href="#">Clasificación</a>
+                        <a href="">Ingreso de material</a>
+                        <a href="/Pages/Clasificacion.html">Clasificación</a>
                     </div>
                 </li>
 
@@ -65,14 +68,14 @@
         </aside>
 
         <div class="main-body-content">
-            <nav class="navbar">
+            <!-- <nav class="navbar">
                 <button class="btn-nav btn-verde">Acción1</button>
                 <button class="btn-nav btn-verde">Acción2</button>
                 <button class="btn-nav btn-azul">Acción3</button>
                 <button class="btn-nav btn-azul">Acción4</button>
                 <button class="btn-nav btn-amarillo">Acción5</button>
                 <button class="btn-nav btn-amarillo">Acción6</button>
-            </nav>
+            </nav> -->
 
             <div class="info-bar">
                 <span>Panel de Administración > Gestión de Empleados</span>
@@ -112,16 +115,22 @@
                                     <input type="string" id="fecha_ingreso" required placeholder="yyyy-mm-dd">
                                 </div>
                                 <div class="form-group">
-                                    <label>Id Cargo</label>
-                                    <input type="int" id="id_cargo">
+                                    <label>Cargo</label>
+                                    <select id="id_cargo">
+                                        <option value="">Cargando cargos...</option>
+                                    </select>
+                                </div>
+                               <div class="form-group">
+                                    <label>Área</label>
+                                    <select id="id_area">
+                                        <option value="">Cargando áreas...</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Id Area</label>
-                                    <input type="int" id="id_area">
-                                </div>
-                                <div class="form-group">
-                                    <label>Id Barrio</label>
-                                    <input type="int" id="id_barrio">
+                                    <label>Barrio</label>
+                                    <select id="id_barrio">
+                                        <option value="">Cargando barrios...</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Id Estado</label>
@@ -190,6 +199,10 @@
                     <div class="card accordion-item">
                         <div class="accordion-header" id="toggleForm">
                             <h2>Listado de Personal</h2>
+                        </div>
+                         <div style="padding: 10px 20px;">
+                            <input type="text" id="inputBusqueda" placeholder="🔍 Filtrar tabla por cualquier campo..."
+                                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                         </div>
                         <div class="table-container">
 
