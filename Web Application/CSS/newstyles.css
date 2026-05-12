@@ -1,0 +1,243 @@
+/* ==========================================================
+   SITMAS - Estilos Globales y Personalización de Bootstrap
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap');
+
+*{
+    box-sizing: border-box;
+}
+
+:root {
+    --emec-celeste: #009ee2;
+    --emec-celeste-light: #50c7fa;
+    --emec-celeste-dark: #0093c4;
+    --emec-verde: #76bc21;
+    --emec-amarillo: #febd11;
+    --emec-naranja: #f58220;
+    --emec-rojo: #e03e2d;
+    --emec-violeta: #662d91;
+    --emec-azul: #0054a6;
+    --emec-verde-oscuro: #017c26;
+    --verde-bio: #78BE20;
+    --verde-inst: #007A33;
+    --verde-fondo-claro: #f0f7ed;
+}
+
+/* --- Base --- */
+body {
+    font-family: 'Maven Pro', sans-serif;
+    background-color: var(--verde-fondo-claro);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Animación de Fondo (Login) --- */
+.gradient-bg {
+    background: linear-gradient(-70deg, #662d91, #0054a6, #0099cc, #76bc21, #017c26);
+    background-size: 400% 400%;
+    animation: fluirColor 6s ease infinite;
+}
+
+@keyframes fluirColor {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- Layout Principal --- */
+.main-layout {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.main-body-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* --- Componentes: Sidebar --- */
+.sidebar-vertical {
+    width: 250px;
+    background-color: var(--emec-celeste-dark);
+    color: white;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+
+.sidebar-vertical .nav-link {
+    color: white;
+    padding: 12px 20px;
+    transition: background 0.3s;
+}
+
+.sidebar-vertical .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-permiso] {
+    display: none !important;
+}
+
+/* --- Componentes: Header & InfoBar --- */
+.main-header {
+    /* background-color: rgba(255, 255, 255, 0.1); */
+    backdrop-filter: blur(10px);
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.2); */
+    padding: 10px 20px;
+}
+.header-color-emec {
+    color: var(--emec-celeste-dark);
+    background-color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.info-bar {
+    background-color: var(--emec-celeste-light);
+    padding: 10px 30px;
+    color: var(--emec-azul);
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* --- Componentes: Cards Profesionales --- */
+.sitmas-card {
+    background: white;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.sitmas-card h3, .sitmas-card h2 {
+    color: var(--verde-inst);
+    border-left: 5px solid var(--verde-bio);
+    padding-left: 15px;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* --- Tablas --- */
+.table-sitmas thead th {
+    background-color: var(--verde-inst);
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    border: none;
+}
+
+/* --- Footer Estilo Listón --- */
+.footer-liston {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding: 15px 0;
+    text-align: center;
+    
+}
+
+
+
+.logo-inst { height: 40px; }
+
+/* --- Botones Personalizados --- */
+.btn-sitmas-primary {
+    background-color: var(--emec-violeta);
+    color: white;
+    border-radius: 20px;
+    border: none;
+}
+
+.btn-sitmas-success {
+    background-color: var(--verde-bio);
+    color: white;
+    border-radius: 8px;
+}
+
+/* Estructura de cards ABM y Listado */
+
+.sitmas-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.sitmas-card h2 {
+    color: var(--verde-inst);
+    border-left: 5px solid var(--verde-bio);
+    padding-left: 15px;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+/* Acordeón */
+.accordion-header {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.accordion-header:hover { opacity: 0.8; }
+
+.icon-arrow {
+    font-size: 0.8rem;
+    color: #ccc;
+    transition: transform 0.3s;
+}
+[aria-expanded="true"] .icon-arrow {
+    transform: rotate(180deg);
+}
+
+/* Tabla Estilizada */
+.table {
+    font-size: 0.9rem;
+}
+
+.table thead th {
+    background-color: var(--verde-fondo-claro) !important; /* Según paleta fondos EMEC[cite: 1] */
+    color: var(--verde-inst) !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--verde-bio) !important;
+    padding: 12px;
+}
+
+.table tbody td {
+    padding: 12px;
+    color: #555;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+/* Scroll personalizado */
+.table-responsive::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--verde-bio);
+    border-radius: 10px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Botón de éxito EMEC */
+.btn-sitmas-success {
+    background-color: var(--verde-bio);
+    color: white;
+    border: none;
+    font-weight: 600;
+    transition: filter 0.2s;
+}
+.btn-sitmas-success:hover {
+    filter: brightness(1.1);
+    color: white;
+}
+
