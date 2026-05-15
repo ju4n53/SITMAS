@@ -7,6 +7,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Data.SqlClient; // Necesario para SqlConnection y SqlCommand
+using System.Configuration;   // Necesario para ConfigurationManager
 
 namespace API_SITMAS.Controllers
 {
@@ -73,7 +75,41 @@ namespace API_SITMAS.Controllers
             oUsuario.Modificar();
         }
 
+        [HttpPost]
+        [Route("api/Usuario/Login")]
+        public IHttpActionResult Login([FromBody] Usuarios login)
+        {
+            DataTable dt = login.Validar(); 
 
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                // 1. Obtenemos el Id_Empleado que devolvió el login
+                string idEmpleado = dt.Rows[0]["Id_Empleado"].ToString();
+                string nombreMostrar = dt.Rows[0]["Usuario"].ToString(); // Por defecto el correo
+
+                // 2. Buscamos el nombre real en la tabla Empleado
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString))
+                {
+                    string query = "SELECT Nombre, Apellido FROM Empleado WHERE Id = @Id";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@Id", idEmpleado);
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        // Formateamos: "Juan Videla"
+                        nombreMostrar = reader["Nombre"].ToString() + " " + reader["Apellido"].ToString();
+                    }
+                }
+
+                return Ok(new
+                {
+                    nombre = nombreMostrar,
+                    rol = "Administrador" 
+                });
+            }
+            return Unauthorized(); 
+        }
         // DELETE: api/Usuario/5
         //[HttpDelete]
 

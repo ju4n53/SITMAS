@@ -10,7 +10,7 @@ namespace API_SITMAS
     {
         public static void Register(HttpConfiguration config)
         {
-            var cors = new EnableCorsAttribute("http://127.0.0.1:5501", "*", "GET,POST,PUT,DELETE");
+            var cors = new EnableCorsAttribute("*", "*", "*");
 
             config.EnableCors(cors);
 

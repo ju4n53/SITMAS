@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control - Planta de Reciclaje</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/CSS/styleLS.css"> 
+    <title>SITMAS - Panel de Control</title>
+    
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../CSS/styleLS.css"> 
 </head>
 <body>
 
     <header class="main-header">
         <div class="nombre-sistema">
-            <span id="fecha-hora">EcoGestión</span>
+            <span id="fecha-hora">SITMAS</span>
         </div>
+        
         <div class="info-right">
-            <span>Usuario: <span class="data">---</span></span>
-            <span>Rol: <span class="data">---</span></span>
+            <span>Usuario: <span class="data" id="header-user">---</span></span>
+            <span>Rol: <span class="data" id="header-role">---</span></span>
             <div class="role-icon"></div>
         </div>
     </header>
@@ -30,145 +32,94 @@
                     <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE PERSONAL</a>
                     <div class="dropdown-content">
                         <a href="cargaempleados.html">Empleados</a>
-                        <a href="#">Usuarios</a>
-                        <a href="#">Roles y permisos C</a>
+                        <a href="cargacargos.html">Cargos</a>
+                        <a href="cargabarrios.html">Barrios</a>
                     </div>
                 </li>
 
                 <li class="dropdown" id="sidebar-logistica">
-                    <a href="javascript:void(0)" class="dropbtn">GESTIÓN LOGÍSTICA</a>
+                    <a href="javascript:void(0)" class="dropbtn">LOGÍSTICA</a>
                     <div class="dropdown-content">
+                        <a href="#">Rutas</a>
                         <a href="#">Vehículos</a>
-                        <a href="#">Hojas de ruta</a>
-                    </div>
-                </li>
-                <li class="dropdown" id="sidebar-trazabilidad">
-                    <a href="javascript:void(0)" class="dropbtn">GESTIÓN DE TRAZABILIDAD</a>
-                    <div class="dropdown-content">
-                        <a href="#">Ingreso de material</a>
-                        <a href="#">Clasificación</a>
                     </div>
                 </li>
 
-                <li id="sidebar-configuracion"><a href="#">CONFIGURACIÓN</a></li>
+                <li id="sidebar-configuracion">
+                    <a href="#">CONFIGURACIÓN</a>
+                </li>
             </ul>
         </aside>
-        
-        <div class="main-body-content">
-            <nav class="navbar">
-                <button class="btn-nav btn-verde">Acción 1</button>
-                <button class="btn-nav btn-verde">Acción 2</button>
-                <button class="btn-nav btn-azul">Acción 3</button>
-                <button class="btn-nav btn-azul">Acción 4</button>
-                <button class="btn-nav btn-amarillo">Acción 5</button>
-                <button class="btn-nav btn-amarillo">Acción 6</button>
-            </nav>
 
+        <main class="main-body-content">
             <div class="info-bar">
-                <span>Panel de Administración</span>
+                <span>Panel Principal > Dashboard</span>
             </div>
 
-            <main class="content">
-                <section class="form-container">
-                    <form class="form-azul">
-                        <h3>Gráficos o Novedades</h3>
-                        <div class="grid-inputs">
-                            <h3>Gráfico</h3>
-                            <h3>Acá va un gráfico</h3>
-                            <h3>Informes</h3>
-                            <h3>o novedades</h3>
-                        </div>
-                    </form>
-
-                    <form class="form-amarillo">
-                        <h3>Reporte de Salida</h3>
-                        <div class="grid-inputs">
-                            <input type="text" placeholder="Entrada 1">
-                            <input type="text" placeholder="Entrada 2">
-                            <input type="text" placeholder="Entrada 3">
-                            <input type="text" placeholder="Entrada 4">
-                            <input type="text" placeholder="Entrada 5">
-                            <input type="text" placeholder="Entrada 6">
-                            <input type="text" placeholder="Entrada 7">
-                            <input type="text" placeholder="Entrada 8">
-                            <input type="text" placeholder="Entrada 9">
-                            <input type="text" placeholder="Entrada 10">
-                        </div>
-                        <div class="form-buttons">
-                            <button type="submit">Enviar</button>
-                            <button type="reset">Limpiar</button>
-                        </div>
-                    </form>
-                </section>
-            </main>
-        </div>
+            <section class="dashboard-grid">
+                <button class="btn-nav" id="accion1">NUEVA CARGA</button>
+                <button class="btn-nav" id="accion2">REPORTES</button>
+                <button class="btn-nav" id="accion3">INVENTARIO</button>
+            </section>
+        </main>
     </div>
 
-    <footer class="footer-liston">
-        <div class="logos-container">
-            <img src="biocba_sinfondo.png" alt="Ente BioCórdoba" class="logo-inst">
-            <img src="espacios_verdes_sinfondo.png" alt="Espacios Verdes" class="logo-inst">
-            <img src="ambiente_sinfondo.png" alt="Secretaría de Ambiente" class="logo-inst">
-            <img src="escudo1_sinfondo.png" alt="Municipalidad de Córdoba" class="logo-inst">
-            <img src="escudo2_contexto_sinfondo.png" alt="Córdoba Capital" class="logo-inst">
-        </div>
-    </footer>
-</body>
+    <script>
+        // 1. OBTENER DATOS DEL LOCALSTORAGE
+        // Aquí vendrá el objeto { nombre: "Juan Videla", rol: "Administrador" } desde el controlador
+        const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
 
-<script>
-
-        //Permisos y sesiones
-    // Simulación de usuario logueado (puedes traerlo de localStorage)
-    const usuarioSesion = {
-        nombre: "Juan Perez",
-        rol: "Administrador" // Valores posibles: 'Administrador', 'Encargado', 'Operario', 'Gerente'
-    };
-
-    const configPermisos = {
-        'Operario': {
-            botonesVisibles: ['accion1', 'accion2', 'accion3'], // IDs de los botones
-            sidebarVisibles: ['sidebar-logistica', 'sidebar-trazabilidad'] // IDs del menú
-        },
-        'Administrador': {
-            botonesVisibles: ['accion1', 'accion2', 'accion3', 'accion4', 'accion5', 'accion6'],
-            sidebarVisibles: ['sidebar-empleados', 'sidebar-logistica', 'sidebar-trazabilidad', 'sidebar-configuracion']
+        // 2. VERIFICACIÓN DE IDENTIDAD
+        if (!sesion) {
+            window.location.href = "../index.html";
+        } else {
+            // 3. ACTUALIZAR HEADER CON EL NOMBRE REAL
+            // sesion.nombre ahora contiene "Nombre Apellido" gracias al cambio en el Controller
+            document.getElementById('header-user').textContent = sesion.nombre;
+            document.getElementById('header-role').textContent = sesion.rol.toUpperCase();
         }
-        // Puedes agregar más roles aquí fácilmente
-    };
 
-    // 2. Función para aplicar la visibilidad
-    function aplicarPermisos(rolUsuario) {
-        const permisos = configPermisos[rolUsuario];
+        // 4. LÓGICA DE PERMISOS
+        const configPermisos = {
+            'Administrador': { 
+                botonesVisibles: ['accion1', 'accion2', 'accion3'],
+                sidebarVisibles: ['sidebar-empleados', 'sidebar-logistica', 'sidebar-configuracion']
+            },
+            'operario': {
+                botonesVisibles: ['accion1'],
+                sidebarVisibles: ['sidebar-logistica']
+            }
+        };
 
-        if (!permisos) return; // Si el rol no existe, no hacemos nada
+        function aplicarPermisos(rol) {
+            const permisos = configPermisos[rol];
+            if (!permisos) return;
 
-        // Ocultar todo primero para limpiar
-        document.querySelectorAll('.btn-nav').forEach(btn => btn.style.display = 'none');
-        document.querySelectorAll('.nav-list li').forEach(item => item.style.display = 'none');
+            // Ocultar todo por defecto
+            document.querySelectorAll('.btn-nav').forEach(btn => btn.style.display = 'none');
+            document.querySelectorAll('.nav-list > li').forEach(item => item.style.display = 'none');
 
-        // Mostrar solo lo permitido
-        permisos.botonesVisibles.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'inline-block';
+            // Mostrar lo que corresponde según el rol
+            permisos.botonesVisibles.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'inline-block';
+            });
+            permisos.sidebarVisibles.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'block';
+            });
+        }
+
+        // Aplicamos permisos basados en el rol guardado
+        aplicarPermisos(sesion.rol);
+
+        // Lógica de dropdowns del menú lateral
+        document.querySelectorAll('.dropdown').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Evitamos que el click se propague si es necesario
+                item.classList.toggle('active');
+            });
         });
-
-        permisos.sidebarVisibles.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'block';
-        });
-    }
-
-    aplicarPermisos(usuarioSesion.rol)
-
-
-
-    document.querySelectorAll('.dropdown').forEach(item => {
-    item.addEventListener('click', () => {
-        // Cerramos los otros antes de abrir este (opcional)
-        // document.querySelectorAll('.dropdown').forEach(el => el.classList.remove('active'));
-        
-        item.classList.toggle('active');
-    });
-});
-</script>
+    </script>
+</body>
 </html>

@@ -5,32 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Planta de Reciclaje</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/CSS/styleABM.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
-    </script>
-    <script src="../Js/listado_empleado.js"></script>
-    <script src="../Js/Buscar_IdEmpleado.js"></script>
-    <script src="../Js/insertar_empleado.js"></script>
-    <script src="../Js/modificar_empleado.js"></script>
-    <script src="../Js/llenar_combos.js"></script>
-    <script src="../Js/filtro_tablas.js"></script>
-
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../CSS/styleABM.css">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../Js/empleados_logica.js"></script>
 </head>
 
 <body>
 
     <header class="main-header">
-        <div class="nombre-sistema">
-            <span id="fecha-hora">
-                <H2>SITMAS</H2>
-            </span>
-        </div>
-        <div class="info-right">
-            <span>Usuario: <span class="data">---</span></span>
-            <span>Rol: <span class="data">---</span></span>
-            <div class="role-icon"></div>
-        </div>
+     <div class="nombre-sistema">
+        <span id="fecha-hora">SITMAS</span>
+     </div>
+    
+     <div class="info-right">
+        <span>Usuario: <span class="data" id="header-user">---</span></span>
+        <span>Rol: <span class="data" id="header-role">---</span></span>
+        <div class="role-icon"></div>
+     </div>
     </header>
 
     <div class="main-layout">
@@ -68,28 +61,18 @@
         </aside>
 
         <div class="main-body-content">
-            <!-- <nav class="navbar">
-                <button class="btn-nav btn-verde">Acción1</button>
-                <button class="btn-nav btn-verde">Acción2</button>
-                <button class="btn-nav btn-azul">Acción3</button>
-                <button class="btn-nav btn-azul">Acción4</button>
-                <button class="btn-nav btn-amarillo">Acción5</button>
-                <button class="btn-nav btn-amarillo">Acción6</button>
-            </nav> -->
-
             <div class="info-bar">
                 <span>Panel de Administración > Gestión de Empleados</span>
             </div>
 
             <main class="content-wrapper">
                 <section class="card-section">
-                    <div class="card accordion-item">
-                        <div class="accordion-header" id="toggleForm">
-                            <h2>Registrar Nuevo Empleado</h2>
+                    <div class="card accordion-item active"> <div class="accordion-header" id="toggleForm">
+                            <h2>Registrar / Editar Empleado</h2>
                             <span class="icon-arrow">▼</span>
                         </div>
                         <div class="accordion-content" id="formContent">
-                            <form class="grid-form" onsubmit="alert('Datos enviados'); return false;">
+                            <form class="grid-form" onsubmit="return false;">
                                 <div class="form-group">
                                     <label>Apellido</label>
                                     <input type="text" id="apellido" required placeholder="Ej: Pérez">
@@ -100,7 +83,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>CUIL</label>
-                                    <input type="string" id="cuil" required placeholder=20-33444555-9>
+                                    <input type="text" id="cuil" required placeholder="20-XXXXXXXX-9" maxlength="13">
                                 </div>
                                 <div class="form-group">
                                     <label>Teléfono</label>
@@ -108,11 +91,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" id="email" required placeholder="Ej: juan.perez@email.com">
+                                    <input type="email" id="email" required placeholder="juan.perez@email.com">
                                 </div>
                                 <div class="form-group">
                                     <label>Fecha de Ingreso</label>
-                                    <input type="string" id="fecha_ingreso" required placeholder="yyyy-mm-dd">
+                                    <input type="date" id="fecha_ingreso" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Cargo</label>
@@ -120,7 +103,7 @@
                                         <option value="">Cargando cargos...</option>
                                     </select>
                                 </div>
-                               <div class="form-group">
+                                <div class="form-group">
                                     <label>Área</label>
                                     <select id="id_area">
                                         <option value="">Cargando áreas...</option>
@@ -134,78 +117,50 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Id Estado</label>
-                                    <input type="int" id="id_estado">
+                                    <input type="number" id="id_estado">
                                 </div>
                                 <div class="form-group">
                                     <label>Calle</label>
-                                    <input type="int" id="calle">
+                                    <input type="text" id="calle">
                                 </div>
                                 <div class="form-group">
                                     <label>Número</label>
-                                    <input type="int" id="numero">
+                                    <input type="number" id="numero">
                                 </div>
                                 <div class="form-group">
                                     <label>Piso</label>
-                                    <input type="int" id="piso">
+                                    <input type="number" id="piso">
                                 </div>
                                 <div class="form-group">
                                     <label>Dpto</label>
-                                    <input type="int" id="dpto">
+                                    <input type="text" id="dpto">
                                 </div>
 
-                                <!-- <div class="form-group">
-                                    <label>Área</label>
-                                    <select id="id_area">
-                                        <option value="1">Administración</option>
-                                        <option value="2">Planta de Reciclaje</option>
-                                        <option value="3">Logística</option>
-                                    </select>
-                                </div> -->
-                                <!-- <div class="form-group">
-                                    <select id="id_cargo">
-                                        <option value="1">Operario</option>
-                                        <option value="2">Encargado</option>
-                                        <option value="3">Gerente</option>
-                                    </select>
-                                </div> -->
-                                <!-- <div class="form-group">
-                                    <select id="id_vinculacion">
-                                        <option value="1">Becario</option>
-                                        <option value="2">Empleado de planta</option>
-                                        <option value="3">Monotributista</option>
-                                    </select>
-                                </div> -->
-                                <!-- <div class="form-group">
-                                    <select id="id_estado">
-                                        <option value="1">Activo</option>
-                                        <option value="2">Inactivo</option>
-                                    </select>
-                                </div> -->
-                                <div class="form-group">
-                                    <input id="BuscarIdEmpleado" type="text" placeholder="Busqueda por Codigo">
-                                    <input type="button" value="Buscar" id="btnBuscar1" onclick="BuscarEmpleado()">
+                                <div class="form-group" style="grid-column: span 2; display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid #eee; padding-top: 15px;">
+                                    <div style="flex-grow: 1;">
+                                        <label>Búsqueda por Código (ID)</label>
+                                        <input id="BuscarIdEmpleado" type="number" placeholder="Ingrese ID del empleado">
+                                    </div>
+                                    <button type="button" class="btn-submit" style="background-color: #666; width: auto; margin-bottom: 0;" onclick="BuscarEmpleado()">Buscar</button>
                                 </div>
-                                <div></div>
-                                <div class="form-buttons">
-                                    <button type="submit" class="btn-submit" onclick="RegistrarEmpleado()">Guardar Empleado</button>
-                                   <br> <br>
-                                    <button type="button" class="btn-submit" onclick="ModificarEmpleado()">Modificar Empleado</button>
+
+                                <div class="form-buttons" style="grid-column: span 2; display: flex; gap: 10px; margin-top: 10px;">
+                                    <button type="button" class="btn-submit" style="flex: 1;" onclick="RegistrarEmpleado()">Guardar Nuevo</button>
+                                    <button type="button" class="btn-submit" style="flex: 1; background-color: #007bff;" onclick="ModificarEmpleado()">Actualizar Datos</button>
                                 </div>
                             </form>
                         </div>
                     </div>
 
-                    
                     <div class="card accordion-item">
-                        <div class="accordion-header" id="toggleForm">
-                            <h2>Listado de Personal</h2>
+                        <div class="accordion-header">
+                            <h2>Listado de Personal (IDs)</h2>
                         </div>
-                         <div style="padding: 10px 20px;">
-                            <input type="text" id="inputBusqueda" placeholder="🔍 Filtrar tabla por cualquier campo..."
+                        <div style="padding: 10px 20px;">
+                            <input type="text" id="inputBusqueda" placeholder="🔍 Filtrar tabla..."
                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                         </div>
                         <div class="table-container">
-
                             <table>
                                 <thead>
                                     <tr>
@@ -215,49 +170,43 @@
                                         <th>CUIL</th>
                                         <th>Telefono</th>
                                         <th>Email</th>
-                                        <th>Fecha de Ingreso</th>
-                                        <th>Id Cargo</th>
-                                        <th>Id Area</th>
-                                        <th>Id Barrio</th>
-                                        <th>Id Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody1">
-
-                                </tbody>
-
-                            </table>
-                            
-                        </div>
-                    </div>
-                    <br><br>
-                    <div class="card accordion-item">
-                        <div class="accordion-header">
-                            <h2>Detalle de Personal</h2>
-                        </div>
-                        <div class="table-container">
-
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Id</th>
-                                        <th>Apellido</th>
-                                        <th>Nombre</th>
-                                        <th>CUIL</th>
-                                        <th>Telefono</th>
-                                        <th>Email</th>
-                                        <th>Fecha de Ingreso</th>
+                                        <th>Ingreso</th>
                                         <th>Cargo</th>
                                         <th>Area</th>
                                         <th>Barrio</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tbody3">
+                                <tbody id="tbody1"></tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                                </tbody>
+                    <br>
 
-                            
+                    <div class="card accordion-item">
+                        <div class="accordion-header">
+                            <h2>Detalle de Personal (Nombres)</h2>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Apellido</th>
+                                        <th>Nombre</th>
+                                        <th>CUIL</th>
+                                        <th>Telefono</th>
+                                        <th>Email</th>
+                                        <th>Ingreso</th>
+                                        <th>Cargo</th>
+                                        <th>Area</th>
+                                        <th>Barrio</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody3"></tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
@@ -265,34 +214,40 @@
         </div>
     </div>
 
-    <!-- <footer class="footer-liston">
-        <div class="logos-container">
-            <img src=assets/biocba_sinfondo.png alt="Ente BioCórdoba" class="logo-inst">
-            <img src=assets/espacios_verdes_sinfondo.png alt="Espacios Verdes" class="logo-inst">
-            <img src=assets/ambiente_sinfondo.png alt="Secretaría de Ambiente" class="logo-inst">
-            <img src=assets/escudo1_sinfondo.png alt="Municipalidad de Córdoba" class="logo-inst">
-            <img src=assets/escudo2_contexto_sinfondo.png alt="Córdoba Capital" class="logo-inst">
-        </div>
-    </footer> -->
-</body>
-
-<script>
-    // src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js";
-    // src="listado_empleado.js";
-
-
-    document.querySelectorAll('.dropdown').forEach(item => {
-        item.addEventListener('click', () => {
-            // Cerramos los otros antes de abrir este (opcional)
-            // document.querySelectorAll('.dropdown').forEach(el => el.classList.remove('active'));
-
-            item.classList.toggle('active');
+    <script>
+        // Lógica de UI para los menús desplegables
+        document.querySelectorAll('.dropdown').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
         });
-    });
 
-    document.getElementById('toggleForm').addEventListener('click', function () {
-        this.parentElement.classList.toggle('active');
-    });
-</script>
+        document.getElementById('toggleForm').addEventListener('click', function () {
+            this.parentElement.classList.toggle('active');
+        });
+    </script>
 
+    <script>
+        // 1. OBTENER DATOS DEL LOCALSTORAGE
+        const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
+
+        // 2. VERIFICACIÓN DE IDENTIDAD: Si no hay datos, devolver al login inmediatamente
+        if (!sesion) {
+            window.location.href = "../index.html"; // Ajusta la ruta si index.html está en otra carpeta
+        } else {
+            // 3. ACTUALIZAR HEADER CON LOS DATOS REALES TRASPASADOS DESDE EL LOGIN
+            document.getElementById('header-user').textContent = sesion.nombre;
+            document.getElementById('header-role').textContent = sesion.rol.toUpperCase();
+        }
+
+        // 4. CONTROL DE ACCESO POR ROL (Opcional pero recomendado)
+        // Si un operario intenta entrar escribiendo la URL a mano, lo rebotamos a la landing
+        if (sesion && sesion.rol !== 'Administrador') {
+            alert('No tiene permisos para acceder a la gestión de empleados.');
+            window.location.href = "landingestructura.html"; 
+        }
+
+        // --- Aquí abajo puedes continuar con la lógica propia de cargaempleados.html (inputs, botones, etc.) ---
+    </script>
+</body>
 </html>
