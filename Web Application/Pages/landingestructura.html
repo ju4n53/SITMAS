@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITMAS - Panel Principal</title>
+    <title>SITMAS - Panel de Control</title>
+    
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../CSS/styleLS.css"> 
+</head>
+<body>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../CSS/newstyles.css">
@@ -15,14 +20,12 @@
 
     <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
         <div class="nombre-sistema">
-            <span id="fecha-hora" class="fw-bold h5 mb-0">Escuela Municipal de Economia Circular</span>
+            <span id="fecha-hora">SITMAS</span>
         </div>
-        <div class="info-right d-flex align-items-center gap-3">
-            <div class="text-end">
-                <p class="small m-0 text-white-50">Usuario: <span class="data text-white" id="display-user">---</span>
-                </p>
-                <p class="small m-0 text-white-50">Rol: <span class="data text-white" id="display-rol">---</span></p>
-            </div>
+        
+        <div class="info-right">
+            <span>Usuario: <span class="data" id="header-user">---</span></span>
+            <span>Rol: <span class="data" id="header-role">---</span></span>
             <div class="role-icon"></div>
         </div>
     </header>
@@ -36,19 +39,19 @@
                     <a class="nav-link  d-flex justify-content-between align-items-center" href="#">INICIO</a>
                 </li>
 
-                <li class="nav-item" id="sidebar-empleados">
+                <li class="nav-item" id="sidebar-empleados" data-permiso="P_g, U_g">
                     <a data-bs-toggle="collapse" class="nav-link  d-flex justify-content-between align-items-center"
                         href="#gp">
                         GESTIÓN DE PERSONAL
                     </a>
                     <div id="gp" class="collapse">
-                        <a class="nav-link small ps-4" href="../Pages/Empleados.html">Empleados</a>
+                        <a class="nav-link small ps-4" href="cargaempleados.html">Empleados</a>
                         <a class="nav-link small ps-4" href="#">Usuarios</a>
                         <a class="nav-link small ps-4" href="#">Roles y Permisos</a>
                     </div>
                 </li>
 
-                <li class="nav-item dropdown" id="sidebar-logistica">
+                <li class="nav-item dropdown" id="sidebar-logistica" data-permiso="T_m">
                     <a data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center"
                         href="#gl">
                         GESTIÓN LOGÍSTICA
@@ -59,13 +62,13 @@
                     </div>
                 </li>
 
-                <li class="nav-item dropdown" id="sidebar-trazabilidad">
+                <li class="nav-item dropdown" id="sidebar-trazabilidad" data-permiso="T_e, T_l">
                     <a data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center"
                         href="#gt">
                         GESTIÓN DE TRAZABILIDAD
                     </a>
                     <div id="gt" class="collapse">
-                        <a class="nav-link small ps-4" href="../Pages/IngresoYClasificacion.html">Ingreso Material</a>
+                        <a class="nav-link small ps-4" href="#">Ingreso Material</a>
                         <a class="nav-link small ps-4" href="#">Clasificación</a>
                     </div>
                 </li>
@@ -76,167 +79,75 @@
             </ul>
         </aside>
 
-        <div class="main-body-content flex-grow-1">
-
-            <div class="info-bar border-bottom">
-                <span class="text-uppercase tracking-wider">Dashboard de Administración</span>
+        <main class="main-body-content">
+            <div class="info-bar">
+                <span>Panel Principal > Dashboard</span>
             </div>
 
-            <main class="container-fluid p-4">
-                <div class="row g-4">
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2>Estadísticas y Novedades</h2>
-                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                style="height: 300px;">
-                                <p class="text-muted italic">[Espacio reservado para Chart.js]</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2>Reporte de Salida Rápida</h2>
-                            <form class="row g-3">
-                                <div class="col-md-6"><input type="text" class="form-control" placeholder="Entrada 1">
-                                </div>
-                                <div class="col-md-6"><input type="text" class="form-control" placeholder="Entrada 2">
-                                </div>
-                                <div class="col-md-6"><input type="text" class="form-control" placeholder="Entrada 3">
-                                </div>
-                                <div class="col-md-6"><input type="text" class="form-control" placeholder="Entrada 4">
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="d-flex gap-2 justify-content-end mt-3">
-                                        <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
-                                        <button type="submit" class="btn btn-sitmas-success">Enviar Reporte</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+            <section class="dashboard-grid">
+                <button class="btn-nav" id="accion1">NUEVA CARGA</button>
+                <button class="btn-nav" id="accion2">REPORTES</button>
+                <button class="btn-nav" id="accion3">INVENTARIO</button>
+            </section>
+        </main>
     </div>
 
-    <footer class="footer-liston">
-        <div class="logos-container">
-            <img src="/assets/biocba_sinfondo.png" alt="Ente BioCórdoba" class="logo-inst">
-            <img src="/assets/espacios_verdes_sinfondo.png" alt="Espacios Verdes" class="logo-inst">
-            <img src="/assets/ambiente_sinfondo.png" alt="Secretaría de Ambiente" class="logo-inst">
-            <img src="/assets/escudo1_sinfondo.png" alt="Municipalidad de Córdoba" class="logo-inst">
-            <img src="/assets/escudo2_contexto_sinfondo.png" alt="Córdoba Capital" class="logo-inst">
-        </div>
-    </footer>
-</body>
+    <script>
+        // 1. OBTENER DATOS DEL LOCALSTORAGE
+        // Aquí vendrá el objeto { nombre: "Juan Videla", rol: "Administrador" } desde el controlador
+        const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-
-    //Permisos y sesiones
-    // Simulación de usuario logueado (puedes traerlo de localStorage)
-    const usuarioSesion = {
-        nombre: "Juan Perez",
-        rol: "Operario" // Valores posibles: 'Administrador', 'Encargado', 'Operario', 'Gerente'
-    };
-
-    const configPermisos = {
-        'Operario': {
-            permisos: ["T_l", "T_e"],
-            etiquetaDashboard: "Operaciones"
-        },
-        'Coordinador': {
-            permisos: ["R_b", "R_a", "T_l", "T_e", "T_m", "U_g"],
-            etiquetaDashboard: "Coordinación"
-        },
-        'Director': {
-            permisos: ["R_a"],
-            etiquetaDashboard: "Dirección"
-        },
-        'RRHH': {
-            permisos: ["U_g", "P_g"],
-            etiquetaDashboard: "Recursos Humanos"
-        },
-        'RRII': {
-            permisos: ["R_b", "R_a", "T_l", "T_e", "T_m"],
-            etiquetaDashboard: "Relaciones Institucionales"
-        },
-        'Supervisor': {
-            permisos: ["R_b", "T_l", "T_e", "T_m"],
-            etiquetaDashboard: "Supervisión"
-        },
-        'Administrador': {
-            permisos: ["R_b", "R_a", "T_l", "T_e", "T_m", "U_g", "P_g"],
-            etiquetaDashboard: "Administración"
+        // 2. VERIFICACIÓN DE IDENTIDAD
+        if (!sesion) {
+            window.location.href = "../index.html";
+        } else {
+            // 3. ACTUALIZAR HEADER CON EL NOMBRE REAL
+            // sesion.nombre ahora contiene "Nombre Apellido" gracias al cambio en el Controller
+            document.getElementById('header-user').textContent = sesion.nombre;
+            document.getElementById('header-role').textContent = sesion.rol.toUpperCase();
         }
-    };
 
-    function aplicarPermisos(objetoRol) {
-        // 1. Buscamos todos los elementos con la marca de permiso
-        const elementosProtegidos = document.querySelectorAll('[data-permiso]');
-
-        const configuracionDelRol = configPermisos[objetoRol];
-
-        // Si el rol no existe en nuestra configuración, tratamos como lista vacía
-        const permisosUsuarioActual = configuracionDelRol ? configuracionDelRol.permisos : [];
-
-        elementosProtegidos.forEach(el => {
-            // Obtenemos la descripción/clave del permiso del atributo
-            const permisoRequerido = el.getAttribute('data-permiso'); // Ej: "Admin,Supervisor"
-
-            console.log(permisoRequerido)
-            // Convertimos el atributo en un array y verificamos si AL MENOS UNO coincide con los del usuario
-            const listaPermisos = permisoRequerido.split(',').map(p => p.trim());
-
-            const tieneAcceso = listaPermisos.some(p => permisosUsuarioActual.includes(p));
-
-            if (tieneAcceso) {
-                el.style.setProperty('display', 'block', 'important');
-            } else {
-                el.style.display = '';
+        // 4. LÓGICA DE PERMISOS
+        const configPermisos = {
+            'Administrador': { 
+                botonesVisibles: ['accion1', 'accion2', 'accion3'],
+                sidebarVisibles: ['sidebar-empleados', 'sidebar-logistica', 'sidebar-configuracion']
+            },
+            'operario': {
+                botonesVisibles: ['accion1'],
+                sidebarVisibles: ['sidebar-logistica']
             }
+        };
+
+        function aplicarPermisos(rol) {
+            const permisos = configPermisos[rol];
+            if (!permisos) return;
+
+            // Ocultar todo por defecto
+            document.querySelectorAll('.btn-nav').forEach(btn => btn.style.display = 'none');
+            document.querySelectorAll('.nav-list > li').forEach(item => item.style.display = 'none');
+
+            // Mostrar lo que corresponde según el rol
+            permisos.botonesVisibles.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'inline-block';
+            });
+            permisos.sidebarVisibles.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'block';
+            });
+        }
+
+        // Aplicamos permisos basados en el rol guardado
+        aplicarPermisos(sesion.rol);
+
+        // Lógica de dropdowns del menú lateral
+        document.querySelectorAll('.dropdown').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Evitamos que el click se propague si es necesario
+                item.classList.toggle('active');
+            });
         });
-
-        // 2. Optimización de menús (Economía de clics)
-        gestionarColapsosPequeños();
-    }
-
-    function gestionarColapsosPequeños() {
-        // Buscamos todos los contenedores colapsables del sidebar
-        const sidebar = document.querySelector('#sidebar-wrapper') || document.querySelector('.main-nav');
-
-        if (!sidebar) return; // Si no hay sidebar, no hacemos nada (evitamos residuos de ejecución)
-
-        // 2. Buscamos colapsables SOLO dentro del sidebar
-        const contenedores = sidebar.querySelectorAll('.collapse');
-
-        contenedores.forEach(contenedor => {
-            // Contamos cuántas opciones visibles quedaron después de filtrar permisos
-            const opcionesVisibles = contenedor.querySelectorAll('.nav-link:not([style*="display: none"])');
-
-            if (opcionesVisibles.length <= 3) {
-                // Si hay 2 o menos, eliminamos el comportamiento de colapso
-                const idContenedor = contenedor.getAttribute('id');
-                const disparador = document.querySelector(`[data-bs-target="#${idContenedor}"]`);
-
-                if (disparador) {
-                    disparador.removeAttribute('data-bs-toggle');
-                    disparador.style.cursor = 'default';
-                    // Opcional: podrías quitarle la flechita de "dropdown" vía CSS o JS aquí
-                }
-
-                // Forzamos a que se vea siempre
-                contenedor.classList.remove('collapse');
-                contenedor.classList.add('show');
-            }
-        });
-    }
-
-    aplicarPermisos(usuarioSesion.rol)
-
-
-</script>
-
+    </script>
+</body>
 </html>

@@ -201,7 +201,34 @@ namespace API_SITMAS.Models
 
         }
 
+        public DataTable Validar()
+        {
+            // Nombre exacto de tu SP según la captura
+            string sqlSentencia = "sp_Login"; 
 
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                // Parámetros idénticos a los del SP (@User y @Pass)
+                sqlCom.Parameters.Add("@User", SqlDbType.VarChar, 100).Value = Usuario;
+                sqlCom.Parameters.Add("@Pass", SqlDbType.VarChar, 100).Value = Password;
+
+                DataSet ds = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(sqlCom);
+                
+                try {
+                    sqlCnn.Open();
+                    da.Fill(ds);
+                    return ds.Tables[0];
+                } catch (Exception ex) {
+                    throw new Exception("Error en DB: " + ex.Message);
+                } finally {
+                    sqlCnn.Close();
+                }
+            }
+       }
         //public DataTable VistalistadoEmpleados()
         //{
 
@@ -234,7 +261,7 @@ namespace API_SITMAS.Models
 
 
         //}
-
+    
 
         #endregion
 

@@ -33,15 +33,15 @@ function CargarComboAreas() {
         success: function (data) {
             let select = $("#id_area");
             select.empty();
-            select.append('<option value="">Seleccione un √Årea</option>');
+            select.append('<option value="">Seleccione un ¡rea</option>');
 
             data.forEach(item => {
                 select.append(`<option value="${item.Id}">${item.Area}</option>`);
             });
-            console.log("Areas cargadas OK");
+            console.log("¡reas cargadas OK");
         },
         error: function (err) {
-            console.error("Error cargando √Åreas", err);
+            console.error("Error cargando ·reas", err);
         }
     });
 }
@@ -58,7 +58,7 @@ function CargarComboBarrios() {
             data.forEach(item => {
                 select.append(`<option value="${item.Id}">${item.Barrio}</option>`);
             });
-            console.log("Barrios cargados con √âxito");
+            console.log("Barrios cargados con Èxito");
         },
         error: function (err) {
             console.error("Error cargando barrios", err);

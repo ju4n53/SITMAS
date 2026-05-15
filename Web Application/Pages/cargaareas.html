@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SITMAS - Gestión de Áreas</title>
+
+    <link rel="stylesheet" href="../CSS/styles.css">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="../Js/areas_logica.js"></script>
+
+</head>
+<body>
+    <div class="header">
+        <h1>SITMAS</h1>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h3 style="color: white; padding: 15px;">INICIO</h3>
+            <div class="menu-item">GESTION DE PERSONAL</div>
+            <div class="sub-menu">
+                <p>Empleados</p>
+                <p><b>Áreas de Trabajo</b></p>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>Panel de Administracion - Áreas de Trabajo</h2>
+
+            <div class="card">
+                <h3>REGISTRAR O EDITAR AREA</h3>
+                <div class="form-row" style="display: flex; gap: 20px; align-items: flex-end;">
+                    <div class="form-group">
+                        <label>ID</label><br>
+                        <input type="text" id="id_area_trabajo" placeholder="Auto" readonly style="width: 80px; padding: 8px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre del Area</label><br>
+                        <input type="text" id="nombre_area_input" style="width: 300px; padding: 8px;">
+                    </div>
+                    <div class="button-group">
+                        <button onclick="GuardarArea()" style="background-color: #78be20; color: white; border: none; padding: 10px 20px; cursor: pointer;">Guardar</button>
+                        <button onclick="LimpiarFormulario()" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; cursor: pointer;">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3>LISTADO DE AREAS</h3>
+                <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                    <thead style="background-color: #007a33; color: white;">
+                        <tr>
+                            <th style="padding: 12px; border: 1px solid #ddd;">ID</th>
+                            <th style="padding: 12px; border: 1px solid #ddd;">Area</th>
+                            <th style="padding: 12px; border: 1px solid #ddd;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAreas">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
