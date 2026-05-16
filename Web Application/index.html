@@ -93,9 +93,14 @@
             // Llamada al servicio real
             const data = await authService.login(userVal, passVal);
 
-            // 4. Manejo de éxito
-            localStorage.setItem('authToken', response.token); // O mejor, usar cookies HttpOnly
-            window.location.href = "./Pages/landingestructura.html"; // Redirigir a la página principal
+            // Almacenamos los datos de sesión devueltos por el servidor (nombre y rol)
+            localStorage.setItem('usuarioSesion', JSON.stringify({
+                nombre: data.nombre,
+                rol: data.rol
+            }));
+
+            // Redirección a la landing de estructura tras éxito
+            window.location.href = "../Pages/landingestructura.html";
 
         } catch (err) {
             // Si la API devuelve un error (ej: 401 Unauthorized), lo mostramos en pantalla
