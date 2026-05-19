@@ -51,7 +51,7 @@
             }));
 
             // Redirección a la landing de estructura tras éxito
-            window.location.href="../Pages/landing.html";
+            window.location.href="/Pages/landing.html";
 
         } catch (err) {
             // Si la API devuelve un error (ej: 401 Unauthorized), lo mostramos en pantalla
