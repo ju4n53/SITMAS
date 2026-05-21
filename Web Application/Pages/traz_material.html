@@ -110,29 +110,13 @@
         <div id="collapseTipoMaterial" class="collapse">
             <div class="pt-4">
 
-                <form onsubmit="alert('Tipo de material registrado'); return false;">
-
-                    <div class="row g-3">
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Nombre</label>
-
-                            <input type="text"
-                                class="form-control"
-                                id="nombre_tipo_material"
-                                required
-                                placeholder="Ej: Plástico">
-                        </div>
-
-                    </div>
-
-                    <div class="pt-3 d-flex justify-content-end">
-                        <button type="submit"
-                            class="btn btn-sitmas-success px-5">
-                            Guardar Tipo
-                        </button>
-                    </div>
-
+                <form id="formTipo" onsubmit="GuardarTipo(); return false;">
+                    <input type="hidden" id="txtIdTipo" value="0">
+                    
+                    <label>Nombre del Tipo:</label>
+                    <input type="text" id="txtNombreTipo" class="form-control" required>
+                    
+                    <button type="submit" class="btn btn-primary mt-2">Guardar Tipo</button>
                 </form>
 
             </div>
@@ -155,43 +139,16 @@
         <div id="collapseSubtipoMaterial" class="collapse">
             <div class="pt-4">
 
-                <form onsubmit="alert('Subtipo registrado'); return false;">
-
-                    <div class="row g-3">
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Tipo de Material</label>
-
-                            <select class="form-select"
-                                id="id_tipo_material"
-                                required>
-
-                                <option value="">Seleccione un tipo</option>
-                                <option value="1">Plástico</option>
-                                <option value="2">Vidrio</option>
-                                <option value="3">Metal</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Nombre</label>
-
-                            <input type="text"
-                                class="form-control"
-                                id="nombre_subtipo_material"
-                                required
-                                placeholder="Ej: PET">
-                        </div>
-
-                    </div>
-
-                    <div class="pt-3 d-flex justify-content-end">
-                        <button type="submit"
-                            class="btn btn-sitmas-success px-5">
-                            Guardar Subtipo
-                        </button>
-                    </div>
-
+               <form id="formSubtipo" onsubmit="GuardarSubtipo(); return false;">
+                    <input type="hidden" id="txtIdSubtipo" value="0">
+                    
+                    <label>Tipo al que pertenece:</label>
+                    <select id="selectTipoMaterial" class="form-select" required></select>
+                    
+                    <label>Nombre del Subtipo:</label>
+                    <input type="text" id="txtNombreSubtipo" class="form-control" required>
+                    
+                    <button type="submit" class="btn btn-success mt-2">Guardar Subtipo</button>
                 </form>
 
             </div>
@@ -216,60 +173,9 @@
 
             <div class="table-responsive pt-4">
 
-                <table class="table table-hover align-middle">
-
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr>
-                            <td>1</td>
-
-                            <td class="fw-bold">
-                                Plástico
-                            </td>
-
-                            <td class="text-center">
-
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    Editar
-                                </button>
-
-                                <button class="btn btn-sm btn-outline-danger">
-                                    Eliminar
-                                </button>
-
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>2</td>
-
-                            <td class="fw-bold">
-                                Vidrio
-                            </td>
-
-                            <td class="text-center">
-
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    Editar
-                                </button>
-
-                                <button class="btn btn-sm btn-outline-danger">
-                                    Eliminar
-                                </button>
-
-                            </td>
-                        </tr>
-
-                    </tbody>
-
+                <table class="table">
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
+                    <tbody id="tbodyTipos"></tbody>
                 </table>
 
             </div>
@@ -295,73 +201,9 @@
 
             <div class="table-responsive pt-4">
 
-                <table class="table table-hover align-middle">
-
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Tipo de Material</th>
-                            <th>Nombre</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr>
-                            <td>1</td>
-
-                            <td>
-                                <span class="badge bg-light text-dark border">
-                                    Plástico
-                                </span>
-                            </td>
-
-                            <td class="fw-bold">
-                                PET
-                            </td>
-
-                            <td class="text-center">
-
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    Editar
-                                </button>
-
-                                <button class="btn btn-sm btn-outline-danger">
-                                    Eliminar
-                                </button>
-
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>2</td>
-
-                            <td>
-                                <span class="badge bg-light text-dark border">
-                                    Vidrio
-                                </span>
-                            </td>
-
-                            <td class="fw-bold">
-                                Templado
-                            </td>
-
-                            <td class="text-center">
-
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    Editar
-                                </button>
-
-                                <button class="btn btn-sm btn-outline-danger">
-                                    Eliminar
-                                </button>
-
-                            </td>
-                        </tr>
-
-                    </tbody>
-
+                <table class="table">
+                    <thead><tr><th>ID</th><th>ID Tipo</th><th>Subtipo</th><th>Acciones</th></tr></thead>
+                    <tbody id="tbodySubtipos"></tbody>
                 </table>
 
             </div>
@@ -386,6 +228,10 @@
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="../Js/traz_material_logica.js"></script>
 
 <script>
 

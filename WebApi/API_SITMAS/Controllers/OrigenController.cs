@@ -59,8 +59,8 @@ namespace API_SITMAS.Controllers
         }
 
         // PUT: api/Origen/5
-        [HttpPut]
-        public void Modificar(int id, [FromBody] EmpresaOrigen value)
+        [HttpPost]
+        public void Modificar([FromUri] int id, [FromBody] EmpresaOrigen value)
         {
 
             EmpresaOrigen oOrigen = new EmpresaOrigen();
