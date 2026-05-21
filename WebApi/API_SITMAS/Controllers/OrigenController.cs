@@ -77,9 +77,9 @@ namespace API_SITMAS.Controllers
         }
 
         // DELETE: api/Origen/5
-        [HttpDelete]
+        [HttpPost]
 
-        public void Borrar(int id)
+        public void Borrar([FromUri] int id)
         {
 
             EmpresaOrigen oOrigen = new EmpresaOrigen();

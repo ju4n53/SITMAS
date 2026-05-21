@@ -56,7 +56,7 @@ namespace API_SITMAS.Controllers
         }
 
         // PUT: api/TP_Material/5
-        [HttpPut]
+        [HttpPost]
         public void Modificar(int id, [FromBody] Tipo_Material value)
         {
 
@@ -69,7 +69,7 @@ namespace API_SITMAS.Controllers
         }
 
         // DELETE: api/TP_Material/5
-        [HttpDelete]
+        [HttpPost]
 
         public void Borrar(int id)
         {

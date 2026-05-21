@@ -111,6 +111,7 @@ F:\Carrera Sistemas\5TO semestre\Practica Profesionalizante 2\SITMAS\SITMAS Soft
 F:\Carrera Sistemas\5TO semestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.csproj.CopyComplete
 F:\Carrera Sistemas\5TO semestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.dll
 F:\Carrera Sistemas\5TO semestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.pdb
+F:\Carrera Sistemas\5TO semestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.csproj.AssemblyReference.cache
 E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\bin\API_SITMAS.dll.config
 E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\bin\API_SITMAS.xml
 E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\bin\API_SITMAS.dll
@@ -225,4 +226,3 @@ E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Softwar
 E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.csproj.Up2Date
 E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.dll
 E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.pdb
-F:\Carrera Sistemas\5TO semestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\obj\Debug\API_SITMAS.csproj.AssemblyReference.cache

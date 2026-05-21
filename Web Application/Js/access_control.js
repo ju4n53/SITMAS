@@ -12,50 +12,8 @@
 
     // 4. CONTROL DE ACCESO POR ROL (Opcional pero recomendado)
     // Si un operario intenta entrar escribiendo la URL a mano, lo rebotamos a la landing
-    if (sesion && sesion.rol !== 'Administrador') {
+    if (sesion && sesion.rol !== 'Administrador' && sesion.rol !== 'Supervisor' && sesion.rol !== 'RRHH' && sesion.rol !== 'RRII') {
         alert('No tiene permisos para acceder a la gestión de empleados.');
         window.location.href = "landing.html";
     }
 
-
-     // 5. LÓGICA DE PERMISOS
-    // const configPermisos = {
-    //     'Administrador': {
-    //         botonesVisibles: ['accion1', 'accion2', 'accion3'],
-    //         sidebarVisibles: ['sidebar-empleados', 'sidebar-logistica', 'sidebar-configuracion']
-    //     },
-    //     'operario': {
-    //         botonesVisibles: ['accion1'],
-    //         sidebarVisibles: ['sidebar-logistica']
-    //     }
-    // };
-
-    // function aplicarPermisos(rol) {
-    //     const permisos = configPermisos[rol];
-    //     if (!permisos) return;
-
-    //     // Ocultar todo por defecto
-    //     document.querySelectorAll('.btn-nav').forEach(btn => btn.style.display = 'none');
-    //     document.querySelectorAll('.nav-list > li').forEach(item => item.style.display = 'none');
-
-    //     // Mostrar lo que corresponde según el rol
-    //     permisos.botonesVisibles.forEach(id => {
-    //         const el = document.getElementById(id);
-    //         if (el) el.style.display = 'inline-block';
-    //     });
-    //     permisos.sidebarVisibles.forEach(id => {
-    //         const el = document.getElementById(id);
-    //         if (el) el.style.display = 'block';
-    //     });
-    // }
-
-    // // Aplicamos permisos basados en el rol guardado
-    // aplicarPermisos(sesion.rol);
-
-    // Lógica de dropdowns del menú lateral
-    // document.querySelectorAll('.dropdown').forEach(item => {
-    //     item.addEventListener('click', (e) => {
-    //         // Evitamos que el click se propague si es necesario
-    //         item.classList.toggle('active');
-    //     });
-    // });

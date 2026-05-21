@@ -80,13 +80,16 @@ namespace API_SITMAS.Controllers
         [Route("api/Usuario/Login")]
         public IHttpActionResult Login([FromBody] Usuarios login)
         {
-            DataTable dt = login.Validar(); 
+            DataTable dt = login.Validar();
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                // 1. Obtenemos el Id_Empleado que devolvió el login
+                // 1. Obtenemos los datos dinámicos que provienen del nuevo sp_Login
                 string idEmpleado = dt.Rows[0]["Id_Empleado"].ToString();
-                string nombreMostrar = dt.Rows[0]["Usuario"].ToString(); // Por defecto el correo
+                string nombreMostrar = dt.Rows[0]["Usuario"].ToString();
+
+                // ¡Aquí está la magia! Capturamos el rol real de la base de datos
+                string rolAsignado = dt.Rows[0]["NombreRol"].ToString();
 
                 // 2. Buscamos el nombre real en la tabla Empleado
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString))
@@ -98,18 +101,18 @@ namespace API_SITMAS.Controllers
                     SqlDataReader reader = cmd.ExecuteReader();
                     if (reader.Read())
                     {
-                        // Formateamos: "Juan Videla"
                         nombreMostrar = reader["Nombre"].ToString() + " " + reader["Apellido"].ToString();
                     }
                 }
 
+                // 3. Devolvemos la respuesta al Frontend con su Rol correspondiente
                 return Ok(new
                 {
                     nombre = nombreMostrar,
-                    rol = "Administrador" 
+                    rol = rolAsignado // Ya no está hardcodeado, cambia según el usuario
                 });
             }
-            return Unauthorized(); 
+            return Unauthorized();
         }
         // DELETE: api/Usuario/5
         //[HttpDelete]
