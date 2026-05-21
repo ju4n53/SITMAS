@@ -57,7 +57,7 @@ namespace API_SITMAS.Controllers
         }
 
         // PUT: api/SbTp_Material/5
-        [HttpPut]
+        [HttpPost]
         public void Modificar(int id, [FromBody] SubtipoMaterial value)
         {
 
@@ -71,7 +71,7 @@ namespace API_SITMAS.Controllers
         }
 
         // DELETE: api/SbTp_Material/5
-        [HttpDelete]
+        [HttpPost]
 
         public void Borrar(int id)
         {

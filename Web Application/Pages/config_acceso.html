@@ -171,62 +171,28 @@
                     <!-- FORM -->
                     <div class="pt-4">
 
-                        <form onsubmit="alert('Relación usuario-rol registrada'); return false;">
-
+                        <form id="formUsuarioRol" onsubmit="GuardarUsuarioRol(); return false;">
+                            <input type="hidden" id="txtIdUsuarioRol">
                             <div class="row g-3">
-
-                                <div class="col-md-6">
-
+                                <div class="col-6">
                                     <label class="form-label fw-bold">Usuario</label>
-
-                                    <select class="form-select"
-                                        id="id_usuario"
-                                        required>
-
-                                        <option value="">Seleccione usuario</option>
-                                        <option value="1">Juan Pérez</option>
-                                        <option value="2">María Gómez</option>
-
-                                    </select>
-
+                                    <select class="form-select" id="selectUsuarios" required></select>
                                 </div>
-
-                                <div class="col-md-6">
-
+                                <div class="col-6">
                                     <label class="form-label fw-bold">Rol</label>
-
-                                    <select class="form-select"
-                                        id="id_rol"
-                                        required>
-
-                                        <option value="">Seleccione rol</option>
-                                        <option value="1">Administrador</option>
-                                        <option value="2">Supervisor</option>
-
-                                    </select>
-
+                                    <select class="form-select" id="selectRoles" required></select>
                                 </div>
-
                             </div>
-
                             <div class="pt-3 d-flex justify-content-end">
-
-                                <button type="submit"
-                                    class="btn btn-sitmas-success px-5">
-                                    Guardar Relación
-                                </button>
-
+                                <button type="submit" class="btn btn-sitmas-success px-5">Guardar Relación</button>
                             </div>
-
                         </form>
 
                     </div>
 
                     <!-- TABLA -->
                     <div class="table-responsive pt-4">
-
                         <table class="table table-hover align-middle">
-
                             <thead>
                                 <tr>
                                     <th>Usuario</th>
@@ -234,39 +200,8 @@
                                     <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
-
-                            <tbody>
-
-                                <tr>
-
-                                    <td class="fw-bold">
-                                        Juan Pérez
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-light text-dark border">
-                                            Administrador
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn btn-sm btn-outline-primary me-1">
-                                            Editar
-                                        </button>
-
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            Eliminar
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
+                            <tbody id="tbodyUsuarioRol"></tbody>
                         </table>
-
                     </div>
 
                 </div>
@@ -603,6 +538,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="../Js/roles_logica.js"></script>
 <script src="../Js/permisos_logica.js"></script>
+<script src="../Js/usuariorol_logica.js"></script>
 
 <script>
 

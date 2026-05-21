@@ -59,8 +59,8 @@ namespace API_SITMAS.Controllers
         }
 
         // PUT: api/Origen/5
-        [HttpPut]
-        public void Modificar(int id, [FromBody] EmpresaOrigen value)
+        [HttpPost]
+        public void Modificar([FromUri] int id, [FromBody] EmpresaOrigen value)
         {
 
             EmpresaOrigen oOrigen = new EmpresaOrigen();
@@ -77,9 +77,9 @@ namespace API_SITMAS.Controllers
         }
 
         // DELETE: api/Origen/5
-        [HttpDelete]
+        [HttpPost]
 
-        public void Borrar(int id)
+        public void Borrar([FromUri] int id)
         {
 
             EmpresaOrigen oOrigen = new EmpresaOrigen();
