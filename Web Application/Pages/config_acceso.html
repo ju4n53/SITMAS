@@ -115,41 +115,23 @@
 
                     <!-- FORM -->
                     <div class="pt-4">
-
-                        <form onsubmit="alert('Rol registrado'); return false;">
-
+                         <form id="formRol" onsubmit="GuardarRol(); return false;">
                             <div class="row g-3">
-
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Rol</label>
-
-                                    <input type="text"
-                                        class="form-control"
-                                        id="rol"
-                                        required
-                                        placeholder="Ej: Administrador">
-                                </div>
-
+                                
+                              <div class="col-12">
+                                  <label class="form-label fw-bold">Rol</label>
+                                  <input type="hidden" id="txtIdRol" value=""> <input type="text" class="form-control" id="rol" required placeholder="Ej: Administrador">
+                              </div>
                             </div>
-
                             <div class="pt-3 d-flex justify-content-end">
-
-                                <button type="submit"
-                                    class="btn btn-sitmas-success px-5">
-                                    Guardar Rol
-                                </button>
-
+                                <button type="submit" class="btn btn-sitmas-success px-5">Guardar Rol</button>
                             </div>
-
-                        </form>
-
+                         </form>
                     </div>
 
                     <!-- TABLA -->
                     <div class="table-responsive pt-4">
-
                         <table class="table table-hover align-middle">
-
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -157,33 +139,9 @@
                                     <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
-
-                            <tbody>
-
-                                <tr>
-                                    <td>1</td>
-
-                                    <td class="fw-bold">
-                                        Administrador
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn btn-sm btn-outline-primary me-1">
-                                            Editar
-                                        </button>
-
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            Eliminar
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                            </tbody>
-
+                            <tbody id="tbodyRoles">
+                                </tbody>
                         </table>
-
                     </div>
 
                 </div>
@@ -338,42 +296,24 @@
                     <!-- FORM -->
                     <div class="pt-4">
 
-                        <form onsubmit="alert('Permiso registrado'); return false;">
-
+                        <form id="formPermiso" onsubmit="GuardarPermiso(); return false;">
+                            <input type="hidden" id="txtIdPermiso">
                             <div class="row g-3">
-
                                 <div class="col-12">
-
                                     <label class="form-label fw-bold">Permiso</label>
-
-                                    <input type="text"
-                                        class="form-control"
-                                        id="permiso"
-                                        required
-                                        placeholder="Ej: Gestionar Usuarios">
-
+                                    <input type="text" class="form-control" id="txtNombrePermiso" required placeholder="Ej: Trazabilidad_Escritura">
                                 </div>
-
                             </div>
-
                             <div class="pt-3 d-flex justify-content-end">
-
-                                <button type="submit"
-                                    class="btn btn-sitmas-success px-5">
-                                    Guardar Permiso
-                                </button>
-
+                                <button type="submit" class="btn btn-sitmas-success px-5">Guardar Permiso</button>
                             </div>
-
                         </form>
 
                     </div>
 
                     <!-- TABLA -->
                     <div class="table-responsive pt-4">
-
                         <table class="table table-hover align-middle">
-
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -381,35 +321,9 @@
                                     <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
-
-                            <tbody>
-
-                                <tr>
-
-                                    <td>1</td>
-
-                                    <td class="fw-bold">
-                                        Gestionar Usuarios
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn btn-sm btn-outline-primary me-1">
-                                            Editar
-                                        </button>
-
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            Eliminar
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
+                            <tbody id="tbodyPermisos">
+                                </tbody>
                         </table>
-
                     </div>
 
                 </div>
@@ -685,6 +599,10 @@
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="../Js/roles_logica.js"></script>
+<script src="../Js/permisos_logica.js"></script>
 
 <script>
 
