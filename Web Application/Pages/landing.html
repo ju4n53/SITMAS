@@ -155,61 +155,7 @@
 <script>
 
 
-    // // 1. OBTENER DATOS DEL LOCALSTORAGE
-    // // Aquí vendrá el objeto { nombre: "Juan Videla", rol: "Administrador" } desde el controlador
-    // const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
-
-    // // 2. VERIFICACIÓN DE IDENTIDAD
-    // if (!sesion) {
-    //     window.location.href = "../index.html";
-    // } else {
-    //     // 3. ACTUALIZAR HEADER CON EL NOMBRE REAL
-    //     // sesion.nombre ahora contiene "Nombre Apellido" gracias al cambio en el Controller
-    //     document.getElementById('header-user').textContent = sesion.nombre;
-    //     document.getElementById('header-role').textContent = sesion.rol.toUpperCase();
-    // }
-
-    // // 4. LÓGICA DE PERMISOS
-    // const configPermisos = {
-    //     'Administrador': {
-    //         botonesVisibles: ['accion1', 'accion2', 'accion3'],
-    //         sidebarVisibles: ['sidebar-empleados', 'sidebar-logistica', 'sidebar-configuracion']
-    //     },
-    //     'operario': {
-    //         botonesVisibles: ['accion1'],
-    //         sidebarVisibles: ['sidebar-logistica']
-    //     }
-    // };
-
-    // function aplicarPermisos(rol) {
-    //     const permisos = configPermisos[rol];
-    //     if (!permisos) return;
-
-    //     // Ocultar todo por defecto
-    //     document.querySelectorAll('.btn-nav').forEach(btn => btn.style.display = 'none');
-    //     document.querySelectorAll('.nav-list > li').forEach(item => item.style.display = 'none');
-
-    //     // Mostrar lo que corresponde según el rol
-    //     permisos.botonesVisibles.forEach(id => {
-    //         const el = document.getElementById(id);
-    //         if (el) el.style.display = 'inline-block';
-    //     });
-    //     permisos.sidebarVisibles.forEach(id => {
-    //         const el = document.getElementById(id);
-    //         if (el) el.style.display = 'block';
-    //     });
-    // }
-
-    // // Aplicamos permisos basados en el rol guardado
-    // aplicarPermisos(sesion.rol);
-
-    // // Lógica de dropdowns del menú lateral
-    // document.querySelectorAll('.dropdown').forEach(item => {
-    //     item.addEventListener('click', (e) => {
-    //         // Evitamos que el click se propague si es necesario
-    //         item.classList.toggle('active');
-    //     });
-    // });
+    
 
 </script>
 
