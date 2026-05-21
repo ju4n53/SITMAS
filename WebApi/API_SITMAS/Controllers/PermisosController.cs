@@ -56,7 +56,7 @@ namespace API_SITMAS.Controllers
         }
 
         // PUT: api/Permisos/5
-        [HttpPut]
+        [HttpPost]
         public void Modificar(int id, [FromBody] PermisoUser value)
         {
 
