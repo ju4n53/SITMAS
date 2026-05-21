@@ -3,7 +3,7 @@
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>E:\Cervantes\5° Cuatrimestre\Practica Profesionalizante 2\SITMAS\SITMAS Software\SITMAS\WebApi\API_SITMAS\bin\app.publish\</_PublishTargetUrl>
-    <History>True|2026-05-20T06:15:19.6648544Z||;</History>
+    <History>True|2026-05-21T08:13:27.0698598Z||;True|2026-05-20T03:15:19.6648544-03:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -77,10 +77,10 @@
       <publishTime>05/19/2026 23:32:14</publishTime>
     </File>
     <File Include="bin/API_SITMAS.dll">
-      <publishTime>05/20/2026 03:15:17</publishTime>
+      <publishTime>05/21/2026 05:13:25</publishTime>
     </File>
     <File Include="bin/API_SITMAS.pdb">
-      <publishTime>05/20/2026 03:15:17</publishTime>
+      <publishTime>05/21/2026 05:13:25</publishTime>
     </File>
     <File Include="bin/es/System.Net.Http.Formatting.resources.dll">
       <publishTime>05/19/2026 23:32:14</publishTime>
@@ -512,7 +512,7 @@
       <publishTime>05/19/2026 23:32:13</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>05/20/2026 03:15:18</publishTime>
+      <publishTime>05/21/2026 05:13:26</publishTime>
     </File>
   </ItemGroup>
 </Project>
