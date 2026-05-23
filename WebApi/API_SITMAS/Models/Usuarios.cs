@@ -229,6 +229,43 @@ namespace API_SITMAS.Models
                 }
             }
        }
+
+
+        public List<string> ObtenerPermisos(int idUsuario)
+        {
+            List<string> listaPermisos = new List<string>();
+
+            using (SqlConnection conn = new SqlConnection(conectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("sp_ObtenerPermisosUsuario", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+
+                    try
+                    {
+                        conn.Open();
+                        // 1. Ejecutamos el procedimiento y guardamos el resultado en el contenedor 'dr'
+                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            // 2. Mientras el lector encuentre filas, avanzamos
+                            while (dr.Read())
+                            {
+                                // 3. Agregamos el texto de la columna (ojo que coincida con tu SELECT del SP)
+                                listaPermisos.Add(dr["PermisoUsuario"].ToString());
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error al obtener permisos en la DB: " + ex.Message);
+                    }
+                }
+            }
+            return listaPermisos;
+        }
+
+
         //public DataTable VistalistadoEmpleados()
         //{
 
@@ -261,7 +298,7 @@ namespace API_SITMAS.Models
 
 
         //}
-    
+
 
         #endregion
 

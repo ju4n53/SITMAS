@@ -41,17 +41,18 @@
         }
 
         try {
-            // Llamada al servicio real
+            // Llamada al servicio real (Devuelve: idUsuario, nombre, rol y permisos)
             const data = await authService.login(userVal, passVal);
 
-            // Almacenamos los datos de sesión devueltos por el servidor (nombre y rol)
+            // ⬇️ MODIFICAMOS ESTA SECCIÓN PARA GUARDAR TAMBIÉN LOS PERMISOS ⬇️
             localStorage.setItem('usuarioSesion', JSON.stringify({
                 nombre: data.nombre,
-                rol: data.rol
+                rol: data.rol,
+                permisos: data.permisos // 👈 Sumamos esto para que viaje la lista de strings
             }));
 
             // Redirección a la landing de estructura tras éxito
-            window.location.href="/Pages/landing.html";
+            window.location.href = "/Pages/landing.html";
 
         } catch (err) {
             // Si la API devuelve un error (ej: 401 Unauthorized), lo mostramos en pantalla

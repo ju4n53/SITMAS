@@ -1,4 +1,4 @@
-const URL_UR = "https://localhost:44325/api/UsuarioRol"; // Ajusta según tu controlador
+const URL_UR = "https://localhost:44325/api/Usuario_Rol"; // Ajusta según tu controlador
 
 $(document).ready(function () {
     CargarSelects();

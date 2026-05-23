@@ -75,23 +75,25 @@ namespace API_SITMAS.Controllers
 
             oUsuario.Modificar();
         }
-
         [HttpPost]
         [Route("api/Usuario/Login")]
         public IHttpActionResult Login([FromBody] Usuarios login)
         {
+            // 1. Validamos las credenciales con tu SP sp_Login (con hash y salt)
             DataTable dt = login.Validar();
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                // 1. Obtenemos los datos dinámicos que provienen del nuevo sp_Login
+                // 2. Extraemos los datos básicos del usuario logueado
+                int idUsuario = Convert.ToInt32(dt.Rows[0]["Id_Usuario"]);
                 string idEmpleado = dt.Rows[0]["Id_Empleado"].ToString();
                 string nombreMostrar = dt.Rows[0]["Usuario"].ToString();
-
-                // ¡Aquí está la magia! Capturamos el rol real de la base de datos
                 string rolAsignado = dt.Rows[0]["NombreRol"].ToString();
 
-                // 2. Buscamos el nombre real en la tabla Empleado
+                // 3. ¡LA NUEVA MAGIA! Instanciamos tu método corregido para traer los permisos reales
+                List<string> misPermisos = login.ObtenerPermisos(idUsuario);
+
+                // 4. Buscamos el nombre real en la tabla Empleado (como ya lo tenías)
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString))
                 {
                     string query = "SELECT Nombre, Apellido FROM Empleado WHERE Id = @Id";
@@ -105,15 +107,21 @@ namespace API_SITMAS.Controllers
                     }
                 }
 
-                // 3. Devolvemos la respuesta al Frontend con su Rol correspondiente
+                // 5. Devolvemos el objeto completo al Frontend. ¡Mirá qué joya!
                 return Ok(new
                 {
+                    idUsuario = idUsuario,
                     nombre = nombreMostrar,
-                    rol = rolAsignado // Ya no está hardcodeado, cambia según el usuario
+                    rol = rolAsignado,
+                    permisos = misPermisos // 👈 Facu y Ramiro van a recibir la lista de strings acá
                 });
             }
+
+            // Si metió mal los dedos, credenciales inválidas
             return Unauthorized();
         }
+
+
         // DELETE: api/Usuario/5
         //[HttpDelete]
 

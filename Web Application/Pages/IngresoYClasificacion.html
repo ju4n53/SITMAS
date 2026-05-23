@@ -16,15 +16,20 @@
 <body class="min-vh-100 d-flex flex-column">
 
     <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
-        <div class="nombre-sistema">
-            <span id="fecha-hora" class="fw-bold h5 mb-0">Escuela Municipal de Economia Circular</span>
+        <div>
+            <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
         </div>
+
         <div class="info-right d-flex align-items-center gap-3">
-            <div class="text-end">
-                <p class="small m-0 text-black-50">Usuario: <span class="data text-white" id="display-user">---</span>
-                </p>
-                <p class="small m-0 text-black-50">Rol: <span class="data text-white" id="display-rol">---</span></p>
+            <div class="text-end d-flex flex-column"> <span>Hola, <span class="data"
+                        id="header-user">---</span></span>
+                <span>Eres: <span class="data" id="header-role">---</span></span>
+
+                <a href="#" class="text-danger small fw-bold" onclick="cerrarSesion(event)">
+                    ❌ Cerrar Sesión
+                </a>
             </div>
+
             <div class="role-icon"></div>
         </div>
     </header>
@@ -33,56 +38,66 @@
     <div class="main-layout flex-grow-1">
 
         <!-- Tu aside intacto, solo añadimos la clase 'sidebar-collapsible' para enganchar el CSS -->
-        <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+         <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
             <ul class="nav flex-column nav-list pt-3">
 
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="#">
+                    <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
                         <span class="material-symbols-outlined">home</span>
                         <span class="menu-text">INICIO</span>
                     </a>
                 </li>
 
+                <!-- SIDEBAR PERSONAL -->
                 <li class="nav-item" id="sidebar-empleados">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gp">
                         <span class="material-symbols-outlined">group</span>
                         <span class="menu-text">PERSONAL</span>
                     </a>
                     <div id="gp" class="collapse">
-                        <a class="nav-link small ps-4" href="cargaempleados.html">Empleados</a>
+                        <a class="nav-link small ps-4" href="../Pages/empleado.html">Empleados</a>
                         <a class="nav-link small ps-4" href="#">Usuarios</a>
                         <a class="nav-link small ps-4" href="#">Roles y Permisos</a>
                     </div>
                 </li>
 
+                <!-- SIDEBAR LOGISTICA -->
                 <li class="nav-item dropdown" id="sidebar-logistica">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gl">
                         <span class="material-symbols-outlined">local_shipping</span>
                         <span class="menu-text">LOGÍSTICA</span>
                     </a>
                     <div id="gl" class="collapse">
-                        <a class="nav-link small ps-4" href="#">Vehículos</a>
-                        <a class="nav-link small ps-4" href="#">Hojas de Ruta</a>
+                        <a class="nav-link small ps-4" href="../Pages/log_vehiculo.html">Vehículos</a>
+                        <a class="nav-link small ps-4" href="../Pages/log_hdr.html">Hojas de Ruta</a>
                     </div>
                 </li>
 
+                <!-- SIDEBAR TRAZABILIDAD -->
                 <li class="nav-item dropdown" id="sidebar-trazabilidad">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gt">
                         <span class="material-symbols-outlined">sync</span>
                         <span class="menu-text">TRAZABILIDAD</span>
                     </a>
                     <div id="gt" class="collapse">
-                        <a class="nav-link small ps-4" href="#">Ingreso Material</a>
-                        <a class="nav-link small ps-4" href="#">Clasificación</a>
+                        <a class="nav-link small ps-4" href="../Pages/traz_material.html">Ingreso Material</a>
+                        <a class="nav-link small ps-4" href="../Pages/traz_empresa.html">Origen</a>
+                        <a class="nav-link small ps-4" href="../Pages/IngresoYClasificacion.html">Clasificación</a>
                     </div>
                 </li>
 
-                <li class="nav-item" id="sidebar-configuracion">
-                    <a class="nav-link d-flex align-items-center" href="#">
+                <!-- SIDEBAR CONFIGURACION -->
+                <li class="nav-item dropdown" id="sidebar-configuracion">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gc">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="menu-text">CONFIGURACIÓN</span>
                     </a>
+                    <div id="gc" class="collapse">
+                        <a class="nav-link small ps-4" href="../Pages/config_estructura.html">General</a>
+                        <a class="nav-link small ps-4" href="../Pages/config_acceso.html">Accesos</a>
+                    </div>
                 </li>
+
             </ul>
         </aside>
 
@@ -317,68 +332,74 @@
     </footer>
 </body>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="../Js/access_control.js"></script>
+<!-- <script src="../Js/ingreso_clasificacion.js"></script> -->
+<script src="../Js/logout.js"></script>
+
 <script>
 
-    // Configuración de navegación
-    function showPag(n) {
-        // 1. Ocultar todas las secciones
-        const secciones = ['pag-1', 'pag-2', 'pag-clasificacion', 'pag-informes'];
-        secciones.forEach(id => document.getElementById(id).style.display = 'none');
+    // // Configuración de navegación
+    // function showPag(n) {
+    //     // 1. Ocultar todas las secciones
+    //     const secciones = ['pag-1', 'pag-2', 'pag-clasificacion', 'pag-informes'];
+    //     secciones.forEach(id => document.getElementById(id).style.display = 'none');
 
-        // 2. Mostrar la sección deseada
-        if (n === 1) document.getElementById('pag-1').style.display = 'block';
-        else if (n === 2) document.getElementById('pag-2').style.display = 'block';
-        else if (n === 3) document.getElementById('pag-clasificacion').style.display = 'block';
-        else if (n === 4) {
-            document.getElementById('pag-informes').style.display = 'block';
-            cargarInformes(); // Carga automática al entrar
-        }
+    //     // 2. Mostrar la sección deseada
+    //     if (n === 1) document.getElementById('pag-1').style.display = 'block';
+    //     else if (n === 2) document.getElementById('pag-2').style.display = 'block';
+    //     else if (n === 3) document.getElementById('pag-clasificacion').style.display = 'block';
+    //     else if (n === 4) {
+    //         document.getElementById('pag-informes').style.display = 'block';
+    //         cargarInformes(); // Carga automática al entrar
+    //     }
 
-        actualizarBotonesNav(n);
-    }
+    //     actualizarBotonesNav(n);
+    // }
 
-    function actualizarBotonesNav(n) {
-        const links = document.querySelectorAll('.nav-tabs .nav-link');
-        links.forEach(link => {
-            link.classList.remove('active');
-            link.classList.add('text-secondary');
-        });
+    // function actualizarBotonesNav(n) {
+    //     const links = document.querySelectorAll('.nav-tabs .nav-link');
+    //     links.forEach(link => {
+    //         link.classList.remove('active');
+    //         link.classList.add('text-secondary');
+    //     });
 
-        if (n === 1 || n === 2) {
-            document.getElementById('btn-ingreso').classList.add('active');
-            document.getElementById('btn-ingreso').classList.remove('text-secondary');
-        } else if (n === 3) {
-            document.getElementById('btn-clasificacion').classList.add('active');
-            document.getElementById('btn-clasificacion').classList.remove('text-secondary');
-        } else if (n === 4) {
-            document.getElementById('btn-informes').classList.add('active');
-            document.getElementById('btn-informes').classList.remove('text-secondary');
-        }
-    }
+    //     if (n === 1 || n === 2) {
+    //         document.getElementById('btn-ingreso').classList.add('active');
+    //         document.getElementById('btn-ingreso').classList.remove('text-secondary');
+    //     } else if (n === 3) {
+    //         document.getElementById('btn-clasificacion').classList.add('active');
+    //         document.getElementById('btn-clasificacion').classList.remove('text-secondary');
+    //     } else if (n === 4) {
+    //         document.getElementById('btn-informes').classList.add('active');
+    //         document.getElementById('btn-informes').classList.remove('text-secondary');
+    //     }
+    // }
 
-    // 4. Asignar los clics a los botones de la Navbar
-    document.getElementById('btn-ingreso').addEventListener('click', () => showPag(1));
-    document.getElementById('btn-clasificacion').addEventListener('click', () => showPag(3));
+    // // 4. Asignar los clics a los botones de la Navbar
+    // document.getElementById('btn-ingreso').addEventListener('click', () => showPag(1));
+    // document.getElementById('btn-clasificacion').addEventListener('click', () => showPag(3));
 
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Estas líneas solo se ejecutan cuando el HTML está 100% cargado
-        const btnIngreso = document.getElementById('btn-ingreso');
-        const btnClasificacion = document.getElementById('btn-clasificacion');
-        const btnInformes = document.getElementById('btn-informes');
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     // Estas líneas solo se ejecutan cuando el HTML está 100% cargado
+    //     const btnIngreso = document.getElementById('btn-ingreso');
+    //     const btnClasificacion = document.getElementById('btn-clasificacion');
+    //     const btnInformes = document.getElementById('btn-informes');
 
-        if (btnIngreso) btnIngreso.addEventListener('click', () => showPag(1));
-        if (btnClasificacion) btnClasificacion.addEventListener('click', () => showPag(3));
-        if (btnInformes) btnInformes.addEventListener('click', () => showPag(4));
+    //     if (btnIngreso) btnIngreso.addEventListener('click', () => showPag(1));
+    //     if (btnClasificacion) btnClasificacion.addEventListener('click', () => showPag(3));
+    //     if (btnInformes) btnInformes.addEventListener('click', () => showPag(4));
 
-        const formMateriales = document.getElementById('form-materiales');
-        if (formMateriales) {
-            formMateriales.addEventListener('submit', (e) => {
-                e.preventDefault();
-                alert("¡Datos de ingreso capturados!");
-            });
-        }
-    });
+    //     const formMateriales = document.getElementById('form-materiales');
+    //     if (formMateriales) {
+    //         formMateriales.addEventListener('submit', (e) => {
+    //             e.preventDefault();
+    //             alert("¡Datos de ingreso capturados!");
+    //         });
+    //     }
+    // });
 
 
 
