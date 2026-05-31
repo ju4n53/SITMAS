@@ -192,6 +192,7 @@
     <Compile Include="Controllers\EST_HDRController.cs" />
     <Compile Include="Controllers\EST_MaterialController.cs" />
     <Compile Include="Controllers\EST_UsuarioController.cs" />
+    <Compile Include="Controllers\Hoja_RutaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IngresoMaterialController.cs" />
     <Compile Include="Controllers\LocalidadesCbaController.cs" />
@@ -204,6 +205,7 @@
     <Compile Include="Controllers\SbTp_MaterialController.cs" />
     <Compile Include="Controllers\TpVinculacionController.cs" />
     <Compile Include="Controllers\TP_MaterialController.cs" />
+    <Compile Include="Controllers\Tp_VehiculoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Controllers\Usuario_RolController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
@@ -220,6 +222,7 @@
     <Compile Include="Models\EST_HDR.cs" />
     <Compile Include="Models\EST_Material.cs" />
     <Compile Include="Models\EST_Usuario.cs" />
+    <Compile Include="Models\Hoja_Ruta.cs" />
     <Compile Include="Models\IngresoMaterial.cs" />
     <Compile Include="Models\LocalidadesCba.cs" />
     <Compile Include="Models\MarcaVeh.cs" />
@@ -231,6 +234,7 @@
     <Compile Include="Models\SbTp_Material.cs" />
     <Compile Include="Models\TpVinculacion.cs" />
     <Compile Include="Models\Tp_Material.cs" />
+    <Compile Include="Models\Tp_Vehiculo.cs" />
     <Compile Include="Models\Usuarios.cs" />
     <Compile Include="Models\Usuario_Rol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
