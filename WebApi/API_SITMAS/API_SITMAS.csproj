@@ -209,6 +209,7 @@
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Controllers\Usuario_RolController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\VehiculoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -237,6 +238,7 @@
     <Compile Include="Models\Tp_Vehiculo.cs" />
     <Compile Include="Models\Usuarios.cs" />
     <Compile Include="Models\Usuario_Rol.cs" />
+    <Compile Include="Models\Vehiculo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
