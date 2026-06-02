@@ -45,77 +45,89 @@ namespace API_SITMAS.Controllers
 
         //}
 
-        //// POST: api/Empleado
+        //// POST: api/IngresoMaterial
+
         [HttpPost]
-
-        public void Insertar([FromBody] Ingreso_Material value)
+        public IHttpActionResult Insertar([FromBody] Ingreso_Material value)
         {
-            Ingreso_Material oIngresoMaterial = new Ingreso_Material();
-            oIngresoMaterial.Id_Origen = value.Id_Origen;
-            oIngresoMaterial.Id_Usuario_Registro = value.Id_Usuario_Registro;
-            oIngresoMaterial.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
-            oIngresoMaterial.Id_Vehiculo_Ingreso = value.Id_Vehiculo_Ingreso;
-           
+            if (value == null) return BadRequest("Datos del ingreso inválidos.");
 
-            oIngresoMaterial.Insertar();
+            try
+            {
+                Ingreso_Material oIngreso = new Ingreso_Material();
+                oIngreso.Id_Origen = value.Id_Origen;
+                oIngreso.Id_Usuario_Registro = value.Id_Usuario_Registro;
+                oIngreso.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
+                oIngreso.Id_Vehiculo_Ingreso = value.Id_Vehiculo_Ingreso;
+
+                // Ejecutamos la inserción y capturamos el ID de la base de datos
+                int idAsignado = oIngreso.Insertar();
+
+                // Respondemos con éxito enviando el ID asignado al Front
+                return Ok(new { id = idAsignado, mensaje = "Cabecera de ingreso registrada." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
         // PUT: api/Empleado/5
         //[HttpPut]
 
-        //public void Modificar(int id, [FromBody] Empleado value)
-        //{
+        public IHttpActionResult Modificar(int id, [FromBody] Ingreso_Material value)
+        {
+            if (value == null) return BadRequest("Datos vacíos.");
 
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-        //    oEmpleado.Apellido = value.Apellido;
-        //    oEmpleado.Nombre = value.Nombre;
-        //    oEmpleado.Cuil = value.Cuil;
-        //    oEmpleado.Telefono = value.Telefono;
-        //    oEmpleado.Email = value.Email;
-        //    oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;
-        //    oEmpleado.Id_Cargo = value.Id_Cargo;
-        //    oEmpleado.Id_Area = value.Id_Area;
-        //    oEmpleado.Id_Barrio = value.Id_Barrio;
-        //    oEmpleado.Id_Estado_Empleado = value.Id_Estado_Empleado;
-        //    oEmpleado.Calle = value.Calle;
-        //    oEmpleado.Numero = value.Numero;
-        //    oEmpleado.Piso = value.Piso;
-        //    oEmpleado.Dpto = value.Dpto;
+            try
+            {
+                Ingreso_Material oIngreso = new Ingreso_Material();
+                oIngreso.IdIngresoM = id; // Tomamos el ID de la URL
+                oIngreso.Id_Origen = value.Id_Origen;
+                oIngreso.Id_Usuario_Registro = value.Id_Usuario_Registro;
+                oIngreso.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
+                oIngreso.Id_Vehiculo_Ingreso = value.Id_Vehiculo_Ingreso;
 
-        //    oEmpleado.Modificar();
-
-
-        //}
+                oIngreso.Modificar();
+                return Ok("Registro de ingreso actualizado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
         // DELETE: api/Empleado/5
         //[HttpDelete]
 
-        //public void Borrar(int id)
-        //{
+        public IHttpActionResult Borrar(int id)
+        {
+            try
+            {
+                Ingreso_Material oIngreso = new Ingreso_Material();
+                oIngreso.IdIngresoM = id;
 
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    oEmpleado.Borrar();
-
-        //}
-
-
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
+                oIngreso.Borrar();
+                return Ok("Registro de ingreso eliminado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
 
-        //}
+            //[HttpGet]
+            //[Route("api/Ingreso_Material/ListarVista")]
 
-    }
+            public List<Ingreso_Material> ListarVista()
+            {
+                Ingreso_Material oIngreso = new Ingreso_Material();
+                DataTable dt = oIngreso.VistaIngreso_Material();
+
+                var listaJson = JsonConvert.SerializeObject(dt);
+                return JsonConvert.DeserializeObject<List<Ingreso_Material>>(listaJson);
+            }
+
+        }
 }
