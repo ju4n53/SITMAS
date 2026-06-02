@@ -16,21 +16,23 @@ namespace API_SITMAS.Models
 
         #region Atributos
 
-        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
         private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
-
-        //string conectionString = @"Data Source=DESKTOP-N824T94;Initial Catalog=Gestion_SITMAS; Integrated Security= True ";
 
         #endregion
 
         #region Propìedades
 
         public int IdDetalleIngreso { get; set; }
-        public int Id_Ingreso_Material { get; set; } // El que capturamos con Scope_Identity
+        public int Id_Ingreso_Material { get; set; }
         public int Id_SubTipo_Material { get; set; }
         public decimal PesoBruto { get; set; }
         public string Observaciones { get; set; }
+        public string EstadoDtIng { get; set; }
+
+        // Propiedades auxiliares de la vista legible
+        public string Tipo { get; set; }
+        public string Subtipo { get; set; }
 
 
 
@@ -101,142 +103,85 @@ namespace API_SITMAS.Models
         public void Insertar()
         {
 
-            string sqlSentencia = "sp_InsertarDetalleIngreso";
+            string sqlSentencia = "sp_InsertarDetalle_Ingreso";
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
 
+                sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value = Id_Ingreso_Material;
+                sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
+                sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
+                sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
 
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value = Id_Ingreso_Material;
-            sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
-            sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
-            sqlCom.Parameters.Add("@Observaciones", SqlDbType.NVarChar).Value = Observaciones;
-            
-            sqlCnn.Open();
-
-
-            var res = sqlCom.ExecuteNonQuery();
-
-
-            sqlCnn.Close();
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+            }
 
 
         }
 
 
-        //public void Modificar()
-        //{
+        public void Modificar()
+        {
+
+            string sqlSentencia = "sp_ActualizarDetalle_Ingreso";
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.Add("@IdDetalleIngreso", SqlDbType.Int).Value = IdDetalleIngreso;
+                sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
+                sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
+                sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
+
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+            }
 
 
-        //    string sqlSentencia = "sp_ActualizarEmpleado";
+        }
 
 
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
+        public void Borrar()
+        {
+
+            string sqlSentencia = "sp_EliminarDetalle_Ingreso";
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+                sqlCom.Parameters.Add("@IdDetalleIngreso", SqlDbType.Int).Value = IdDetalleIngreso;
+
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+            }
 
 
+        }
 
 
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
+        public DataTable SelectPorCabecera(int idCabecera)
+        {
 
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-        //    sqlCom.Parameters.Add("@Apellido", SqlDbType.NVarChar).Value = Apellido;
-        //    sqlCom.Parameters.Add("@Nombre", SqlDbType.NVarChar).Value = Nombre;
-        //    sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
-        //    sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
-        //    sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
-        //    sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;
-        //    sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
-        //    sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
-        //    sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
-        //    sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
-        //    sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
-        //    sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
-        //    sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
-        //    sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
+            string sqlSentencia = "sp_ListarVistaDetalle_Ingreso";
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+                sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = idCabecera;
 
-
-        //    sqlCnn.Open();
-
-
-        //    var res = sqlCom.ExecuteNonQuery();
-
-
-        //    sqlCnn.Close();
-
-
-        //}
-
-
-        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
-
-        //public void Borrar()
-        //{
-
-        //    string sqlSentencia = "sp_EliminarEmpleado";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-
-        //    sqlCnn.Open();
-
-
-        //    var res = sqlCom.ExecuteNonQuery();
-
-
-        //    sqlCnn.Close();
-
-
-        //}
-
-
-        //public DataTable VistalistadoEmpleados()
-        //{
-
-
-        //    string sqlSentencia = "sp_ListarEmpleadosDetallados";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
+                DataSet ds = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(sqlCom);
+                sqlCnn.Open();
+                da.Fill(ds);
+                return ds.Tables[0];
+            }
 
 
 
-        //    sqlCnn.Close();
-
-
-        //    return ds.Tables[0];
-
-
-
-        //}
+        }
 
 
         #endregion

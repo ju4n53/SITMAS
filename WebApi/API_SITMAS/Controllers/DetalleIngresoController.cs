@@ -27,6 +27,20 @@ namespace API_SITMAS.Controllers
 
         }
 
+
+        // GET: api/Detalle_Ingreso/PorCabecera/5
+        // Trae los pesajes legibles asociados a un camión específico
+        [HttpGet]
+        [Route("api/Detalle_Ingreso/PorCabecera/{idCabecera}")]
+        public List<Detalle_Ingreso> PorCabecera(int idCabecera)
+        {
+            Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+            DataTable dt = oDetalle.SelectPorCabecera(idCabecera);
+
+            var listaJson = JsonConvert.SerializeObject(dt);
+            return JsonConvert.DeserializeObject<List<Detalle_Ingreso>>(listaJson);
+        }
+
         // GET: api/Empleado/5
         //[HttpGet]
 
@@ -48,73 +62,58 @@ namespace API_SITMAS.Controllers
         // POST: api/DetalleIngreso
         [HttpPost]
 
-        public void Insertar([FromBody] Detalle_Ingreso value)
+        public IHttpActionResult Insertar([FromBody] Detalle_Ingreso value)
         {
-            Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
-            oDetalleIngreso.Id_Ingreso_Material = value.Id_Ingreso_Material;
-            oDetalleIngreso.Id_SubTipo_Material = value.Id_SubTipo_Material;
-            oDetalleIngreso.PesoBruto = value.PesoBruto;
-            oDetalleIngreso.Observaciones = value.Observaciones;
-
-            oDetalleIngreso.Insertar();
+            if (value == null) return BadRequest("Datos inválidos.");
+            try
+            {
+                value.Insertar();
+                return Ok("Pesada de material registrada en el camión.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
         // PUT: api/Empleado/5
         //[HttpPut]
 
-        //public void Modificar(int id, [FromBody] Empleado value)
-        //{
-
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-        //    oEmpleado.Apellido = value.Apellido;
-        //    oEmpleado.Nombre = value.Nombre;
-        //    oEmpleado.Cuil = value.Cuil;
-        //    oEmpleado.Telefono = value.Telefono;
-        //    oEmpleado.Email = value.Email;
-        //    oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;
-        //    oEmpleado.Id_Cargo = value.Id_Cargo;
-        //    oEmpleado.Id_Area = value.Id_Area;
-        //    oEmpleado.Id_Barrio = value.Id_Barrio;
-        //    oEmpleado.Id_Estado_Empleado = value.Id_Estado_Empleado;
-        //    oEmpleado.Calle = value.Calle;
-        //    oEmpleado.Numero = value.Numero;
-        //    oEmpleado.Piso = value.Piso;
-        //    oEmpleado.Dpto = value.Dpto;
-
-        //    oEmpleado.Modificar();
-
-
-        //}
+        public IHttpActionResult Modificar(int id, [FromBody] Detalle_Ingreso value)
+        {
+            if (value == null) return BadRequest("Datos inválidos.");
+            try
+            {
+                value.IdDetalleIngreso = id;
+                value.Modificar();
+                return Ok("Pesada de material modificada.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
         // DELETE: api/Empleado/5
         //[HttpDelete]
 
-        //public void Borrar(int id)
-        //{
-
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    oEmpleado.Borrar();
-
-        //}
-
-
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
+        public IHttpActionResult Borrar(int id)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                oDetalle.IdDetalleIngreso = id;
+                oDetalle.Borrar();
+                return Ok("Pesada anulada correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
 
-        //}
+
 
 
     }
