@@ -21,8 +21,7 @@
         </div>
 
         <div class="info-right d-flex align-items-center gap-3">
-            <div class="text-end d-flex flex-column"> <span>Hola, <span class="data"
-                        id="header-user">---</span></span>
+            <div class="text-end d-flex flex-column"> <span>Hola, <span class="data" id="header-user">---</span></span>
                 <span>Eres: <span class="data" id="header-role">---</span></span>
 
                 <a href="#" class="text-danger small fw-bold" onclick="cerrarSesion(event)">
@@ -38,7 +37,7 @@
     <div class="main-layout flex-grow-1">
 
         <!-- Tu aside intacto, solo añadimos la clase 'sidebar-collapsible' para enganchar el CSS -->
-         <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+        <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
             <ul class="nav flex-column nav-list pt-3">
 
                 <li class="nav-item">
@@ -107,17 +106,19 @@
                 <div class="col-12">
                     <ul class="nav nav-tabs border-0">
                         <li class="nav-item">
-                            <button class="nav-link active" id="btn-ingreso" onclick="showPag(1)">Ingreso</button>
+                            <button type="button" class="nav-link active" id="btn-ingreso"
+                                onclick="showPag(1)">Ingreso</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link text-secondary" id="btn-clasificacion"
+                            <button type="button" class="nav-link text-secondary" id="btn-detalle"
+                                onclick="showPag(2)">Detalle</button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="nav-link text-secondary" id="btn-clasificacion-tab"
                                 onclick="showPag(3)">Clasificación</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link text-secondary" id="btn-salida">Salida</button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="nav-link text-secondary" id="btn-informes"
+                            <button type="button" class="nav-link text-secondary" id="btn-informes"
                                 onclick="showPag(4)">Informes</button>
                         </li>
                     </ul>
@@ -136,10 +137,11 @@
                         </div>
                         <div class="row g-4">
 
-                                                       <div class="col-md-6">
+                            <div class="col-md-6">
 
                                 <label class="form-label mt-3">Usuario</label>
-                                <input class="form-control" id="input-usuario" readonly placeholder="UsuarioLogueado"></input>
+                                <input class="form-control" id="input-usuario" readonly
+                                    placeholder="UsuarioLogueado"></input>
                                 <div class="error-msg">Dato requerido</div>
                             </div>
                             <div class="col-md-6">
@@ -153,21 +155,20 @@
                             </div>
                             <div class="col-md-6">
 
-                                <label class="form-label mt-3">Vehículo</label>
+                                <label class="form-label mt-3">Chofer</label>
                                 <select class="form-select" id="select-vehiculo"></select>
                                 <div class="error-msg">Dato requerido</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label mt-3">Chofer</label>
+                                <label class="form-label mt-3">vehiculo</label>
                                 <select class="form-select" id="input-chofer">
                                     <option value="1">Juan Perez</option>
-                                    <option value="2">Carlitos</option>
                                 </select>
                                 <div class="error-msg">Ingrese el nombre del chofer</div>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end mt-5">
-                            <button type="button" class="btn btn-primary px-5" onclick="showPag(2)">Siguiente</button>
+                           <button type="button" class="btn btn-primary px-5" onclick="showPag(2)">Siguiente</button>
                         </div>
                     </div>
 
@@ -199,7 +200,7 @@
                                         <label class="form-label mt-3">Peso (kg)</label>
                                         <input type="number" class="form-control" step="0.1" id="input-peso">
                                         <div class="error-msg">Ingrese un peso válido</div>
-                                
+
 
                                         <label class="form-label mt-3">Observaciones</label>
                                         <textarea class="form-control" rows="1" id="textarea-obs"></textarea>
@@ -334,72 +335,13 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="../Js/access_control.js"></script>
+<!-- <script src="../Js/access_control.js"></script> -->
 <!-- <script src="../Js/ingreso_clasificacion.js"></script> -->
+ <script src="../Js/clasificacion_formulario.js"></script>
 <script src="../Js/logout.js"></script>
 
 <script>
 
-    // // Configuración de navegación
-    // function showPag(n) {
-    //     // 1. Ocultar todas las secciones
-    //     const secciones = ['pag-1', 'pag-2', 'pag-clasificacion', 'pag-informes'];
-    //     secciones.forEach(id => document.getElementById(id).style.display = 'none');
-
-    //     // 2. Mostrar la sección deseada
-    //     if (n === 1) document.getElementById('pag-1').style.display = 'block';
-    //     else if (n === 2) document.getElementById('pag-2').style.display = 'block';
-    //     else if (n === 3) document.getElementById('pag-clasificacion').style.display = 'block';
-    //     else if (n === 4) {
-    //         document.getElementById('pag-informes').style.display = 'block';
-    //         cargarInformes(); // Carga automática al entrar
-    //     }
-
-    //     actualizarBotonesNav(n);
-    // }
-
-    // function actualizarBotonesNav(n) {
-    //     const links = document.querySelectorAll('.nav-tabs .nav-link');
-    //     links.forEach(link => {
-    //         link.classList.remove('active');
-    //         link.classList.add('text-secondary');
-    //     });
-
-    //     if (n === 1 || n === 2) {
-    //         document.getElementById('btn-ingreso').classList.add('active');
-    //         document.getElementById('btn-ingreso').classList.remove('text-secondary');
-    //     } else if (n === 3) {
-    //         document.getElementById('btn-clasificacion').classList.add('active');
-    //         document.getElementById('btn-clasificacion').classList.remove('text-secondary');
-    //     } else if (n === 4) {
-    //         document.getElementById('btn-informes').classList.add('active');
-    //         document.getElementById('btn-informes').classList.remove('text-secondary');
-    //     }
-    // }
-
-    // // 4. Asignar los clics a los botones de la Navbar
-    // document.getElementById('btn-ingreso').addEventListener('click', () => showPag(1));
-    // document.getElementById('btn-clasificacion').addEventListener('click', () => showPag(3));
-
-
-    // document.addEventListener('DOMContentLoaded', () => {
-    //     // Estas líneas solo se ejecutan cuando el HTML está 100% cargado
-    //     const btnIngreso = document.getElementById('btn-ingreso');
-    //     const btnClasificacion = document.getElementById('btn-clasificacion');
-    //     const btnInformes = document.getElementById('btn-informes');
-
-    //     if (btnIngreso) btnIngreso.addEventListener('click', () => showPag(1));
-    //     if (btnClasificacion) btnClasificacion.addEventListener('click', () => showPag(3));
-    //     if (btnInformes) btnInformes.addEventListener('click', () => showPag(4));
-
-    //     const formMateriales = document.getElementById('form-materiales');
-    //     if (formMateriales) {
-    //         formMateriales.addEventListener('submit', (e) => {
-    //             e.preventDefault();
-    //             alert("¡Datos de ingreso capturados!");
-    //         });
-    //     }
-    // });
 
 
 
