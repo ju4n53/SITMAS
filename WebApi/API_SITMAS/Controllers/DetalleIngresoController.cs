@@ -9,12 +9,15 @@ using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
+
 {
+     [RoutePrefix("api/DetalleIngreso")]
     public class DetalleIngresoController : ApiController
     {
         // GET: api/DetalleIngreso
         [HttpGet]
-        public List<Detalle_Ingreso> ListarTodo()
+        [Route("")]
+    public List<Detalle_Ingreso> ListarTodo()
         {
             Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
 
@@ -31,7 +34,7 @@ namespace API_SITMAS.Controllers
         // GET: api/Detalle_Ingreso/PorCabecera/5
         // Trae los pesajes legibles asociados a un camión específico
         [HttpGet]
-        [Route("api/Detalle_Ingreso/PorCabecera/{idCabecera}")]
+        [Route("PorCabecera/{idCabecera}")]
         public List<Detalle_Ingreso> PorCabecera(int idCabecera)
         {
             Detalle_Ingreso oDetalle = new Detalle_Ingreso();
@@ -61,6 +64,7 @@ namespace API_SITMAS.Controllers
 
         // POST: api/DetalleIngreso
         [HttpPost]
+        [Route("")]
 
         public IHttpActionResult Insertar([FromBody] Detalle_Ingreso value)
         {
@@ -76,9 +80,9 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // PUT: api/Empleado/5
-        //[HttpPut]
-
+        // PUT: api/DetalleIngreso/5
+        [HttpPut]
+        [Route("{id}")]
         public IHttpActionResult Modificar(int id, [FromBody] Detalle_Ingreso value)
         {
             if (value == null) return BadRequest("Datos inválidos.");
@@ -94,9 +98,9 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // DELETE: api/Empleado/5
-        //[HttpDelete]
-
+        // DELETE: api/DetalleIngreso/5
+        [HttpDelete]
+        [Route("{id}")]
         public IHttpActionResult Borrar(int id)
         {
             try

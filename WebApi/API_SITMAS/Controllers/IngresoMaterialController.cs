@@ -3,51 +3,39 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/IngresoMaterial")] // Esto limpia las rutas de todo el controlador
     public class IngresoMaterialController : ApiController
     {
         // GET: api/IngresoMaterial
         [HttpGet]
+        [Route("")]
         public List<Ingreso_Material> ListarTodo()
         {
             Ingreso_Material oIngresoMaterial = new Ingreso_Material();
-
             DataTable dt = oIngresoMaterial.SelectAll();
             var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<Ingreso_Material>>(listaJson);
-
-            return Lista;
-
+            return JsonConvert.DeserializeObject<List<Ingreso_Material>>(listaJson);
         }
 
-        // GET: api/Empleado/5
-        //[HttpGet]
+        // GET: api/IngresoMaterial/ListarVista
+        [HttpGet]
+        [Route("ListarVista")] 
+        public List<Ingreso_Material> ListarVista()
+        {
+            Ingreso_Material oIngreso = new Ingreso_Material();
+            DataTable dt = oIngreso.VistaIngreso_Material();
 
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
+            var listaJson = JsonConvert.SerializeObject(dt);
+            return JsonConvert.DeserializeObject<List<Ingreso_Material>>(listaJson);
+        }
 
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
-
-        //// POST: api/IngresoMaterial
-
+        // POST: api/IngresoMaterial
         [HttpPost]
+        [Route("")] 
         public IHttpActionResult Insertar([FromBody] Ingreso_Material value)
         {
             if (value == null) return BadRequest("Datos del ingreso inválidos.");
@@ -60,10 +48,7 @@ namespace API_SITMAS.Controllers
                 oIngreso.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
                 oIngreso.Id_Vehiculo_Ingreso = value.Id_Vehiculo_Ingreso;
 
-                // Ejecutamos la inserción y capturamos el ID de la base de datos
                 int idAsignado = oIngreso.Insertar();
-
-                // Respondemos con éxito enviando el ID asignado al Front
                 return Ok(new { id = idAsignado, mensaje = "Cabecera de ingreso registrada." });
             }
             catch (Exception ex)
@@ -72,17 +57,16 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // PUT: api/Empleado/5
-        //[HttpPut]
-
+        // PUT: api/IngresoMaterial/5
+        [HttpPut]
+        [Route("{id}")] 
         public IHttpActionResult Modificar(int id, [FromBody] Ingreso_Material value)
         {
             if (value == null) return BadRequest("Datos vacíos.");
-
             try
             {
                 Ingreso_Material oIngreso = new Ingreso_Material();
-                oIngreso.IdIngresoM = id; // Tomamos el ID de la URL
+                oIngreso.IdIngresoM = id;
                 oIngreso.Id_Origen = value.Id_Origen;
                 oIngreso.Id_Usuario_Registro = value.Id_Usuario_Registro;
                 oIngreso.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
@@ -97,37 +81,22 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // DELETE: api/Empleado/5
-        //[HttpDelete]
-
+        // DELETE: api/IngresoMaterial/5
+        [HttpDelete]
+        [Route("{id}")] 
         public IHttpActionResult Borrar(int id)
         {
             try
             {
                 Ingreso_Material oIngreso = new Ingreso_Material();
                 oIngreso.IdIngresoM = id;
-
                 oIngreso.Borrar();
-                return Ok("Registro de ingreso eliminado correctamente.");
+                return Ok("Registro de ingreso anulado correctamente.");
             }
             catch (Exception ex)
             {
                 return InternalServerError(ex);
             }
         }
-
-
-            //[HttpGet]
-            //[Route("api/Ingreso_Material/ListarVista")]
-
-            public List<Ingreso_Material> ListarVista()
-            {
-                Ingreso_Material oIngreso = new Ingreso_Material();
-                DataTable dt = oIngreso.VistaIngreso_Material();
-
-                var listaJson = JsonConvert.SerializeObject(dt);
-                return JsonConvert.DeserializeObject<List<Ingreso_Material>>(listaJson);
-            }
-
-        }
+    }
 }

@@ -20,12 +20,12 @@ $(document).ready(function () {
  */
 function showPag(paso) {
     pasoActual = paso;
+    console.log("SITMAS Flujo - Cambiando a paso:", paso);
 
-    // --- ETAPA 1: OCULTAR/MOSTRAR SECCIONES ---
-    // Ocultamos todos los contenedores de planilla primero
+    // 1. Ocultamos de forma segura todos los contenedores
     $("#pag-1, #pag-2, #pag-clasificacion, #pag-informes").hide();
 
-    // Activamos mediante una estructura condicional el div seleccionado
+    // 2. Activamos el contenedor correspondiente
     if (paso === 1) {
         $("#pag-1").show();
     } else if (paso === 2) {
@@ -34,23 +34,26 @@ function showPag(paso) {
         $("#pag-clasificacion").show();
     } else if (paso === 4) {
         $("#pag-informes").show();
-        // Aprovechamos el gancho para consultar a la API WebAPI los datos actualizados
-        if (typeof cargarInformes === 'function') cargarInformes();
+        // Usamos una validación segura: si la función existe en el entorno, la ejecuta
+        if (typeof window.cargarInformes === 'function') {
+            window.cargarInformes();
+        } else if (typeof window.ListarIngresosHistoricos === 'function') {
+            window.ListarIngresosHistoricos();
+        }
     }
 
-    // --- ETAPA 2: ACTUALIZAR EL VISUAL DE LAS PESTAÑAS (NAV-TABS) ---
-    // Reseteamos todas las solapas a su estado inactivo por defecto
+    // 3. Estilo visual de las solapas superiores
     $(".nav-tabs .nav-link").removeClass("active").addClass("text-secondary");
 
-    // Mapeamos el número de paso con el ID físico del botón de la solapa superior
     let idBotonActivo = "";
     switch(paso) {
         case 1: idBotonActivo = "#btn-ingreso"; break;
-        case 2: idBotonActivo = "#btn-detalle"; break; // Modificaremos este id en el HTML
-        case 3: idBotonActivo = "#btn-clasificacion-tab"; break; // Modificaremos este id en el HTML
+        case 2: idBotonActivo = "#btn-detalle"; break;
+        case 3: idBotonActivo = "#btn-clasificacion-tab"; break;
         case 4: idBotonActivo = "#btn-informes"; break;
     }
 
-    // Le damos el estilo activo resaltado de Bootstrap a la solapa actual
-    $(idBotonActivo).addClass("active").removeClass("text-secondary");
+    if (idBotonActivo) {
+        $(idBotonActivo).addClass("active").removeClass("text-secondary");
+    }
 }

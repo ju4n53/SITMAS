@@ -127,74 +127,54 @@
 
             <!-- Cuerpo del Formulario (Solapa Saliente) -->
             <div class="tab-content-wrapper flex-grow-1">
-                <form id="form-materiales">
 
-                    <!-- PAGINACIÓN 1: ORIGEN -->
-                    <div id="pag-1">
-
+                <div id="pag-1">
+                    <form id="form-ingreso-cabecera">
                         <div class="row g-4">
                             <h3>Ingresar datos de materiales</h3>
                         </div>
                         <div class="row g-4">
-
                             <div class="col-md-6">
-
                                 <label class="form-label mt-3">Usuario</label>
-                                <input class="form-control" id="input-usuario" readonly
-                                    placeholder="UsuarioLogueado"></input>
+                                <input class="form-control" id="input-usuario" readonly placeholder="UsuarioLogueado">
                                 <div class="error-msg">Dato requerido</div>
                             </div>
                             <div class="col-md-6">
-
                                 <label class="form-label mt-3">Origen</label>
-                                <select class="form-select" id="id-origen">
-                                </select>
+                                <select class="form-select" id="id-origen"></select>
                                 <div class="error-msg">Seleccione un origen</div>
-
                             </div>
                             <div class="col-md-6">
-
                                 <label class="form-label mt-3">Chofer</label>
                                 <select class="form-select" id="select-Chofer"></select>
                                 <div class="error-msg">Seleccione Chofer</div>
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label mt-3">Vehiculo</label>
                                 <select class="form-select" id="select-Vehiculo"></select>
-                                </select>
                                 <div class="error-msg">Seleccione Vehiculo</div>
                             </div>
+                            <button type="submit" class="btn-submit btn-sitmas-success py-2 shadow-sm">
+                                Guardar solo Ingreso
+                            </button>
                         </div>
-                        <button type="submit" class="btn-submit btn-sitmas-success py-2 shadow-sm"
-                            onclick="RegistrarIngreso()">Guardar solo Ingreso</button>
-                        <div class="d-flex justify-content-end mt-5">
-                            <button type="button" class="btn btn-primary px-5" onclick="showPag(2)">Siguiente</button>
-                        </div>
+                    </form>
+                    <div class="d-flex justify-content-end mt-5">
+                        <button type="button" class="btn btn-primary px-5" onclick="showPag(2)">Siguiente</button>
                     </div>
-
-                    <!-- PAGINACIÓN 2: MATERIAL (Oculta por defecto) -->
-                    <div id="pag-2" style="display: none;">
-
+                </div>
+                <!-- DETALLE DE INGRESO-->
+                <div id="pag-2" style="display: none;">
+                    <form id="form-ingreso-detalle">
                         <div class="row g-4">
                             <h3>Ingresar datos de materiales</h3>
                         </div>
                         <div class="row g-4">
-                            <!-- Columna Formulario (10/12) -->
                             <div class="col-md-10">
                                 <div class="row">
-
                                     <div class="col-md-6">
-                                        <label class="form-label mt-3">Tipo de Material</label>
-                                        <select class="form-select" id="select-material">
-
-                                        </select>
-                                        <div class="error-msg">Seleccione material</div>
-
                                         <label class="form-label mt-3">Subtipo</label>
-                                        <select class="form-select" id="select-subtipo">
-
-                                        </select>
+                                        <select class="form-select" id="select-SbTpMaterial"></select>
                                         <div class="error-msg">Seleccione subtipo</div>
                                     </div>
                                     <div class="col-md-6">
@@ -202,126 +182,105 @@
                                         <input type="number" class="form-control" step="0.1" id="input-peso">
                                         <div class="error-msg">Ingrese un peso válido</div>
 
-
                                         <label class="form-label mt-3">Observaciones</label>
                                         <textarea class="form-control" rows="1" id="textarea-obs"></textarea>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Columna Botones y Carrito (2/12) -->
-                            <div class="col-md-2 border-start ps-3">
-                                <button type="button" class="btn btn-outline-success btn-sm w-100 mb-2">
-                                    + <br> <small>Agregar Ingreso</small>
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-3">
-                                    Limpiar datos
-                                </button>
-
-                                <div class="cart-column">
-                                    <p class="fw-bold mb-1 border-bottom">Detalle:</p>
-                                    <ul class="list-unstyled mb-0" id="lista-carrito">
-                                        <li class="d-flex justify-content-between">
-                                            PET | 150kg <span class="text-danger fw-bold">-</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Navegación Pag 2 -->
                         <div class="d-flex justify-content-between mt-5">
                             <button type="button" class="btn btn-secondary px-5" onclick="showPag(1)">Volver</button>
                             <button type="submit" class="btn btn-success px-5">Registrar</button>
                         </div>
+                    </form>
+                </div>
+                <!-- CLASIFICACION DEL MATERIAL -->
+                <div id="pag-clasificacion" style="display: none;">
+                    <div class="row g-4">
+                        <h3>Clasificación de Materiales</h3>
                     </div>
+                    <div class="tab-content-wrapper mt-3">
+                        <form id="form-clasificacion">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-primary">Seleccione el Material a
+                                        Clasificar</label>
+                                    <select id="select-id-ingreso" class="form-select" required>
+                                        <option value="" selected disabled>Cargando materiales del camión...</option>
+                                    </select>
+                                    <div class="error-msg" id="err-id-ingreso">Seleccione un ítem válido</div>
 
-                    <div id="pag-clasificacion" style="display: none;">
-                        <div class="row g-4">
-                            <h3>Clasificación de Materiales</h3>
-                        </div>
-                        <div class="tab-content-wrapper">
-                            <form id="form-clasificacion">
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">ID Ingreso (Referencia)</label>
-                                        <select id="select-id-ingreso" class="form-select" required>
-                                            <option value="" selected disabled>Seleccione un ingreso pendiente...
-                                            </option>
-                                        </select>
-                                        <div class="error-msg" id="err-id-ingreso">Seleccione un ID válido</div>
+                                    <label class="form-label mt-3">Estado del Material</label>
+                                    <select id="select-EST_Material" class="form-select" required>
+                                        <option value="" selected disabled>Seleccione estado...</option>
+                                    </select>
 
-                                        <label class="form-label mt-3">Peso Final (kg)</label>
-                                        <input type="number" id="peso-clasif" class="form-control" step="0.01"
-                                            placeholder="0.00" required>
-                                        <div class="error-msg" id="err-peso">Ingrese un peso con hasta 2 decimales</div>
+                                    <label class="form-label mt-3">Peso Final (kg)</label>
+                                    <input type="number" id="peso-clasif" class="form-control" step="0.01"
+                                        placeholder="0.00" required>
+                                    <div class="error-msg" id="err-peso">Ingrese un peso con hasta 2 decimales</div>
 
-                                        <label class="form-label mt-3">Estado del Material</label>
-                                        <select id="select-estado" class="form-select" required>
-                                            <option value="" selected disabled>Seleccione estado...</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label">Destino</label>
-                                        <select id="select-destino" class="form-select" required>
-                                            <option value="" selected disabled>Seleccione destino...</option>
-                                        </select>
-
-                                        <label class="form-label mt-3">Usuario Clasificador</label>
-                                        <select id="select-clasificador" class="form-select" required>
-                                            <option value="" selected disabled>Seleccione personal...</option>
-                                        </select>
-                                    </div>
                                 </div>
 
-                                <div class="d-flex justify-content-end mt-5">
-                                    <button type="submit" class="btn btn-success px-5">Finalizar Clasificación</button>
+                                <div class="col-md-6">
+                                    <label class="form-label">Destino</label>
+                                    <select id="select-destino" class="form-select" required>
+                                        <option value="" selected disabled>Seleccione destino...</option>
+                                    </select>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
 
-                    <!-- PAGINACIÓN 4: INFORMES (Tabla de datos) -->
-                    <div id="pag-informes" style="display: none;">
-                        <div class="row g-4 mb-3">
-                            <div class="col-12 d-flex justify-content-between align-items-center">
-                                <h3>Listado de Materiales Gestionados</h3>
-                                <button class="btn btn-sm btn-outline-primary" onclick="cargarInformes()">
-                                    Actualizar Datos
-                                </button>
+                                <div class="col-md-6">
+                                    <label class="form-label mt-3">Usuario</label>
+                                    <input class="form-control" id="input-usuario-clasif" readonly
+                                        placeholder="UsuarioLogueado">
+                                    <div class="error-msg">Dato requerido</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="table-responsive" style="max-height: 60vh; overflow-y: auto;">
-                            <table class="table table-hover align-middle" id="tabla-informes">
-                                <thead class="table-light sticky-top">
-                                    <tr>
-                                        <th>ID Ingreso</th>
-                                        <th>Fecha</th>
-                                        <th>Origen</th>
-                                        <th>Chofer</th>
-                                        <th>Vehículo</th>
-                                        <th>Categoría</th>
-                                        <th>Subtipo</th>
-                                        <th>Peso Bruto</th>
-                                        <th>Peso Total</th>
-                                        <th>Condición</th>
-                                        <th>Destino</th>
-                                        <th>Clasificador</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-informes">
-                                    <!-- Se rellena vía JavaScript -->
-                                </tbody>
-                            </table>
+                            <div class="d-flex justify-content-end mt-5">
+                                <button type="submit" class="btn btn-success px-5">Finalizar Clasificación</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="pag-informes" style="display: none;">
+                    <div class="row g-4 mb-3">
+                        <div class="col-12 d-flex justify-content-between align-items-center">
+                            <h3 class="fw-bold text-success">📋 Reporte de Trazabilidad Completa</h3>
+                            <button class="btn btn-sm btn-outline-primary px-3" onclick="cargarInformes()">
+                                🔄 Actualizar Datos
+                            </button>
                         </div>
                     </div>
 
-                </form>
+                    <div class="table-responsive shadow-sm border rounded" style="max-height: 65vh; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0" id="tabla-informes">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    <th>Nro Ingreso</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Origen</th>
+                                    <th>Chofer</th>
+                                    <th>Vehículo</th>
+                                    <th>Categoría</th>
+                                    <th>Subtipo</th>
+                                    <th>Peso Bruto</th>
+                                    <th>Peso Útil</th>
+                                    <th>Condición</th>
+                                    <th>Destino Final</th>
+                                    <th>Clasificador</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-informes">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+        </main>
     </div>
-    </main>
 
     <footer class="footer-liston">
         <div class="logos-container">

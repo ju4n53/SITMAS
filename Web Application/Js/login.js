@@ -46,6 +46,7 @@
 
             // ⬇️ MODIFICAMOS ESTA SECCIÓN PARA GUARDAR TAMBIÉN LOS PERMISOS ⬇️
             localStorage.setItem('usuarioSesion', JSON.stringify({
+                id: data.idUsuario,
                 nombre: data.nombre,
                 rol: data.rol,
                 permisos: data.permisos // 👈 Sumamos esto para que viaje la lista de strings

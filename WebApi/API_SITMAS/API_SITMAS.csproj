@@ -201,6 +201,7 @@
     <Compile Include="Controllers\ModeloVehController.cs" />
     <Compile Include="Controllers\OrigenController.cs" />
     <Compile Include="Controllers\PermisosController.cs" />
+    <Compile Include="Controllers\ReporteTrazabilidadController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\Rol_PermisoController.cs" />
     <Compile Include="Controllers\SbTp_MaterialController.cs" />
@@ -232,6 +233,7 @@
     <Compile Include="Models\ModeloVeh.cs" />
     <Compile Include="Models\Origen.cs" />
     <Compile Include="Models\Permisos.cs" />
+    <Compile Include="Models\ReporteTrazabilidad.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\Rol_Permiso.cs" />
     <Compile Include="Models\SbTp_Material.cs" />
