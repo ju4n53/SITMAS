@@ -232,14 +232,10 @@ namespace API_SITMAS.Models
 
         public DataTable VistalistadoEmpleados()
         {
-
-
             string sqlSentencia = "sp_ListarEmpleadosDetallados";
-
 
             SqlConnection sqlCnn = new SqlConnection();
             sqlCnn.ConnectionString = conectionString;
-
 
             sqlCnn.Open();
 
@@ -252,14 +248,33 @@ namespace API_SITMAS.Models
             da.SelectCommand = sqlCom;
             da.Fill(ds);
 
-
-
             sqlCnn.Close();
-
 
             return ds.Tables[0];
 
+        }
 
+        public DataTable ListadoChoferes()
+        {
+            string sqlSentencia = "sp_ListarCamioneros";
+
+            SqlConnection sqlCnn = new SqlConnection();
+            sqlCnn.ConnectionString = conectionString;
+
+            sqlCnn.Open();
+
+            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+            sqlCom.CommandType = CommandType.StoredProcedure;
+
+            DataSet ds = new DataSet();
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            da.SelectCommand = sqlCom;
+            da.Fill(ds);
+
+            sqlCnn.Close();
+
+            return ds.Tables[0];
 
         }
 

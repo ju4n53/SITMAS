@@ -127,6 +127,19 @@ namespace API_SITMAS.Controllers
 
         }
 
+        [HttpGet]
+        public List<Empleado> ListarChoferes()
+        {
+            Empleado oEmpleado = new Empleado();
+
+            var dt = oEmpleado.ListadoChoferes();
+            var ListaJsom = JsonConvert.SerializeObject(dt);
+
+            var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
+            return Lista;
+
+
+        }
 
     }
 }
