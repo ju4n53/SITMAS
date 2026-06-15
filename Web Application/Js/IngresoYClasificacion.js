@@ -129,19 +129,18 @@ function ComboDestino() {
     });
 }
 
-// --- 1. FUNCIÓN: REGISTRAR INGRESO (Pestaña 1) ---
-// --- 1. MODIFICACIÓN EN REGISTRAR INGRESO (Pestaña 1) ---
+// --- 1. FUNCIÓN: REGISTRAR INGRESO (Pestaña 1 - CORREGIDA) ---
 function RegistrarIngreso() {
     const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
     const idUsuarioReal = (sesion && sesion.id) ? parseInt(sesion.id) : 1;
 
-    if (!$("#id-origen").val() || !$("#select-Chofer").val() || !$("#select-Vehiculo").val()) {
-        alert("⚠️ Por favor, complete todos los campos de origen, chofer y vehículo.");
+    // 👈 CAMBIO: Quitamos "!$('#id-origen').val() ||" porque ya no pertenece a esta pestaña
+    if (!$("#select-Chofer").val() || !$("#select-Vehiculo").val()) {
+        alert("⚠️ Por favor, complete los campos de Chofer y Vehículo para registrar el arribo.");
         return;
     }
 
     const ingresoObj = {
-        "Id_Origen": parseInt($("#id-origen").val()),
         "Id_Usuario_Registro": idUsuarioReal,
         "Id_Camionero_Ingreso": parseInt($("#select-Chofer").val()),
         "Id_Vehiculo_Ingreso": parseInt($("#select-Vehiculo").val())
@@ -156,7 +155,6 @@ function RegistrarIngreso() {
             idIngresoActual = response.id;
             alert(`✅ ${response.mensaje} Registrado con el ID Número: ${idIngresoActual}`);
             
-            // Reemplazo Analítico: Al crear el camión, ya dejamos preparado el disparador automático de desgloses
             CargarMaterialesPendientesClasificar(idIngresoActual);
             
             showPag(2);
@@ -168,43 +166,7 @@ function RegistrarIngreso() {
         }
     });
 }
-// function RegistrarIngreso() {
-//     const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
-//     const idUsuarioReal = (sesion && sesion.id) ? parseInt(sesion.id) : 1;
 
-//     if (!$("#id-origen").val() || !$("#select-Chofer").val() || !$("#select-Vehiculo").val()) {
-//         alert("⚠️ Por favor, complete todos los campos de origen, chofer y vehículo.");
-//         return;
-//     }
-
-//     const ingresoObj = {
-//         "Id_Origen": parseInt($("#id-origen").val()),
-//         "Id_Usuario_Registro": idUsuarioReal,
-//         "Id_Camionero_Ingreso": parseInt($("#select-Chofer").val()),
-//         "Id_Vehiculo_Ingreso": parseInt($("#select-Vehiculo").val())
-//     };
-
-//     $.ajax({
-//         type: "POST",
-//         url: URL_INGRESO,
-//         data: JSON.stringify(ingresoObj),
-//         contentType: "application/json; charset=utf-8",
-//         success: function (response) {
-//             idIngresoActual = response.id;
-//             alert(`✅ ${response.mensaje} Registrado con el ID Número: ${idIngresoActual}`);
-            
-//             // Alimentamos el select de referencia de la Pestaña 3 con el ID actual de viaje
-//             CargarSelectReferenciaIngreso(idIngresoActual);
-            
-//             showPag(2);
-//             ListarIngresosHistoricos();
-//         },
-//         error: function (err) {
-//             console.error("Error en RegistrarIngreso:", err);
-//             alert("❌ Hubo un error al guardar la cabecera del ingreso.");
-//         }
-//     });
-// }
 
 // --- FUNCIÓN AUXILIAR: LLENAR DINÁMICAMENTE EL SELECTOR DE LA PESTAÑA 3 ---
 function CargarSelectReferenciaIngreso(idIngreso) {
@@ -213,8 +175,7 @@ function CargarSelectReferenciaIngreso(idIngreso) {
     selectClasif.append(`<option value="${idIngreso}" selected>Ingreso Actual Múltiple (#${idIngreso})</option>`);
 }
 
-// --- 2. FUNCIÓN: REGISTRAR DETALLE DE MATERIAL (Pestaña 2) ---
-// --- 2. MODIFICACIÓN EN REGISTRAR DETALLE (Pestaña 2) ---
+// --- 2. FUNCIÓN: REGISTRAR DETALLE DE MATERIAL (Pestaña 2 - CORREGIDA) ---
 function RegistrarDetalleMaterial() {
     if (!idIngresoActual) {
         alert("⚠️ Operación inválida: Primero debe registrar la cabecera en la pestaña 'Ingreso'.");
@@ -222,12 +183,14 @@ function RegistrarDetalleMaterial() {
         return;
     }
 
+    const idOrigenMaterial = $("#id-origen").val(); // 👈 Captura el origen de la solapa 2
     const idSubtipoMaterial = $("#select-SbTpMaterial").val();
     const pesoInput = $("#input-peso").val();
     const observaciones = $("#textarea-obs").val();
 
-    if (!idSubtipoMaterial || !pesoInput || parseFloat(pesoInput) <= 0) {
-        alert("⚠️ Por favor, seleccione un subtipo y cargue un peso válido (mayor a 0).");
+    // 👈 CAMBIO: Validamos obligatoriamente que se haya elegido una empresa/origen para esta pesada
+    if (!idOrigenMaterial || !idSubtipoMaterial || !pesoInput || parseFloat(pesoInput) <= 0) {
+        alert("⚠️ Por favor, complete el Origen, Subtipo y un Peso Bruto válido (mayor a 0).");
         return;
     }
 
@@ -235,7 +198,8 @@ function RegistrarDetalleMaterial() {
         "Id_Ingreso_Material": parseInt(idIngresoActual),
         "Id_SubTipo_Material": parseInt(idSubtipoMaterial),
         "PesoBruto": parseFloat(pesoInput),
-        "Observaciones": observaciones || ""
+        "Observaciones": observaciones || "",
+        "Id_Origen": parseInt(idOrigenMaterial) // 👈 Empaquetado perfecto para C#
     };
 
     $.ajax({
@@ -246,10 +210,10 @@ function RegistrarDetalleMaterial() {
         success: function (response) {
             alert("✅ " + response);
 
-            // Cada vez que se registra un desglose bruto con éxito en la solapa 2, 
-            // volvemos a consultar la API para que actualice la lista de la pestaña 3.
             CargarMaterialesPendientesClasificar(idIngresoActual);
 
+            // 👈 LIMPIEZA TOTAL: Incluimos el reseteo del combo de origen
+            $("#id-origen").val("");
             $("#select-SbTpMaterial").val("");
             $("#input-peso").val("");
             $("#textarea-obs").val("");
@@ -266,60 +230,6 @@ function RegistrarDetalleMaterial() {
         }
     });
 }
-// function RegistrarDetalleMaterial() {
-//     if (!idIngresoActual) {
-//         alert("⚠️ Operación inválida: Primero debe registrar la cabecera en la pestaña 'Ingreso'.");
-//         showPag(1);
-//         return;
-//     }
-
-//     const idSubtipoMaterial = $("#select-SbTpMaterial").val();
-//     const pesoInput = $("#input-peso").val();
-//     const observaciones = $("#textarea-obs").val();
-
-//     if (!idSubtipoMaterial || !pesoInput || parseFloat(pesoInput) <= 0) {
-//         alert("⚠️ Por favor, seleccione un subtipo y cargue un peso válido (mayor a 0).");
-//         return;
-//     }
-
-//     const detalleObj = {
-//         "Id_Ingreso_Material": parseInt(idIngresoActual),
-//         "Id_SubTipo_Material": parseInt(idSubtipoMaterial),
-//         "PesoBruto": parseFloat(pesoInput),
-//         "Observaciones": observaciones || ""
-//     };
-
-//     $.ajax({
-//         type: "POST",
-//         url: URL_DETALLE,
-//         data: JSON.stringify(detalleObj),
-//         contentType: "application/json; charset=utf-8",
-//         success: function (response) {
-//             alert("✅ " + response);
-
-//             // Resguardo de contexto: Dado que el SP de inserción no retorna el ID autogenerado del detalle, 
-//             // vinculamos la clasificación transicionalmente mediante el ID de la cabecera activa,
-//             // o mapeamos temporalmente el ID de cabecera a la propiedad del objeto transaccional.
-//             idDetalleActual = idIngresoActual; 
-
-//             // Limpiamos los campos para permitir nuevos pesajes brutos si aplica
-//             $("#select-SbTpMaterial").val("");
-//             $("#input-peso").val("");
-//             $("#textarea-obs").val("");
-
-//             // Brindamos la opción de saltar a clasificar el lote actual de inmediato
-//             if(confirm("¿Desea pasar ahora mismo a Clasificar el material registrado?")) {
-//                 showPag(3);
-//             }
-
-//             ListarIngresosHistoricos();
-//         },
-//         error: function (err) {
-//             console.error("Error en RegistrarDetalleMaterial:", err);
-//             alert("❌ Hubo un error al guardar el detalle del material.");
-//         }
-//     });
-// }
 
 // --- 3.1 NUEVA FUNCIÓN CONECTORA: ALIMENTAR PESTAÑA 3 DESDE TU ENDPOINT POR CABECERA ---
 function CargarMaterialesPendientesClasificar(idCabecera) {
@@ -532,362 +442,3 @@ window.cargarInformes = function () {
     console.log("SITMAS - Puente ejecutado con éxito.");
     ListarIngresosHistoricos();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Definimos la URL Base correspondiente al controlador de cabeceras de ingreso
-// const URL_INGRESO = "https://localhost:44325/api/IngresoMaterial";
-// const URL_DETALLE = "https://localhost:44325/api/DetalleIngreso";
-
-// // Variable global para almacenar el ID del ingreso que se acaba de crear o seleccionar
-// let idIngresoActual = null;
-
-// $(document).ready(function () {
-//     console.log("Iniciando carga de selectores...");
-//     ComboOrigen();
-//     ComboChoferes();
-//     ComboVehiculos();
-//     ComboSubTipoMaterial();
-//     ComboEstadoMaterial();
-//     ComboDestino();
-
-//     // Además de tus combos, cargamos el listado histórico en la solapa de informes
-//     //ListarIngresosHistoricos();
-
-//     // Escuchamos el submit del formulario exclusivo de la Pestaña 1 y 2
-//     $("#form-ingreso-cabecera").on("submit", function (e) {
-//         e.preventDefault(); // Evita que la página se recargue
-//         RegistrarIngreso(); // Llama a la función de guardado si pasó las validaciones
-//     });
-
-//     $("#form-ingreso-detalle").on("submit", function (e) {
-//         e.preventDefault(); // Evita la recarga de página
-//         RegistrarDetalleMaterial();
-//     });
-
-// });
-
-
-
-
-// function ComboOrigen() {
-//     $.ajax({
-//         type: "GET",
-//         url: "https://localhost:44325/api/Origen/ListarTodo",
-//         success: function (data) {
-//             let select = $("#id-origen");
-//             select.empty().append('<option value="">Seleccione Origen</option>');
-//             data.forEach(i => select.append(`<option value="${i.IdOrigen}">${i.EmpresaInstitucion}</option>`));
-//         }
-//     });
-// }
-
-// function ComboChoferes() {
-//     $.ajax({
-//         type: "GET",
-//         url: "https://localhost:44325/api/Empleado/ListarChoferes",
-//         success: function (data) {
-//             let select = $("#select-Chofer");
-//             select.empty().append('<option value="">Seleccione Chofer</option>');
-//             data.forEach(i => select.append(`<option value="${i.Id}">${i.Nombre},${i.Apellido}</option>`));
-//         }
-//     });
-// }
-
-// function ComboVehiculos() {
-//     $.ajax({
-//         type: "GET",
-//         url: "https://localhost:44325/api/Vehiculo/ListarTodo",
-//         success: function (data) {
-//             let select = $("#select-Vehiculo");
-//             select.empty().append('<option value="">Seleccione Vehículo</option>');
-//             data.forEach(i => select.append(`<option value="${i.Id}">${i.Id} - ${i.Patente}</option>`));
-//         }
-//     });
-// }
-
-
-
-// // function ComboTipoMaterial() {
-// //     $.ajax({
-// //         type: "GET",
-// //         url: "https://localhost:44325/api/TP_Material/ListarTodo",
-// //         success: function (data) {
-// //             let select = $("#select-TpMaterial");
-// //             select.empty().append('<option value="">Seleccione Tipo de Material</option>');
-// //             data.forEach(i => select.append(`<option value="${i.IdTipoMaterial}">${i.TipoMaterial}</option>`));
-// //         }
-// //     });
-// // }
-
-// function ComboSubTipoMaterial() {
-//     $.ajax({
-//         type: "GET",
-//         url: "https://localhost:44325/api/SbTp_Material/ListarTodo",
-//         success: function (data) {
-//             let select = $("#select-SbTpMaterial");
-//             select.empty().append('<option value="">Seleccione Subtipo de Material</option>');
-//             data.forEach(i => select.append(`<option value="${i.IdSubtipoM}">${i.Subtipo}</option>`));
-//         }
-//     });
-// }
-
-// function ComboEstadoMaterial() {
-//     $.ajax({
-//         type: "GET",
-//         url: "https://localhost:44325/api/EST_Material/ListarTodo",
-//         success: function (data) {
-//             let select = $("#select-EST_Material");
-//             select.empty().append('<option value="">Seleccione Estado del Material</option>');
-//             data.forEach(i => select.append(`<option value="${i.IdEstadoMaterial}">${i.EstadoMaterial}</option>`));
-//         }
-//     });
-// }
-
-// function ComboDestino() {
-//     $.ajax({
-//         type: "GET",
-//         url: "https://localhost:44325/api/Destino/ListarTodo",
-//         success: function (data) {
-//             let select = $("#select-destino");
-//             select.empty().append('<option value="">Seleccione Destino</option>');
-//             data.forEach(i => select.append(`<option value="${i.IdDestino}">${i.Destino}</option>`));
-//         }
-//     });
-// }
-
-// // --- 1. FUNCIÓN: REGISTRAR INGRESO (ALTA con captura de ID) ---
-// function RegistrarIngreso() {
-//     // Obtenemos los datos de sesión para saber qué ID de usuario está operando
-//     const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
-
-//     // 2. CAPTURA DINÁMICA: Si existe la sesión, tomamos el .id real de la base de datos.
-//     // Si no existe (caso de prueba aislada), le asignamos 1 por defecto para que no falle.
-//     const idUsuarioReal = (sesion && sesion.id) ? parseInt(sesion.id) : 1;
-
-//     // Control de auditoría en la consola para que el equipo verifique quién está firmando el viaje
-//     console.log("Auditoría SITMAS - ID de Usuario que registra el camión:", idUsuarioReal);
-
-//     // Validamos visualmente que los selectores tengan valores
-//     if (!$("#id-origen").val() || !$("#select-Chofer").val() || !$("#select-Vehiculo").val()) {
-//         alert("⚠️ Por favor, complete todos los campos de origen, chofer y vehículo.");
-//         return;
-//     }
-
-//     // Armamos el objeto exactamente igual a las propiedades del modelo C#
-//     const ingresoObj = {
-//         "Id_Origen": parseInt($("#id-origen").val()),
-//         "Id_Usuario_Registro": idUsuarioReal,
-//         "Id_Camionero_Ingreso": parseInt($("#select-Chofer").val()),
-//         "Id_Vehiculo_Ingreso": parseInt($("#select-Vehiculo").val())
-//     };
-
-//     $.ajax({
-//         type: "POST",
-//         url: URL_INGRESO,
-//         data: JSON.stringify(ingresoObj),
-//         contentType: "application/json; charset=utf-8",
-//         success: function (response) {
-//             // Guardamos el ID autogenerado que nos devolvió el IHttpActionResult de la API
-//             idIngresoActual = response.id;
-
-//             alert(`✅ ${response.mensaje} Registrado con el ID Número: ${idIngresoActual}`);
-
-//             // ACTUALIZACIÓN DE FLUJO: Desbloqueamos y saltamos automáticamente a la pestaña de detalles
-//             // Pasamos el ID al contexto para que sepa dónde añadir los materiales
-//             showPag(2);
-
-//             // Refrescamos los informes por detrás
-//             ListarIngresosHistoricos();
-//         },
-//         error: function (err) {
-//             console.error("Error en RegistrarIngreso:", err);
-//             alert("❌ Hubo un error al guardar la cabecera del ingreso.");
-//         }
-//     });
-// }
-
-
-
-// // --- 4. FUNCIÓN: REGISTRAR DETALLE DE MATERIAL (Pestaña 2) ---
-// function RegistrarDetalleMaterial() {
-//     // Control analítico: validamos que exista un camión activo en el contexto
-//     if (!idIngresoActual) {
-//         alert("⚠️ Operación inválida: Primero debe registrar la cabecera en la pestaña 'Ingreso'.");
-//         showPag(1);
-//         return;
-//     }
-
-//     // Captura de datos desde la interfaz
-//     const idSubtipoMaterial = $("#select-SbTpMaterial").val();
-//     const pesoInput = $("#input-peso").val();
-//     const observaciones = $("#textarea-obs").val();
-
-//     // Validación básica del lado del cliente
-//     if (!idSubtipoMaterial || !pesoInput || parseFloat(pesoInput) <= 0) {
-//         alert("⚠️ Por favor, seleccione un subtipo y cargue un peso válido (mayor a 0).");
-//         return;
-//     }
-
-//     // El objeto se construye con las PROPIEDADES EXACTAS del modelo Detalle_Ingreso en C#
-//     const detalleObj = {
-//         "Id_Ingreso_Material": parseInt(idIngresoActual),
-//         "Id_SubTipo_Material": parseInt(idSubtipoMaterial),
-//         "PesoBruto": parseFloat(pesoInput),
-//         "Observaciones": observaciones || ""
-//     };
-
-//     console.log("SITMAS Envío Detalle ->", detalleObj);
-
-//     $.ajax({
-//         type: "POST",
-//         url: URL_DETALLE,
-//         data: JSON.stringify(detalleObj),
-//         contentType: "application/json; charset=utf-8",
-//         success: function (response) {
-//             // Tu API responde con un Ok("Pesada de material registrada en el camión.")
-//             alert("✅ " + response);
-
-//             // Limpiamos los campos del detalle para permitir otra carga si el camión trae más cosas
-//             //$("#select-TpMaterial").val("");
-//             $("#select-SbTpMaterial").val("");
-//             $("#input-peso").val("");
-//             $("#textarea-obs").val("");
-
-//             // Refrescamos de manera asincrónica el listado histórico de informes
-//             ListarIngresosHistoricos();
-//         },
-//         error: function (err) {
-//             console.error("Error en RegistrarDetalleMaterial:", err);
-//             alert("❌ Hubo un error al guardar el detalle del material.");
-//         }
-//     });
-// }
-
-// // --- 2. FUNCIÓN: LISTAR VISTA (para el Tab de Informes) ---
-// function ListarIngresosHistoricos() {
-//     $.ajax({
-//         type: "GET",
-//         url: URL_INGRESO + "/ListarVista",
-//         dataType: "json",
-//         success: function (data) {
-//             const tbody = document.getElementById("body-informes");
-//             if (!tbody) return;
-
-//             tbody.innerHTML = "";
-
-//             if (data.length === 0) {
-//                 tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted py-4">⚠️ No hay registros de materiales gestionados.</td></tr>`;
-//                 return;
-//             }
-
-//             data.forEach(ing => {
-//                 // 1. Formateamos la fecha
-//                 let fechaFormateada = new Date(ing.FechaIngreso).toLocaleString('es-AR', {
-//                     year: 'numeric', month: '2-digit', day: '2-digit',
-//                     hour: '2-digit', minute: '2-digit'
-//                 });
-
-//                 // 2. Control dinámico del Badge de Condición/Estado
-//                 let badgeEstado = '';
-//                 if (ing.EstadoIng === 'A' || ing.EstadoIng === 'Activo' || ing.EstadoIng === 1) {
-//                     badgeEstado = `<span class="badge bg-success-subtle text-success border border-success-subtle">Activo</span>`;
-//                 } else {
-//                     badgeEstado = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Anulado</span>`;
-//                 }
-
-//                 // 3. Serializamos el objeto 'ing' a formato JSON string seguro para pasarlo por parámetro si fuera necesario
-//                 // O simplemente pasamos los IDs clave como parámetros a la función.
-//                 let paramsEditar = `${ing.IdIngresoM}, ${ing.Id_Origen}, ${ing.Id_Camionero_Ingreso}, ${ing.Id_Vehiculo_Ingreso}`;
-
-//                 // 4. Armamos las 13 celdas exactas que pide el thead
-//                 let tr = `<tr>
-//                             <td class="fw-bold text-secondary">#${ing.IdIngresoM}</td>
-//                             <td>${fechaFormateada}</td>
-//                             <td>${ing.Origen || '---'}</td>
-//                             <td>${ing.Camionero || '---'}</td>
-//                             <td><span class="badge bg-light text-dark border">${ing.Vehiculo || '---'}</span></td>
-                            
-//                             <td class="text-muted small"><em>Ver Detalle</em></td>
-//                             <td class="text-muted small"><em>Ver Detalle</em></td>
-//                             <td>-</td>
-//                             <td>-</td>
-                            
-//                             <td>${badgeEstado}</td>
-//                             <td>-</td>
-//                             <td>${ing.UsuarioRegistro || '---'}</td> <td class="text-center">
-//                                 <div class="d-flex gap-1 justify-content-center">
-//                                     <button type="button" class="btn btn-outline-primary btn-sm px-2 py-0" 
-//                                             onclick="PrepararEditarIngreso(${paramsEditar})">
-//                                         <i class="bi bi-pencil"></i> Editar
-//                                     </button>
-                                    
-//                                     <button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" 
-//                                             onclick="AnularIngresoCabecera(${ing.IdIngresoM})">
-//                                         Anular
-//                                     </button>
-//                                 </div>
-//                             </td>
-//                           </tr>`;
-//                 tbody.innerHTML += tr;
-//             });
-//         },
-//         error: function (error) {
-//             console.log("Error al cargar la vista de informes de ingresos:", error);
-//         }
-//     });
-// }
-
-
-// function PrepararEditarIngreso(idIngreso, idOrigen, idCamionero, idVehiculo) {
-//     // 1. Guardamos el ID del registro que vamos a actualizar
-//     $("#txtIdIngresoModificar").val(idIngreso);
-
-//     // 2. Seteamos los selectores de tu formulario con los IDs reales correspondientes
-//     $("#selectOrigen").val(idOrigen).trigger('change');
-//     $("#selectChofer").val(idCamionero).trigger('change');
-//     $("#selectVehiculo").val(idVehiculo).trigger('change');
-
-//     // 3. Mostramos el modal de edición o cambiamos a la pestaña de carga
-//     $("#modalEditarIngreso").modal("show");
-// }
-
-
-// // --- 3. FUNCIÓN: ANULAR INGRESO (BAJA LÓGICA) ---
-// function AnularIngresoCabecera(idIngreso) {
-//     if (!confirm(`⚠ ¿Está seguro de que desea ANULAR el Ingreso de Material #${idIngreso}?\nEsta acción mantendrá el registro de auditoría pero lo quitará de las planillas activas.`)) {
-//         return;
-//     }
-
-//     $.ajax({
-//         type: "DELETE",
-//         url: `${URL_INGRESO}/${idIngreso}`, // Pega a api/Ingreso_Material/5
-//         success: function (response) {
-//             alert("🔒 " + response);
-//             // Recargamos el listado para ver cómo desaparece de la grilla por acción del filtro del SP
-//             ListarIngresosHistoricos();
-//         },
-//         error: function (err) {
-//             console.error("Error al anular cabecera:", err);
-//             alert("❌ No se pudo completar la anulación del ingreso.");
-//         }
-//     });
-// }
-
-// // --- PUENTE DE CONEXIÓN CON LA PAGINACIÓN GLOBAL ---
-// // Exponemos la función globalmente para que 'clasificacion_formulario.js' la vea sí o sí
-// window.cargarInformes = function () {
-//     console.log("SITMAS - Puente ejecutado con éxito.");
-//     ListarIngresosHistoricos();
-// };
-

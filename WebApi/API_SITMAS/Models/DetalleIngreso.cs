@@ -29,6 +29,8 @@ namespace API_SITMAS.Models
         public decimal PesoBruto { get; set; }
         public string Observaciones { get; set; }
         public string EstadoDtIng { get; set; }
+        public int Id_Origen { get; set; }
+        public string Origen { get; set; }
 
         // Propiedades auxiliares de la vista legible
         public string Tipo { get; set; }
@@ -71,34 +73,7 @@ namespace API_SITMAS.Models
 
         }
 
-        //public DataTable SelectId()
-        //{
-
-
-        //    string sqlSentencia = "sp_VerEmpleadoId";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-        //    sqlCnn.Close();
-
-        //    return ds.Tables[0];
-
-        //}
+        
 
         public void Insertar()
         {
@@ -113,6 +88,7 @@ namespace API_SITMAS.Models
                 sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
                 sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
                 sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
+                sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
 
                 sqlCnn.Open();
                 sqlCom.ExecuteNonQuery();
@@ -135,6 +111,7 @@ namespace API_SITMAS.Models
                 sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
                 sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
                 sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
+                sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
 
                 sqlCnn.Open();
                 sqlCom.ExecuteNonQuery();

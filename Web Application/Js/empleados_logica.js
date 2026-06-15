@@ -81,7 +81,9 @@ function GetVistaMateria() {
 
 // --- FUNCIONES DE ACCIÓN (REGISTRAR / BUSCAR / MODIFICAR) ---
 
-function RegistrarEmpleado() {
+function RegistrarEmpleado(e) {
+    if (e) e.preventDefault(); // Freno de emergencia al submit nativo
+
     const obj = {
         "Apellido": $("#apellido").val(),
         "Nombre": $("#nombre").val(),
@@ -99,16 +101,28 @@ function RegistrarEmpleado() {
         "Dpto": $("#dpto").val()
     };
 
+    console.log("SITMAS - Enviando datos de nuevo empleado:", obj);
+
     $.ajax({
         type: "POST",
-        url: URL_BASE + "/Post",
+        url: URL_BASE + "/Insertar",
         data: JSON.stringify(obj),
         contentType: "application/json; charset=utf-8",
-        success: function () {
-            alert("Empleado guardado con éxito");
-            location.reload(); // Recarga para ver cambios
+        success: function (response) {
+            // Ahora que la memoria no se destruye, el cartel va a saltar impecable
+            alert("✅ Empleado guardado con éxito");
+            
+            // Refrescamos las planillas en tiempo real sin parpadear la pantalla
+            GetAllEmpleados();
+            GetVistaMateria();
+
+            // Limpiamos el formulario para una nueva carga limpia
+            $("#collapseForm form")[0].reset();
         },
-        error: function (err) { alert("Error al registrar empleado"); }
+        error: function (err) { 
+            console.error("Error en RegistrarEmpleado:", err);
+            alert("❌ Error al registrar empleado en el servidor"); 
+        }
     });
 }
 
@@ -162,7 +176,7 @@ function ModificarEmpleado() {
 
     $.ajax({
         type: "PUT",
-        url: URL_BASE + "/Put/" + id,
+        url: URL_BASE + "/Modificar/" + id,
         data: JSON.stringify(obj),
         contentType: "application/json; charset=utf-8",
         success: function () {

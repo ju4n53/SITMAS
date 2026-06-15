@@ -42,13 +42,8 @@ namespace API_SITMAS.Controllers
 
             try
             {
-                Ingreso_Material oIngreso = new Ingreso_Material();
-                oIngreso.Id_Origen = value.Id_Origen;
-                oIngreso.Id_Usuario_Registro = value.Id_Usuario_Registro;
-                oIngreso.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
-                oIngreso.Id_Vehiculo_Ingreso = value.Id_Vehiculo_Ingreso;
-
-                int idAsignado = oIngreso.Insertar();
+                // Al usar 'value' directamente, aprovechamos el objeto que ya armó Newtonsoft.Json
+                int idAsignado = value.Insertar();
                 return Ok(new { id = idAsignado, mensaje = "Cabecera de ingreso registrada." });
             }
             catch (Exception ex)
@@ -67,7 +62,6 @@ namespace API_SITMAS.Controllers
             {
                 Ingreso_Material oIngreso = new Ingreso_Material();
                 oIngreso.IdIngresoM = id;
-                oIngreso.Id_Origen = value.Id_Origen;
                 oIngreso.Id_Usuario_Registro = value.Id_Usuario_Registro;
                 oIngreso.Id_Camionero_Ingreso = value.Id_Camionero_Ingreso;
                 oIngreso.Id_Vehiculo_Ingreso = value.Id_Vehiculo_Ingreso;

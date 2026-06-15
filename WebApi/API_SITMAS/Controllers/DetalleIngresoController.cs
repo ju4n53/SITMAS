@@ -44,23 +44,7 @@ namespace API_SITMAS.Controllers
             return JsonConvert.DeserializeObject<List<Detalle_Ingreso>>(listaJson);
         }
 
-        // GET: api/Empleado/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
+        
 
         // POST: api/DetalleIngreso
         [HttpPost]

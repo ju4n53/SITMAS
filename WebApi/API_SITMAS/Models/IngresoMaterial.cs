@@ -13,12 +13,9 @@ namespace API_SITMAS.Models
     public class Ingreso_Material
     {
 
-
         #region Atributos
 
-        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
         private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
-
 
         #endregion
 
@@ -26,12 +23,10 @@ namespace API_SITMAS.Models
 
         public int IdIngresoM { get; set; }
         public DateTime FechaIngreso { get; set; }
-        public int Id_Origen { get; set; }
         public int Id_Usuario_Registro { get; set; }
         public int Id_Camionero_Ingreso { get; set; }
         public int Id_Vehiculo_Ingreso { get; set; }
         public string EstadoIng { get; set; }
-        public string Origen { get; set; }
         public string UsuarioRegistro { get; set; }
         public string Camionero { get; set; }
         public string Vehiculo { get; set; }
@@ -72,34 +67,7 @@ namespace API_SITMAS.Models
 
         }
 
-        //public DataTable SelectId()
-        //{
-
-
-        //    string sqlSentencia = "sp_VerEmpleadoId";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-        //    sqlCnn.Close();
-
-        //    return ds.Tables[0];
-
-        //}
+        
 
         public int Insertar()
         {
@@ -112,7 +80,6 @@ namespace API_SITMAS.Models
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
                 // Mapeamos los parámetros tal como los definimos en el SP
-                sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
                 sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
                 sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
                 sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
@@ -141,7 +108,6 @@ namespace API_SITMAS.Models
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
                 sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = IdIngresoM;
-                sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
                 sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
                 sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
                 sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
@@ -154,8 +120,6 @@ namespace API_SITMAS.Models
 
         }
 
-
-        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
 
         public void Borrar()
         {
