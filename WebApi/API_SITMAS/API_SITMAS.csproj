@@ -185,6 +185,7 @@
     <Compile Include="Controllers\AreaController.cs" />
     <Compile Include="Controllers\BarrioController.cs" />
     <Compile Include="Controllers\CargoController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DestinoController.cs" />
     <Compile Include="Controllers\DetalleIngresoController.cs" />
     <Compile Include="Controllers\EmpleadoController.cs" />
@@ -218,6 +219,7 @@
     <Compile Include="Models\Areas.cs" />
     <Compile Include="Models\Barrios.cs" />
     <Compile Include="Models\Cargos.cs" />
+    <Compile Include="Models\DashboardData.cs" />
     <Compile Include="Models\Destino.cs" />
     <Compile Include="Models\DetalleIngreso.cs" />
     <Compile Include="Models\Empleado.cs" />
