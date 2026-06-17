@@ -57,5 +57,28 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
+
+        // GET: api/Dashboard/StockActualSubtipos
+        [HttpGet]
+        [Route("StockActualSubtipos")]
+        public IHttpActionResult GetStockActual()
+        {
+            try
+            {
+                DataTable dt = _manager.ObtenerRendimientoClasificacion();
+
+                var json = JsonConvert.SerializeObject(dt);
+                var resultado = JsonConvert.DeserializeObject<List<RendimientoClasificacion>>(json);
+                                
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
+
     }
 }
