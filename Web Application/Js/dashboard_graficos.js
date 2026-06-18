@@ -99,36 +99,48 @@ function cargarGraficoRendimiento() {
 
 // 3. FUNCIÓN DE STOCK REAL
 function cargarGraficoStockActual() {
-    fetch(`${API_URL}/StockActualSubtipos`)
+    // 👈 CAMBIO 1: Apuntamos al nuevo controlador de movimientos de salida y su endpoint de StockNeto
+    fetch(`https://localhost:44325/api/MovimientoSalida/StockNeto`)
         .then(response => {
-            if (!response.ok) throw new Error("Error al obtener el stock");
+            if (!response.ok) throw new Error("Error al obtener el stock neto real");
             return response.json();
         })
         .then(data => {
-            // Extraemos los nombres de los materiales y sus KILOS ÚTILES acumulados
+            // Extraemos los nombres de los materiales de la nueva vista
             const etiquetas = data.map(item => item.SubtipoMaterial);
-            const stockUtil = data.map(item => item.TotalPesoUtilKg); // 👈 ¡Campo clave de PesoUtil!
+            
+            // 👈 CAMBIO 2: ¡La clave de la automatización! 
+            // Mapeamos a 'StockDisponibleKg' (que ya tiene restadas las salidas de producción, egresos y retiros)
+            const stockNetoReal = data.map(item => item.StockDisponibleKg); 
 
             const ctx = document.getElementById('chartStockActual').getContext('2d');
+            
+            // 💡 TIP ANALÍTICO: Si el gráfico ya existía en pantalla, Chart.js puede quejarse al redibujar.
+            // Para evitar que se duplique o parpadee si se actualiza seguido, limpiamos el canvas anterior.
+            let chartStatus = Chart.getChart("chartStockActual");
+            if (chartStatus != undefined) {
+                chartStatus.destroy();
+            }
+
             new Chart(ctx, {
-                type: 'bar',
+                type: 'bar', 
                 data: {
                     labels: etiquetas,
                     datasets: [{
-                        label: 'Stock Disponible (Kg Netos)',
-                        data: stockUtil,
-                        backgroundColor: '#10b981', // Verde Esmeralda (representa stock limpio y listo)
+                        label: 'Stock Neto Disponible (Kg Físicos en Galpón)',
+                        data: stockNetoReal, // 👈 Pasamos los kilos netos actualizados
+                        backgroundColor: '#10b981', // Verde Esmeralda institucional
                         borderRadius: 6,
                         borderWidth: 0
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // 👈 ¡TRUCO DE CHART.JS! Voltea el gráfico para que las barras sean horizontales
+                    indexAxis: 'y', // Mantiene las barras horizontales para modo ranking
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false // Ocultamos la leyenda superior porque el título de la tarjeta ya lo explica
+                            display: false 
                         }
                     },
                     scales: {
@@ -136,14 +148,14 @@ function cargarGraficoStockActual() {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Cantidad disponible (Kg)'
+                                text: 'Inventario Disponible (Kg Netos)'
                             }
                         }
                     }
                 }
             });
         })
-        .catch(error => console.error("Error en Dashboard (Stock):", error));
+        .catch(error => console.error("Error al actualizar la gráfica de Stock Neto:", error));
 }
 
 
