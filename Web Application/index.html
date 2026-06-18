@@ -27,9 +27,9 @@
 
             <form id="form-login">
                 <div class="mb-3">
-                    <!-- <label for="usuario" class="form-label fw-semibold">Usuario</label> -->
-                    <input type="text" id="usuario" class="form-control form-control-lg login-input-rounded"
-                        placeholder="Ingresá tu usuario">
+                    <input type="email" id="usuario" class="form-control form-control-lg login-input-rounded"
+                        placeholder="Ingresá tu usuario" required maxlength="40" autocomplete="username">
+
                     <span class="error-msg mt-1" id="error-user"
                         style="display: none; color: #ff4d4d; font-weight: 600;">
                         * Usuario no encontrado
@@ -37,9 +37,9 @@
                 </div>
 
                 <div class="mb-4">
-                    <!-- <label for="contraseña" class="form-label fw-semibold">Contraseña</label> -->
                     <input type="password" id="contraseña" class="form-control form-control-lg login-input-rounded"
-                        placeholder="Ingresá tu contraseña">
+                        placeholder="Ingresá tu contraseña" required maxlength="25" autocomplete="current-password">
+
                     <span class="error-msg mt-1" id="error-pass"
                         style="display: none; color: #ff4d4d; font-weight: 600;">
                         * Contraseña incorrecta
