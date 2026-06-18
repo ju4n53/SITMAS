@@ -11,7 +11,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
     <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../Js/access_control.js"></script>
 </head>
 
 <body class="min-vh-100 d-flex flex-column">
@@ -37,10 +38,8 @@
     <!-- Se añade el contenedor general flex de Bootstrap para asegurar la alineación horizontal fija -->
     <div class="main-layout flex-grow-1">
 
-        <!-- Tu aside intacto, solo añadimos la clase 'sidebar-collapsible' para enganchar el CSS -->
         <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
             <ul class="nav flex-column nav-list pt-3">
-
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
                         <span class="material-symbols-outlined">home</span>
@@ -48,56 +47,53 @@
                     </a>
                 </li>
 
-                <!-- SIDEBAR PERSONAL -->
-                <li class="nav-item" id="sidebar-empleados">
+                <li class="nav-item d-none" id="sidebar-empleados">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gp">
                         <span class="material-symbols-outlined">group</span>
                         <span class="menu-text">PERSONAL</span>
                     </a>
                     <div id="gp" class="collapse">
-                        <a class="nav-link small ps-4" href="../Pages/empleado.html">Empleados</a>
-                        <!-- <a class="nav-link small ps-4" href="#">Usuarios</a>
-                        <a class="nav-link small ps-4" href="#">Roles y Permisos</a> -->
+                        <a class="nav-link small ps-4 d-none" id="pageEmpleado" href="../Pages/empleado.html">Empleados</a>
                     </div>
                 </li>
 
-                <!-- SIDEBAR LOGISTICA -->
-                <li class="nav-item dropdown" id="sidebar-logistica">
+                <li class="nav-item dropdown d-none" id="sidebar-logistica">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gl">
                         <span class="material-symbols-outlined">local_shipping</span>
                         <span class="menu-text">LOGÍSTICA</span>
                     </a>
                     <div id="gl" class="collapse">
-                        <a class="nav-link small ps-4" href="../Pages/log_vehiculo.html">Vehículos</a>
-                        <a class="nav-link small ps-4" href="../Pages/log_hdr.html">Hojas de Ruta</a>
+                        <a class="nav-link small ps-4 d-none" id="pageVehiculo" href="../Pages/log_vehiculo.html">Vehículos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageHojasRuta" href="../Pages/log_hdr.html">Hojas de Ruta</a>
                     </div>
                 </li>
 
-                <!-- SIDEBAR TRAZABILIDAD -->
-                <li class="nav-item dropdown" id="sidebar-trazabilidad">
+                <li class="nav-item dropdown d-none" id="sidebar-trazabilidad">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gt">
                         <span class="material-symbols-outlined">sync</span>
                         <span class="menu-text">TRAZABILIDAD</span>
                     </a>
                     <div id="gt" class="collapse">
-                        <a class="nav-link small ps-4" href="../Pages/traz_material.html">Ingreso Material</a>
-                        <a class="nav-link small ps-4" href="../Pages/traz_empresa.html">Origen</a>
-                        <!-- <a class="nav-link small ps-4" href="../Pages/IngresoYClasificacion.html">Clasificación</a> -->
+                        <a class="nav-link small ps-4 d-none" id="pageIngresoMaterial"
+                            href="../Pages/traz_material.html">Materiales</a>
+                        <a class="nav-link small ps-4 d-none" id="pageOrigen" href="../Pages/traz_empresa.html">Origen</a>
+                        <a class="nav-link small ps-4 d-none" href="../Pages/IngresoYClasificacion.html">Clasificación</a>
+                        <a class="nav-link small ps-4 d-none" href="../Pages/SalidasYStock.html">Salida</a>
                     </div>
                 </li>
 
-                <!-- SIDEBAR CONFIGURACION -->
-                <li class="nav-item dropdown" id="sidebar-configuracion">
+                <li class="nav-item dropdown d-none" id="sidebar-configuracion">
                     <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gc">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="menu-text">CONFIGURACIÓN</span>
                     </a>
                     <div id="gc" class="collapse">
-                        <a class="nav-link small ps-4" href="../Pages/config_estructura.html">General</a>
-                        <a class="nav-link small ps-4" href="../Pages/config_acceso.html">Accesos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageConfigEstructura"
+                            href="../Pages/config_estructura.html">General</a>
+                        <a class="nav-link small ps-4 d-none" id="pageConfigAcceso"
+                            href="../Pages/config_acceso.html">Accesos</a>
                     </div>
                 </li>
-
             </ul>
         </aside>
 
@@ -118,8 +114,8 @@
 
                     <div id="collapseForm" class="collapse">
                         <div class="pt-4">
-                            <form onsubmit="RegistrarEmpleado(event)";>
-                                <div class="row g-3";>
+                            <form onsubmit="RegistrarEmpleado(event)" ;>
+                                <div class="row g-3" ;>
 
 
 
@@ -319,10 +315,7 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script src="../Js/access_control.js"></script>
-<!-- <script src="../Js/verificador_permisos.js"></script>
-<script src="../Js/limitador_permisos.js"></script> -->
+<script src="../Js/alerts_config.js"></script>
 <script src="../Js/empleados_logica.js"></script>
 <script src="../Js/logout.js"></script>
 
