@@ -5,11 +5,42 @@ $(document).ready(function () {
     CargarComboCargos();
     CargarComboAreas();
     CargarComboBarrios();
+    ComboEstadoEmpleado();
+
+    // 🛡️ FORMATEADOR Y LIMITADOR DINÁMICO DE CUIL 
+    $("#cuil").on("input", function () {
+        // 1. Eliminamos cualquier caracter que NO sea un número
+        let valor = $(this).val().replace(/\D/g, "");
+
+        // 2. Limitamos a un máximo de 11 dígitos puros (el CUIL real tiene 11 números)
+        if (valor.length > 11) {
+            valor = valor.substr(0, 11);
+        }
+
+        // 3. Vamos armando la máscara con guiones dinámicos de forma automática
+        let cuilFormateado = "";
+
+        if (valor.length > 0) {
+            // Primer bloque: XX
+            cuilFormateado += valor.substr(0, 2);
+        }
+        if (valor.length > 2) {
+            // Primer guión y segundo bloque: XX-XXXXXXXX
+            cuilFormateado += "-" + valor.substr(2, 8);
+        }
+        if (valor.length > 10) {
+            // Segundo guión y dígito verificador: XX-XXXXXXXX-X
+            cuilFormateado += "-" + valor.substr(10, 1);
+        }
+
+        // 4. Devolvemos el valor formateado al input en tiempo real
+        $(this).val(cuilFormateado);
+    });
 
     // BUSCADOR UNIVERSAL (Corregido para ambas tablas)
     $("#inputBusqueda").on("keyup", function () {
         var value = $(this).val().toLowerCase();
-        
+
         // Seleccionamos todos los tbody de la página para que filtre ambas tablas
         $("tbody tr").filter(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
@@ -111,7 +142,7 @@ function RegistrarEmpleado(e) {
         success: function (response) {
             // Ahora que la memoria no se destruye, el cartel va a saltar impecable
             alert("✅ Empleado guardado con éxito");
-            
+
             // Refrescamos las planillas en tiempo real sin parpadear la pantalla
             GetAllEmpleados();
             GetVistaMateria();
@@ -119,9 +150,9 @@ function RegistrarEmpleado(e) {
             // Limpiamos el formulario para una nueva carga limpia
             $("#collapseForm form")[0].reset();
         },
-        error: function (err) { 
+        error: function (err) {
             console.error("Error en RegistrarEmpleado:", err);
-            alert("❌ Error al registrar empleado en el servidor"); 
+            alert("❌ Error al registrar empleado en el servidor");
         }
     });
 }
@@ -223,4 +254,17 @@ function CargarComboBarrios() {
             data.forEach(i => select.append(`<option value="${i.Id}">${i.Barrio}</option>`));
         }
     });
-}
+
+    function CargarComboEstadoEmpleado() {
+        $.ajax({
+            type: "GET",
+            url: "https://localhost:44325/api/EstadoEmpleado/ListarTodo",
+            success: function (data) {
+                let select = $("#id_estado");
+                select.empty().append('<option value="">Seleccione Estado</option>');
+                data.forEach(i => select.append(`<option value="${i.Id}">${i.EstadoEmpleado}</option>`));
+            }
+        });
+    }
+
+    }

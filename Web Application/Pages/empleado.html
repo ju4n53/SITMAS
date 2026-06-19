@@ -53,7 +53,8 @@
                         <span class="menu-text">PERSONAL</span>
                     </a>
                     <div id="gp" class="collapse">
-                        <a class="nav-link small ps-4 d-none" id="pageEmpleado" href="../Pages/empleado.html">Empleados</a>
+                        <a class="nav-link small ps-4 d-none" id="pageEmpleado"
+                            href="../Pages/empleado.html">Empleados</a>
                     </div>
                 </li>
 
@@ -63,8 +64,10 @@
                         <span class="menu-text">LOGÍSTICA</span>
                     </a>
                     <div id="gl" class="collapse">
-                        <a class="nav-link small ps-4 d-none" id="pageVehiculo" href="../Pages/log_vehiculo.html">Vehículos</a>
-                        <a class="nav-link small ps-4 d-none" id="pageHojasRuta" href="../Pages/log_hdr.html">Hojas de Ruta</a>
+                        <a class="nav-link small ps-4 d-none" id="pageVehiculo"
+                            href="../Pages/log_vehiculo.html">Vehículos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageHojasRuta" href="../Pages/log_hdr.html">Hojas de
+                            Ruta</a>
                     </div>
                 </li>
 
@@ -76,8 +79,10 @@
                     <div id="gt" class="collapse">
                         <a class="nav-link small ps-4 d-none" id="pageIngresoMaterial"
                             href="../Pages/traz_material.html">Materiales</a>
-                        <a class="nav-link small ps-4 d-none" id="pageOrigen" href="../Pages/traz_empresa.html">Origen</a>
-                        <a class="nav-link small ps-4 d-none" href="../Pages/IngresoYClasificacion.html">Clasificación</a>
+                        <a class="nav-link small ps-4 d-none" id="pageOrigen"
+                            href="../Pages/traz_empresa.html">Origen</a>
+                        <a class="nav-link small ps-4 d-none"
+                            href="../Pages/IngresoYClasificacion.html">Clasificación</a>
                         <a class="nav-link small ps-4 d-none" href="../Pages/SalidasYStock.html">Salida</a>
                     </div>
                 </li>
@@ -121,24 +126,26 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Apellido</label>
-                                        <input type="text" class="form-control" id="apellido" required
+                                        <input type="text" class="form-control" id="apellido" required maxlength="25"
                                             placeholder="Ej: Pérez">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Nombre</label>
-                                        <input type="text" class="form-control" id="nombre" required
+                                        <input type="text" class="form-control" id="nombre" required maxlength="25"
                                             placeholder="Ej: Juan">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">CUIL</label>
-                                        <input type="text" class="form-control" id="cuil" required
-                                            placeholder="20-33444555-9">
+                                        <input type="text" class="form-control" id="cuil" required maxlength="13"
+                                            placeholder="20-33444555-9" pattern="^\d{2}-\d{8}-\d{1}$"
+                                            title="Formato requerido: XX-XXXXXXX-X">
                                     </div>
+
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Teléfono</label>
-                                        <input type="number" class="form-control" id="telefono" required>
+                                        <input type="text" class="form-control" id="telefono" required maxlength="15">
                                     </div>
 
                                     <div class="col-md-4">
@@ -149,7 +156,7 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Fecha de Ingreso</label>
-                                        <input type="text" class="form-control" id="fecha_ingreso" required
+                                        <input type="date" class="form-control" id="fecha_ingreso" required
                                             placeholder="yyyy-mm-dd">
                                     </div>
 
@@ -181,22 +188,26 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Calle</label>
-                                        <input type="text" class="form-control" id="calle">
+                                        <input type="text" class="form-control" id="calle" required maxlength="70"
+                                            placeholder="Ej: Av. Colón">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Número</label>
-                                        <input type="number" class="form-control" id="numero">
+                                        <input type="number" class="form-control" id="numero" 
+                                        required maxlength="5" placeholder="Ej: 1234">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Piso</label>
-                                        <input type="number" class="form-control" id="piso">
+                                        <input type="number" class="form-control" id="piso"
+                                        required maxlength="3" placeholder="Ej: 2">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Dpto</label>
-                                        <input type="text" class="form-control" id="dpto">
+                                        <input type="text" class="form-control" id="dpto"
+                                        required maxlength="3" placeholder="Ej: A">
                                     </div>
 
                                     <div class="form-group">
