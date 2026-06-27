@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITMAS - Panel Principal</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../newstyles.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../Js/access_control.js"></script>
+</head>
+
+<body class="min-vh-100 d-flex flex-column">
+
+    <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
+        <div>
+            <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
+        </div>
+
+        <div class="info-right d-flex align-items-center gap-3">
+            <div class="text-end d-flex flex-column">
+                <span>Hola, <span class="data" id="header-user">---</span></span>
+                <span>Eres: <span class="data" id="header-role">---</span></span>
+
+                <a href="#" type="button" class="btn btn-danger btn-sm" onclick="cerrarSesion(event)">
+                    Cerrar Sesión
+                </a>
+            </div>
+
+            <div class="role-icon"></div>
+        </div>
+    </header>
+
+    <div class="main-layout flex-grow-1">
+
+        <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+            <ul class="nav flex-column nav-list pt-3">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
+                        <span class="material-symbols-outlined">home</span>
+                        <span class="menu-text">INICIO</span>
+                    </a>
+                </li>
+
+                <li class="nav-item d-none" id="sidebar-empleados">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gp">
+                        <span class="material-symbols-outlined">group</span>
+                        <span class="menu-text">PERSONAL</span>
+                    </a>
+                    <div id="gp" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageEmpleado"
+                            href="../Pages/empleado.html">Empleados</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown d-none" id="sidebar-logistica">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gl">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        <span class="menu-text">LOGÍSTICA</span>
+                    </a>
+                    <div id="gl" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageVehiculo"
+                            href="../Pages/log_vehiculo.html">Vehículos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageHojasRuta" href="../Pages/log_hdr.html">Hojas de
+                            Ruta</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown d-none" id="sidebar-trazabilidad">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gt">
+                        <span class="material-symbols-outlined">sync</span>
+                        <span class="menu-text">TRAZABILIDAD</span>
+                    </a>
+                    <div id="gt" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageIngresoMaterial"
+                            href="../Pages/traz_material.html">Materiales</a>
+                        <a class="nav-link small ps-4 d-none" id="pageOrigen"
+                            href="../Pages/traz_empresa.html">Origen</a>
+                        <a class="nav-link small ps-4 d-none" id="pageClasificacion"
+                            href="../Pages/IngresoYClasificacion.html">Clasificación</a>
+                        <a class="nav-link small ps-4 d-none" id="pageSalida"
+                            href="../Pages/SalidasYStock.html">Salida</a>
+                        <a class="nav-link small ps-4 d-none" id="pageReportes"
+                            href="../Pages/traz_reportes.html">Reportes</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown d-none" id="sidebar-configuracion">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gc">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span class="menu-text">CONFIGURACIÓN</span>
+                    </a>
+                    <div id="gc" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageConfigEstructura"
+                            href="../Pages/config_estructura.html">General</a>
+                        <a class="nav-link small ps-4 d-none" id="pageConfigAcceso"
+                            href="../Pages/config_acceso.html">Accesos</a>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+
+        <div class="main-body-content flex-grow-1 d-flex flex-column">
+
+            <div class="info-bar border-bottom p-3">
+                <span class="text-uppercase tracking-wider">Panel de informes</span>
+            </div>
+
+            <main class="container-fluid p-4">
+                <div class="row g-4">
+
+
+                    <div class="sitmas-card">
+
+                        <div
+                            class="d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom pb-3 mb-4 gap-3">
+                            <div>
+
+                                <h2 class="mb-0">Registro General de Movimientos</h2>
+                                <p class="text-muted small mb-0">Seleccione el módulo que desea listar y auditar en
+                                    tiempo real.</p>
+                            </div>
+                            <div style="min-width: 280px;">
+                                <label class="form-label small fw-bold text-secondary">Tipo de Listado:</label>
+                                <select class="form-control" id="select-tipo-reporte" onchange="CambiarReporteActivo()">
+                                    <option value="Ingresos">1. Cabeceras de Ingreso (Camiones)</option>
+                                    <option value="Detalles">2. Desglose de Pesaje Bruto (Pestaña 2)</option>
+                                    <option value="Clasificaciones">3. Material Clasificado Útil (Pestaña 3)</option>
+                                    <option value="Salidas" selected>4. Movimientos de Salida y Consumo</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <!-- 📊 TARJETAS DE INDICADORES / TOTALES GERENCIALES -->
+                        <div class="row g-3 mb-4">
+                            <!-- Tarjeta Celeste: Ingreso Total -->
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="card text-white h-100 shadow-sm border-0"
+                                    style="background-color: #64b5f6;">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center py-4">
+                                        <h6 class="text-uppercase fw-bold opacity-75 small">Ingreso Total (Kg)</h6>
+                                        <p class="display-6 fw-bold my-2" id="kpi-total-base">0</p>
+                                        <span class="small opacity-75">Estado Base</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta Verde -->
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="card text-white h-100 shadow-sm border-0"
+                                    style="background-color: #81c784;">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <h6 class="text-uppercase fw-bold opacity-75 small">Categoría VERDE</h6>
+                                        <p class="display-6 fw-bold my-2" id="kpi-pct-verde">0%</p>
+                                        <span class="small opacity-75" id="kpi-kg-verde">0 Kg</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta Amarilla -->
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="card text-dark h-100 shadow-sm border-0" style="background-color: #fff176;">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <h6 class="text-uppercase fw-bold opacity-75 small">Categoría AMARILLO</h6>
+                                        <p class="display-6 fw-bold my-2" id="kpi-pct-amarillo">0%</p>
+                                        <span class="small opacity-75" id="kpi-kg-amarillo">0 Kg</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta Roja -->
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="card text-white h-100 shadow-sm border-0"
+                                    style="background-color: #e57373;">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <h6 class="text-uppercase fw-bold opacity-75 small">Categoría ROJO</h6>
+                                        <p class="display-6 fw-bold my-2" id="kpi-pct-rojo">0%</p>
+                                        <span class="small opacity-75" id="kpi-kg-rojo">0 Kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- FIN GRÁFICO TOTALES -->
+
+                        <!-- CONTENEDOR DE GRÁFICOS -->
+                        <div class="row g-4 mb-4 d-none" id="panel-graficos-salidas">
+                            <!-- Gráfico Kilos por Subtipo -->
+                            <div class="col-12 col-xl-6">
+                                <div class="sitmas-card h-100">
+                                    <h3 class="fs-5 fw-bold mb-3">📦 Distribución de Salidas por Subtipo (Kg)
+                                    </h3>
+                                    <div style="position: relative; height: 260px; width: 100%;">
+                                        <canvas id="chartSalidasSubtipo"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gráfico Kilos por Tipo de Movimiento -->
+                            <div class="col-12 col-xl-6">
+                                <div class="sitmas-card h-100">
+                                    <h3 class="fs-5 fw-bold mb-3">🔄 Destino de Materiales por Tipo de
+                                        Movimiento (Kg)
+                                    </h3>
+                                    <div style="position: relative; height: 260px; width: 100%;">
+                                        <canvas id="chartSalidasTipoMov"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- FIN GRÁFICO -->
+
+                        <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
+                            data-bs-toggle="collapse" href="#collapseTableListado">
+                            <h2 class="mb-0" id="titulo-reporte-dinamico">Listado General de Salidas</h2>
+                            <span class="icon-arrow">▼</span>
+                        </div>
+
+                        <div id="collapseTableListado" class="collapse show">
+
+
+                            <div class="table-responsive pt-4">
+
+
+                                <table class="table table-hover align-middle">
+                                    <thead id="thead-reporte-dinamico">
+                                    </thead>
+                                    <tbody id="tbody-reporte-dinamico">
+                                        <tr>
+                                            <td colspan="12" class="text-center text-muted py-4">
+                                                Conectando con el servidor de informes de SITMAS...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer-liston">
+        <div class="logos-container">
+            <img src="../assets/footer-logos.png" alt="Logos Institucionales" class="logo-inst">
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../Js/alerts_config.js"></script>
+    <script src="../Js/traz_reportes.js"></script>
+    <script src="../Js/logout.js"></script>
+</body>
+
+</html>
