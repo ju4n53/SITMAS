@@ -66,6 +66,15 @@ namespace API_SITMAS.Models
         public decimal KilosVerde { get; set; }
         public decimal KilosAmarillo { get; set; }
         public decimal KilosRojo { get; set; }
+
+        // Totales por Categoría,barra inferior
+        public decimal KgsCartonPapel { get; set; }
+        public decimal KgsMadera { get; set; }
+        public decimal KgPlasticos { get; set; }
+        public decimal KgsMetal { get; set; }
+        public decimal KgsVidrio { get; set; }
+        public decimal KgsRSU { get; set; }
+        public decimal KgsOtro { get; set; }
     }
 
 

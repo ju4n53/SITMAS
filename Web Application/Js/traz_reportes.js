@@ -304,29 +304,67 @@ function CargarKPIsCalidad() {
         success: function (res) {
             const total = parseFloat(res.KilosTotalBase);
             
-            // Inyectamos el total bruto en la tarjeta celeste
+            // 1.Tarjetas Superiores
             document.getElementById("kpi-total-base").innerText = total.toLocaleString('es-AR', { maximumFractionDigits: 2 });
 
-            // Calculamos porcentajes evitando la división por cero si la planta arranca vacía
             const pctVerde = total > 0 ? (parseFloat(res.KilosVerde) / total * 100) : 0;
             const pctAmarillo = total > 0 ? (parseFloat(res.KilosAmarillo) / total * 100) : 0;
             const pctRojo = total > 0 ? (parseFloat(res.KilosRojo) / total * 100) : 0;
 
-            // Inyectamos porcentajes
             document.getElementById("kpi-pct-verde").innerText = pctVerde.toFixed(2) + " %";
             document.getElementById("kpi-pct-amarillo").innerText = pctAmarillo.toFixed(2) + " %";
             document.getElementById("kpi-pct-rojo").innerText = pctRojo.toFixed(2) + " %";
 
-            // Inyectamos los Kg como información de soporte abajo
             document.getElementById("kpi-kg-verde").innerText = res.KilosVerde.toLocaleString('es-AR') + " Kg";
-            document.getElementById("kpi-kg-amarillo").innerText = res.KilosYellow || res.KilosAmarillo.toLocaleString('es-AR') + " Kg";
+            document.getElementById("kpi-kg-amarillo").innerText = res.KilosAmarillo.toLocaleString('es-AR') + " Kg";
             document.getElementById("kpi-kg-rojo").innerText = res.KilosRojo.toLocaleString('es-AR') + " Kg";
+
+            // 2.Barra Inferior de Categorías
+            document.getElementById("cat-carton-papel").innerText = res.KgsCartonPapel.toLocaleString('es-AR');
+            document.getElementById("cat-madera").innerText = res.KgsMadera.toLocaleString('es-AR');
+            document.getElementById("cat-plastico").innerText = res.KgPlasticos.toLocaleString('es-AR');
+            document.getElementById("cat-metal").innerText = res.KgsMetal.toLocaleString('es-AR');
+            document.getElementById("cat-rsu").innerText = res.KgsRSU.toLocaleString('es-AR');
+            document.getElementById("cat-vidrio").innerText = res.KgsVidrio.toLocaleString('es-AR');
+            document.getElementById("cat-otro").innerText = res.KgsOtro.toLocaleString('es-AR');
         },
         error: function (err) {
-            console.error("Error al cargar KPIs de calidad:", err);
+            console.error("Error al cargar KPIs de calidad e inferiores:", err);
         }
     });
 }
+
+// function CargarKPIsCalidad() {
+//     $.ajax({
+//         type: "GET",
+//         url: `${URL_INFORMES_BASE}/CalidadTotales`,
+//         dataType: "json",
+//         success: function (res) {
+//             const total = parseFloat(res.KilosTotalBase);
+            
+//             // Inyectamos el total bruto en la tarjeta celeste
+//             document.getElementById("kpi-total-base").innerText = total.toLocaleString('es-AR', { maximumFractionDigits: 2 });
+
+//             // Calculamos porcentajes evitando la división por cero si la planta arranca vacía
+//             const pctVerde = total > 0 ? (parseFloat(res.KilosVerde) / total * 100) : 0;
+//             const pctAmarillo = total > 0 ? (parseFloat(res.KilosAmarillo) / total * 100) : 0;
+//             const pctRojo = total > 0 ? (parseFloat(res.KilosRojo) / total * 100) : 0;
+
+//             // Inyectamos porcentajes
+//             document.getElementById("kpi-pct-verde").innerText = pctVerde.toFixed(2) + " %";
+//             document.getElementById("kpi-pct-amarillo").innerText = pctAmarillo.toFixed(2) + " %";
+//             document.getElementById("kpi-pct-rojo").innerText = pctRojo.toFixed(2) + " %";
+
+//             // Inyectamos los Kg como información de soporte abajo
+//             document.getElementById("kpi-kg-verde").innerText = res.KilosVerde.toLocaleString('es-AR') + " Kg";
+//             document.getElementById("kpi-kg-amarillo").innerText = res.KilosYellow || res.KilosAmarillo.toLocaleString('es-AR') + " Kg";
+//             document.getElementById("kpi-kg-rojo").innerText = res.KilosRojo.toLocaleString('es-AR') + " Kg";
+//         },
+//         error: function (err) {
+//             console.error("Error al cargar KPIs de calidad:", err);
+//         }
+//     });
+// }
 
 
 // --- FUNCIONES AUXILIARES GLOBALES ---
