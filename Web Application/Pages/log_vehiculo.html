@@ -35,7 +35,6 @@
         </div>
     </header>
 
-    <!-- Se añade el contenedor general flex de Bootstrap para asegurar la alineación horizontal fija -->
     <div class="main-layout flex-grow-1">
 
         <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
@@ -103,7 +102,6 @@
             </ul>
         </aside>
 
-        <!-- Tu contenedor de contenido intacto -->
         <div class="main-body-content flex-grow-1">
             <div class="info-bar border-bottom">
                 <span class="text-uppercase tracking-wider">Gestión de vehículos</span>
@@ -113,9 +111,6 @@
 
                 <div class="row g-4">
 
-                    <!-- ================================= -->
-                    <!-- TIPO VEHÍCULO -->
-                    <!-- ================================= -->
                     <div class="col-lg-6">
 
                         <div class="sitmas-card h-100">
@@ -129,10 +124,11 @@
 
                             <div id="collapseTipoVehiculo" class="collapse">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form onsubmit="alert('Tipo de vehículo registrado'); return false;">
+                                    <form id="formTipoVehiculo" onsubmit="GuardarTipoVehiculo(); return false;">
+                                        
+                                        <input type="hidden" id="txtIdTipoVehiculo" value="0">
 
                                         <div class="row g-3">
 
@@ -163,7 +159,6 @@
 
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -178,53 +173,8 @@
 
                                         </thead>
 
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    Camión
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                            <tr>
-
-                                                <td>2</td>
-
-                                                <td class="fw-bold">
-                                                    Camioneta
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        </tbody>
+                                        <tbody id="tbodyTiposVehiculo">
+                                            </tbody>
 
                                     </table>
 
@@ -236,9 +186,6 @@
 
                     </div>
 
-                    <!-- ================================= -->
-                    <!-- VEHÍCULO -->
-                    <!-- ================================= -->
                     <div class="col-lg-6">
 
                         <div class="sitmas-card h-100">
@@ -252,10 +199,11 @@
 
                             <div id="collapseVehiculo" class="collapse">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form onsubmit="alert('Vehículo registrado'); return false;">
+                                    <form id="formVehiculo" onsubmit="GuardarVehiculo(); return false;">
+                                        
+                                        <input type="hidden" id="txtIdVehiculo" value="0">
 
                                         <div class="row g-3">
 
@@ -277,19 +225,7 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_modelo" required>
-
-                                                    <option value="">
-                                                        Seleccione modelo
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Ford Cargo
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Toyota Hilux
-                                                    </option>
-
+                                                    <option value="">Seleccione modelo</option>
                                                 </select>
 
                                             </div>
@@ -301,19 +237,7 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_tipo" required>
-
-                                                    <option value="">
-                                                        Seleccione tipo
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Camión
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Camioneta
-                                                    </option>
-
+                                                    <option value="">Seleccione tipo</option>
                                                 </select>
 
                                             </div>
@@ -334,7 +258,6 @@
 
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -351,43 +274,8 @@
 
                                         </thead>
 
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    AB123CD
-                                                </td>
-
-                                                <td>
-                                                    Ford Cargo
-                                                </td>
-
-                                                <td>
-
-                                                    <span class="badge bg-light text-dark border">
-                                                        Camión
-                                                    </span>
-
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        </tbody>
+                                        <tbody id="tbodyVehiculos">
+                                            </tbody>
 
                                     </table>
 
@@ -399,9 +287,6 @@
 
                     </div>
 
-                    <!-- ================================= -->
-                    <!-- MARCA -->
-                    <!-- ================================= -->
                     <div class="col-lg-6">
 
                         <div class="sitmas-card h-100">
@@ -415,10 +300,11 @@
 
                             <div id="collapseMarca" class="collapse">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form onsubmit="alert('Marca registrada'); return false;">
+                                    <form id="formMarca" onsubmit="GuardarMarca(); return false;">
+                                        
+                                        <input type="hidden" id="txtIdMarca" value="0">
 
                                         <div class="row g-3">
 
@@ -449,7 +335,6 @@
 
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -464,53 +349,8 @@
 
                                         </thead>
 
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    Ford
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                            <tr>
-
-                                                <td>2</td>
-
-                                                <td class="fw-bold">
-                                                    Toyota
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        </tbody>
+                                        <tbody id="tbodyMarcas">
+                                            </tbody>
 
                                     </table>
 
@@ -522,9 +362,6 @@
 
                     </div>
 
-                    <!-- ================================= -->
-                    <!-- MODELO -->
-                    <!-- ================================= -->
                     <div class="col-lg-6">
 
                         <div class="sitmas-card h-100">
@@ -538,10 +375,11 @@
 
                             <div id="collapseModelo" class="collapse">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form onsubmit="alert('Modelo registrado'); return false;">
+                                    <form id="formModelo" onsubmit="GuardarModelo(); return false;">
+                                        
+                                        <input type="hidden" id="txtIdModelo" value="0">
 
                                         <div class="row g-3">
 
@@ -563,19 +401,7 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_marca" required>
-
-                                                    <option value="">
-                                                        Seleccione marca
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Ford
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Toyota
-                                                    </option>
-
+                                                    <option value="">Seleccione marca</option>
                                                 </select>
 
                                             </div>
@@ -596,7 +422,6 @@
 
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -612,69 +437,8 @@
 
                                         </thead>
 
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    Cargo
-                                                </td>
-
-                                                <td>
-
-                                                    <span class="badge bg-light text-dark border">
-                                                        Ford
-                                                    </span>
-
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                            <tr>
-
-                                                <td>2</td>
-
-                                                <td class="fw-bold">
-                                                    Hilux
-                                                </td>
-
-                                                <td>
-
-                                                    <span class="badge bg-light text-dark border">
-                                                        Toyota
-                                                    </span>
-
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        </tbody>
+                                        <tbody id="tbodyModelos">
+                                            </tbody>
 
                                     </table>
 
@@ -692,7 +456,6 @@
         </div>
     </div>
 
-
     <footer class="footer-liston">
         <div class="container text-center">
             <div class="d-flex flex-wrap justify-content-center gap-4 align-items-center">
@@ -706,7 +469,8 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../Js/alerts_config.js"></script>
-<script src="../Js/logout.js"></script>
 
+<script src="../Js/log_vehiculo_logica.js"></script>
+<script src="../Js/logout.js"></script>
 
 </html>

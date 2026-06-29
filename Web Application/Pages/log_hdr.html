@@ -35,7 +35,6 @@
         </div>
     </header>
 
-    <!-- Se añade el contenedor general flex de Bootstrap para asegurar la alineación horizontal fija -->
     <div class="main-layout flex-grow-1">
 
         <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
@@ -103,7 +102,6 @@
             </ul>
         </aside>
 
-        <!-- Tu contenedor de contenido intacto -->
         <div class="main-body-content flex-grow-1">
             <div class="info-bar border-bottom">
                 <span class="text-uppercase tracking-wider">Gestión de hojas de ruta</span>
@@ -113,9 +111,6 @@
 
                 <div class="row g-4">
 
-                    <!-- ================================= -->
-                    <!-- ESTADO HOJA DE RUTA -->
-                    <!-- ================================= -->
                     <div class="col-lg-6">
 
                         <div class="sitmas-card h-100">
@@ -127,43 +122,28 @@
                                 <span class="icon-arrow">▼</span>
                             </div>
 
-                            <div id="collapseEstadoHojaRuta" class="collapse">
+                            <div id="collapseEstadoHojaRuta" class="collapse show">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form onsubmit="alert('Estado registrado'); return false;">
+                                    <form id="formEstadoHdr" onsubmit="event.preventDefault(); GuardarEstadoHdr();">
+                                        <input type="hidden" id="txtIdEstadoHdr" value="0">
 
                                         <div class="row g-3">
-
                                             <div class="col-12">
-
-                                                <label class="form-label fw-bold">
-                                                    Estado Hoja de Ruta
-                                                </label>
-
-                                                <input type="text" class="form-control" id="estado_hoja_ruta" required
-                                                    placeholder="Ej: En Curso">
-
+                                                <label class="form-label fw-bold">Estado Hoja de Ruta</label>
+                                                <input type="text" class="form-control" id="estado_hdr" required placeholder="Ej: En Curso">
                                             </div>
-
                                         </div>
 
                                         <div class="pt-3 d-flex justify-content-end">
-
                                             <button type="submit" class="btn btn-sitmas-success px-5">
-
                                                 Guardar Estado
-
                                             </button>
-
                                         </div>
-
                                     </form>
-
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -178,52 +158,7 @@
 
                                         </thead>
 
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    Pendiente
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                            <tr>
-
-                                                <td>2</td>
-
-                                                <td class="fw-bold">
-                                                    Finalizada
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
+                                        <tbody id="tbodyEstadoHdr">
                                         </tbody>
 
                                     </table>
@@ -236,9 +171,6 @@
 
                     </div>
 
-                    <!-- ================================= -->
-                    <!-- HOJA DE RUTA -->
-                    <!-- ================================= -->
                     <div class="col-lg-6">
 
                         <div class="sitmas-card h-100">
@@ -250,12 +182,13 @@
                                 <span class="icon-arrow">▼</span>
                             </div>
 
-                            <div id="collapseHojaRuta" class="collapse">
+                            <div id="collapseHojaRuta" class="collapse show">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form onsubmit="alert('Hoja de ruta registrada'); return false;">
+                                    <form id="formHojaRuta" onsubmit="GuardarHojaRuta(); return false;">
+                                        
+                                        <input type="hidden" id="txtIdHojaRuta" value="0">
 
                                         <div class="row g-3">
 
@@ -276,19 +209,7 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_vehiculo" required>
-
-                                                    <option value="">
-                                                        Seleccione vehículo
-                                                    </option>
-
-                                                    <option value="1">
-                                                        AB123CD
-                                                    </option>
-
-                                                    <option value="2">
-                                                        AC456EF
-                                                    </option>
-
+                                                    <option value="">Seleccione vehículo</option>
                                                 </select>
 
                                             </div>
@@ -300,19 +221,7 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_chofer" required>
-
-                                                    <option value="">
-                                                        Seleccione chofer
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Juan Pérez
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Carlos Gómez
-                                                    </option>
-
+                                                    <option value="">Seleccione chofer</option>
                                                 </select>
 
                                             </div>
@@ -324,19 +233,7 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_estado" required>
-
-                                                    <option value="">
-                                                        Seleccione estado
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Pendiente
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Finalizada
-                                                    </option>
-
+                                                    <option value="">Seleccione estado</option>
                                                 </select>
 
                                             </div>
@@ -357,7 +254,6 @@
 
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -375,46 +271,7 @@
 
                                         </thead>
 
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td>
-                                                    16/05/2026
-                                                </td>
-
-                                                <td class="fw-bold">
-                                                    AB123CD
-                                                </td>
-
-                                                <td>
-                                                    Juan Pérez
-                                                </td>
-
-                                                <td>
-
-                                                    <span class="badge bg-light text-dark border">
-                                                        Pendiente
-                                                    </span>
-
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
+                                        <tbody id="tbodyHojasRuta">
                                         </tbody>
 
                                     </table>
@@ -427,9 +284,6 @@
 
                     </div>
 
-                    <!-- ================================= -->
-                    <!-- DETALLE HOJA RUTA -->
-                    <!-- ================================= -->
                     <div class="col-lg-12">
 
                         <div class="sitmas-card">
@@ -441,9 +295,8 @@
                                 <span class="icon-arrow">▼</span>
                             </div>
 
-                            <div id="collapseDetalleHojaRuta" class="collapse">
+                            <div id="collapseDetalleHojaRuta" class="collapse show">
 
-                                <!-- FORM -->
                                 <div class="pt-4">
 
                                     <form onsubmit="alert('Detalle registrado'); return false;">
@@ -457,19 +310,9 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_hoja_ruta" required>
-
-                                                    <option value="">
-                                                        Seleccione hoja
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Hoja #1
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Hoja #2
-                                                    </option>
-
+                                                    <option value="">Seleccione hoja</option>
+                                                    <option value="1">Hoja #1</option>
+                                                    <option value="2">Hoja #2</option>
                                                 </select>
 
                                             </div>
@@ -481,19 +324,9 @@
                                                 </label>
 
                                                 <select class="form-select" id="id_origen" required>
-
-                                                    <option value="">
-                                                        Seleccione origen
-                                                    </option>
-
-                                                    <option value="1">
-                                                        Municipalidad
-                                                    </option>
-
-                                                    <option value="2">
-                                                        Hospital Central
-                                                    </option>
-
+                                                    <option value="">Seleccione origen</option>
+                                                    <option value="1">Municipalidad</option>
+                                                    <option value="2">Hospital Central</option>
                                                 </select>
 
                                             </div>
@@ -525,7 +358,6 @@
 
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
 
                                     <table class="table table-hover align-middle">
@@ -545,33 +377,14 @@
                                         <tbody>
 
                                             <tr>
-
                                                 <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    Hoja #1
-                                                </td>
-
-                                                <td>
-                                                    Municipalidad
-                                                </td>
-
-                                                <td>
-                                                    Retiro programado
-                                                </td>
-
+                                                <td class="fw-bold">Hoja #1</td>
+                                                <td>Municipalidad</td>
+                                                <td>Retiro programado</td>
                                                 <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Editar</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
                                                 </td>
-
                                             </tr>
 
                                         </tbody>
@@ -607,7 +420,6 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="../Js/alerts_config.js"></script>
 <script src="../Js/logout.js"></script>
-
-
+<script src="../Js/log_hdr_logica.js"></script>
 
 </html>

@@ -186,7 +186,7 @@
                                 <!-- FORM -->
                                 <div class="pt-4">
 
-                                    <form id="formUsuarioRol" onsubmit="GuardarUsuarioRol(); return false;">
+                                    <form id="formUsuarioRol" onsubmit="return GuardarUsuarioRol(event);">
                                         <input type="hidden" id="txtIdUsuarioRol">
                                         <div class="row g-3">
                                             <div class="col-6">
@@ -249,7 +249,7 @@
                                         <input type="hidden" id="txtIdPermiso">
                                         <div class="row g-3">
                                             <div class="col-12">
-                                                <label class="form-label fw-bold">Permiso</label>
+                                                <label class="form-label fw-bold">Nombre del Permiso</label>
                                                 <input type="text" class="form-control" id="txtNombrePermiso" required
                                                     placeholder="Ej: Trazabilidad_Escritura">
                                             </div>
@@ -286,236 +286,104 @@
                     <!-- ================================= -->
                     <!-- ROL PERMISO -->
                     <!-- ================================= -->
-                    <div class="col-lg-6">
-
+                   <div class="col-lg-6">
                         <div class="sitmas-card h-100">
-
                             <div class="accordion-header d-flex justify-content-between align-items-center"
                                 role="button" data-bs-toggle="collapse" href="#collapseRolPermiso">
-
                                 <h2 class="mb-0">Rol - Permiso</h2>
                                 <span class="icon-arrow">▼</span>
                             </div>
 
                             <div id="collapseRolPermiso" class="collapse">
-
-                                <!-- FORM -->
                                 <div class="pt-4">
-
-                                    <form onsubmit="alert('Relación rol-permiso registrada'); return false;">
-
+                                    <form id="formRolPermiso" onsubmit="GuardarRolPermiso(); return false;">
+                                        <input type="hidden" id="txtIdRolOriginal" value="">
+                                        <input type="hidden" id="txtIdPermisoOriginal" value="">
+                                        
                                         <div class="row g-3">
-
                                             <div class="col-md-6">
-
-                                                <label class="form-label fw-bold">Permiso</label>
-
-                                                <select class="form-select" id="id_permiso" required>
-
-                                                    <option value="">Seleccione permiso</option>
-                                                    <option value="1">Gestionar Usuarios</option>
-                                                    <option value="2">Registrar Materiales</option>
-
-                                                </select>
-
-                                            </div>
-
-                                            <div class="col-md-6">
-
                                                 <label class="form-label fw-bold">Rol</label>
-
-                                                <select class="form-select" id="id_rol_permiso" required>
-
+                                                <select class="form-select" id="selectRolPermiso_Rol" required>
                                                     <option value="">Seleccione rol</option>
-                                                    <option value="1">Administrador</option>
-                                                    <option value="2">Operador</option>
-
                                                 </select>
-
                                             </div>
-
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Permiso</label>
+                                                <select class="form-select" id="selectRolPermiso_Permiso" required>
+                                                    <option value="">Seleccione permiso</option>
+                                                </select>
+                                            </div>
                                         </div>
-
                                         <div class="pt-3 d-flex justify-content-end">
-
-                                            <button type="submit" class="btn btn-sitmas-success px-5">
-                                                Guardar Relación
-                                            </button>
-
+                                            <button type="submit" class="btn btn-sitmas-success px-5">Guardar Relación</button>
                                         </div>
-
                                     </form>
-
                                 </div>
 
-                                <!-- TABLA -->
                                 <div class="table-responsive pt-4">
-
                                     <table class="table table-hover align-middle">
-
                                         <thead>
                                             <tr>
-                                                <th>Rol</th>
-                                                <th>Permiso</th>
-                                                <th class="text-center">Acciones</th>
+                                                <th>ROL</th>
+                                                <th>PERMISO</th>
+                                                <th class="text-center">ACCIONES</th>
                                             </tr>
                                         </thead>
-
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>
-                                                    <span class="badge bg-light text-dark border">
-                                                        Administrador
-                                                    </span>
-                                                </td>
-
-                                                <td class="fw-bold">
-                                                    Gestionar Usuarios
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        </tbody>
-
+                                        <tbody id="tbodyRolPermiso">
+                                            </tbody>
                                     </table>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     <!-- ================================= -->
                     <!-- ESTADO USUARIO -->
                     <!-- ================================= -->
                     <div class="col-lg-6">
-
                         <div class="sitmas-card h-100">
-
                             <div class="accordion-header d-flex justify-content-between align-items-center"
                                 role="button" data-bs-toggle="collapse" href="#collapseEstadoUsuario">
-
                                 <h2 class="mb-0">Estado de Usuario</h2>
                                 <span class="icon-arrow">▼</span>
                             </div>
 
                             <div id="collapseEstadoUsuario" class="collapse">
-
-                                <!-- FORM -->
                                 <div class="pt-4">
-
-                                    <form onsubmit="alert('Estado de usuario registrado'); return false;">
-
+                                    
+                                    <form id="formEstadoUsuario">
+                                        <input type="hidden" id="txtIdEstado">
                                         <div class="row g-3">
-
                                             <div class="col-12">
-
                                                 <label class="form-label fw-bold">Estado Usuario</label>
-
-                                                <input type="text" class="form-control" id="estado_usuario" required
-                                                    placeholder="Ej: Activo">
-
+                                                <input type="text" class="form-control" id="txtEstado" 
+                                                    required placeholder="Ej: Activo">
                                             </div>
-
                                         </div>
-
                                         <div class="pt-3 d-flex justify-content-end">
-
                                             <button type="submit" class="btn btn-sitmas-success px-5">
                                                 Guardar Estado
                                             </button>
-
                                         </div>
-
                                     </form>
 
-                                </div>
-
-                                <!-- TABLA -->
-                                <div class="table-responsive pt-4">
-
-                                    <table class="table table-hover align-middle">
-
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Estado</th>
-                                                <th class="text-center">Acciones</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-
-                                            <tr>
-
-                                                <td>1</td>
-
-                                                <td class="fw-bold">
-                                                    Activo
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                            <tr>
-
-                                                <td>2</td>
-
-                                                <td class="fw-bold">
-                                                    Bloqueado
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button class="btn btn-sm btn-outline-primary me-1">
-                                                        Editar
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        Eliminar
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        </tbody>
-
-                                    </table>
+                                    <div class="table-responsive pt-4">
+                                        <table class="table table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Estado</th>
+                                                    <th class="text-center">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodyEstadoUsuario">
+                                                </tbody>
+                                        </table>
+                                    </div>
 
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                 </div>
@@ -545,7 +413,8 @@
 <script src="../Js/permisos_logica.js"></script>
 <script src="../Js/usuariorol_logica.js"></script>
 <script src="../Js/logout.js"></script>
-
+<script src="../Js/rol_permiso_logica.js"></script>
+<script src="../Js/estado_usuario_logica.js"></script>
 <script>
 
 

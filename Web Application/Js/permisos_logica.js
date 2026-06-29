@@ -16,12 +16,13 @@ function ListarPermisos() {
             $("#tbodyPermisos").empty();
             data.forEach(o => {
                 // CAMBIA 'o.Nombre' por 'o.PermisoUsuario'
+                // ... dentro de data.forEach(o => { ...
                 $("#tbodyPermisos").append(`<tr>
                     <td>${o.Id}</td>
                     <td class="fw-bold">${o.PermisoUsuario}</td> 
                     <td class="text-center">
                         <button class="btn btn-sm btn-outline-primary me-1" 
-                                onclick="$('#txtIdPermiso').val(${o.Id}); $('#txtNombrePermiso').val('${o.PermisoUsuario}'); $('#collapsePermiso').collapse('show');">
+                                onclick="CargarEdicionPermiso(${o.Id}, '${o.PermisoUsuario}')">
                             Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="EliminarPermiso(${o.Id})">
@@ -65,20 +66,44 @@ function GuardarPermiso() {
 }
 
 function EliminarPermiso(id) {
-    if (confirm("¿Seguro que deseas eliminar este permiso?")) {
-        $.ajax({
-            // Cambiamos 'POST' por 'DELETE' para que coincida con el controlador
-            type: "DELETE", 
-            // Asegúrate de que la ruta sea correcta: api/Permisos/Borrar/id
-            url: URL_PERMISO + "/Borrar/" + id, 
-            success: function () { 
-                alert("Permiso eliminado correctamente");
-                ListarPermisos(); 
-            },
-            error: function(xhr, status, error) {
-                console.error("Error al eliminar:", error);
-                alert("No se pudo eliminar el permiso. Verifica que el método sea DELETE.");
-            }
-        });
-    }
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡No podrás revertir esta acción!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "DELETE", 
+                url: URL_PERMISO + "/Borrar/" + id, 
+                success: function () { 
+                    Swal.fire('¡Eliminado!', 'El permiso ha sido borrado.', 'success');
+                    ListarPermisos(); 
+                },
+                error: function() {
+                    Swal.fire('Error', 'No se pudo eliminar el permiso.', 'error');
+                }
+            });
+        }
+    });
+}
+function CargarEdicionPermiso(id, nombre) {
+    var collapseElement = document.getElementById('collapsePermiso');
+    var bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElement);
+    
+    $("#txtIdPermiso").val(id);
+    $("#txtNombrePermiso").val(nombre);
+
+    // Scroll primero, apertura después
+    $('html, body').animate({ 
+        scrollTop: $("#formPermiso").offset().top - 120 
+    }, 400);
+
+    setTimeout(function() {
+        bsCollapse.show();
+    }, 200);
 }
