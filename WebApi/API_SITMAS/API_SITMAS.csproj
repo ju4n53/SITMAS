@@ -203,6 +203,7 @@
     <Compile Include="Controllers\MovimientoSalidaController.cs" />
     <Compile Include="Controllers\OrigenController.cs" />
     <Compile Include="Controllers\PermisosController.cs" />
+    <Compile Include="Controllers\ReportesDataController.cs" />
     <Compile Include="Controllers\ReporteTrazabilidadController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\Rol_PermisoController.cs" />
@@ -237,6 +238,7 @@
     <Compile Include="Models\MovimientoSalida.cs" />
     <Compile Include="Models\Origen.cs" />
     <Compile Include="Models\Permisos.cs" />
+    <Compile Include="Models\ReportesData.cs" />
     <Compile Include="Models\ReporteTrazabilidad.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\Rol_Permiso.cs" />

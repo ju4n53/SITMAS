@@ -19,6 +19,7 @@ if (sesion) {
         "traz_empresa.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
         "IngresoYClasificacion.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
         "SalidasYStock.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
+        "traz_reportes.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
         "log_vehiculo.html": ["Logistica_Lectura"],
         "log_hdr.html": ["Logistica_Lectura"],
         "config_estructura.html": ["Sistema_Config"],
@@ -60,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (document.getElementById('pageOrigen')) document.getElementById('pageOrigen').classList.remove('d-none');
             if (document.getElementById('pageClasificacion')) document.getElementById('pageClasificacion').classList.remove('d-none');
             if (document.getElementById('pageSalida')) document.getElementById('pageSalida').classList.remove('d-none');
+            if (document.getElementById('pageReportes')) document.getElementById('pageReportes').classList.remove('d-none');
         }
 
         // Si tiene permisos de logística

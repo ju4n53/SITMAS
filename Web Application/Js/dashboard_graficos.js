@@ -21,7 +21,7 @@ function cargarGraficoPesoBruto() {
 
             const ctx = document.getElementById('chartPesoBruto').getContext('2d');
             new Chart(ctx, {
-                type: 'pie', // Tipo de gráfico: Torta
+                type: 'doughnut', // Tipo de gráfico: Torta
                 data: {
                     labels: etiquetas,
                     datasets: [{
