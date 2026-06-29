@@ -115,200 +115,134 @@
                 <!-- FORMULARIO ESTADO EMPLEADO -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseEstadoEmpleado">
-
                         <h2 class="mb-0">Registrar Estado de Empleado</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseEstadoEmpleado" class="collapse">
-
                         <div class="pt-4">
-
-                            <form onsubmit="alert('Estado registrado'); return false;">
+                            <form id="formEstadoEmpleado" onsubmit="GuardarEstado(); return false;">
+                                <input type="hidden" id="txtIdEstado" value="0">
 
                                 <div class="row g-3">
-
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Estado del Empleado</label>
-
                                         <input type="text" class="form-control" id="estado_empleado" required
                                             placeholder="Ej: Activo">
                                     </div>
-
                                 </div>
-
                                 <div class="pt-3 d-flex justify-content-end">
-
                                     <button type="submit" class="btn btn-sitmas-success px-5">
                                         Guardar Estado
                                     </button>
-
                                 </div>
-
                             </form>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- FORMULARIO TIPO VINCULACIÓN -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseTipoVinculacion">
-
                         <h2 class="mb-0">Registrar Tipo de Vinculación</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseTipoVinculacion" class="collapse">
-
                         <div class="pt-4">
-
-                            <form onsubmit="alert('Tipo de vinculación registrado'); return false;">
-
+                            <form id="formTipoVinculacion" onsubmit="GuardarVinculacion(); return false;">
+                                <input type="hidden" id="txtIdVinculacion" value="0">
                                 <div class="row g-3">
-
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Tipo de Vinculación</label>
-
-                                        <input type="text" class="form-control" id="tipo_vinculacion" required
-                                            placeholder="Ej: Monotributista">
+                                        <input type="text" class="form-control" id="input_tipo_vinculacion" required
+                                            placeholder="Ej: Planta">
                                     </div>
-
                                 </div>
-
                                 <div class="pt-3 d-flex justify-content-end">
-
-                                    <button type="submit" class="btn btn-sitmas-success px-5">
-                                        Guardar Tipo
-                                    </button>
-
+                                    <button type="submit" class="btn btn-sitmas-success px-5">Guardar Tipo</button>
                                 </div>
-
                             </form>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- FORMULARIO ÁREA -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseArea">
-
                         <h2 class="mb-0">Registrar Área</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseArea" class="collapse">
-
                         <div class="pt-4">
-
-                            <form onsubmit="alert('Área registrada'); return false;">
-
+                            <form id="formArea" onsubmit="GuardarArea(); return false;">
+                                <input type="hidden" id="txtIdArea" value="0">
                                 <div class="row g-3">
-
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Área</label>
-
-                                        <input type="text" class="form-control" id="area" required
-                                            placeholder="Ej: Administración">
+                                        <label class="form-label fw-bold">Nombre del Área</label>
+                                        <input type="text" class="form-control" id="input_nombre_area" required
+                                            placeholder="Ej: Recursos Humanos">
                                     </div>
-
                                 </div>
-
                                 <div class="pt-3 d-flex justify-content-end">
-
-                                    <button type="submit" class="btn btn-sitmas-success px-5">
-                                        Guardar Área
-                                    </button>
-
+                                    <button type="submit" class="btn btn-sitmas-success px-5">Guardar Área</button>
                                 </div>
-
                             </form>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- FORMULARIO CARGO -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseCargo">
-
                         <h2 class="mb-0">Registrar Cargo</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseCargo" class="collapse">
-
                         <div class="pt-4">
-
-                            <form onsubmit="alert('Cargo registrado'); return false;">
-
+                            <form id="formCargo" onsubmit="GuardarCargo(); return false;">
+                                <input type="hidden" id="txtIdCargo" value="0">
                                 <div class="row g-3">
-
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Cargo</label>
-
-                                        <input type="text" class="form-control" id="cargo" required
-                                            placeholder="Ej: Encargado">
+                                        <label class="form-label fw-bold">Nombre del Cargo</label>
+                                        <input type="text" class="form-control" id="input_nombre_cargo" required
+                                            placeholder="Ej: Analista Senior">
                                     </div>
-
                                 </div>
-
                                 <div class="pt-3 d-flex justify-content-end">
-
-                                    <button type="submit" class="btn btn-sitmas-success px-5">
-                                        Guardar Cargo
-                                    </button>
-
+                                    <button type="submit" class="btn btn-sitmas-success px-5">Guardar Cargo</button>
                                 </div>
-
                             </form>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- LISTADO ESTADO EMPLEADO -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseTableEstadoEmpleado">
-
                         <h2 class="mb-0">Listado de Estados de Empleado</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseTableEstadoEmpleado" class="collapse">
-
                         <div class="table-responsive pt-4">
-
                             <table class="table table-hover align-middle">
-
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -316,77 +250,26 @@
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>1</td>
-
-                                        <td class="fw-bold">
-                                            Activo
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>2</td>
-
-                                        <td class="fw-bold">
-                                            Suspendido
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
+                                <tbody id="tbodyEstadoEmpleado">
                                 </tbody>
-
                             </table>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- LISTADO TIPO VINCULACIÓN -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseTableTipoVinculacion">
-
                         <h2 class="mb-0">Listado de Tipos de Vinculación</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseTableTipoVinculacion" class="collapse">
-
                         <div class="table-responsive pt-4">
-
                             <table class="table table-hover align-middle">
-
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -394,213 +277,65 @@
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>1</td>
-
-                                        <td class="fw-bold">
-                                            Planta
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>2</td>
-
-                                        <td class="fw-bold">
-                                            Becario
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
+                                <tbody id="tbodyTipoVinculacion">
                                 </tbody>
-
                             </table>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- LISTADO ÁREA -->
                 <!-- ========================= -->
                 <div class="sitmas-card mb-4">
-
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseTableArea">
-
                         <h2 class="mb-0">Listado de Áreas</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseTableArea" class="collapse">
-
                         <div class="table-responsive pt-4">
-
                             <table class="table table-hover align-middle">
-
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Área</th>
+                                        <th>Nombre del Área</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>1</td>
-
-                                        <td class="fw-bold">
-                                            Administración
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>2</td>
-
-                                        <td class="fw-bold">
-                                            Logística
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
+                                <tbody id="tbodyArea">
                                 </tbody>
-
                             </table>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- ========================= -->
                 <!-- LISTADO CARGO -->
                 <!-- ========================= -->
-                <div class="sitmas-card">
-
+                <div class="sitmas-card mb-4">
                     <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
                         data-bs-toggle="collapse" href="#collapseTableCargo">
-
                         <h2 class="mb-0">Listado de Cargos</h2>
                         <span class="icon-arrow">▼</span>
                     </div>
 
                     <div id="collapseTableCargo" class="collapse">
-
                         <div class="table-responsive pt-4">
-
                             <table class="table table-hover align-middle">
-
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Cargo</th>
+                                        <th>Nombre del Cargo</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>1</td>
-
-                                        <td class="fw-bold">
-                                            Operario
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>2</td>
-
-                                        <td class="fw-bold">
-                                            Gerente
-                                        </td>
-
-                                        <td class="text-center">
-
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                            </button>
-
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                Eliminar
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
+                                <tbody id="tbodyCargo">
                                 </tbody>
-
                             </table>
-
                         </div>
-
                     </div>
-
                 </div>
 
             </main>
@@ -624,7 +359,10 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="../Js/alerts_config.js"></script>
 <script src="../Js/usuariorol_logica.js"></script>
+<script src="../Js/estado_empleado_logica.js"></script>
+<script src="../Js/tipo_vinculacion_logica.js"></script>
+<script src="../Js/area_logica.js"></script>
+<script src="../Js/cargo_logica.js"></script>
 <script src="../Js/logout.js"></script>
-
 
 </html>

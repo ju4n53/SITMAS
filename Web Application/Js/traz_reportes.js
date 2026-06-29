@@ -303,7 +303,7 @@ function CargarKPIsCalidad() {
         dataType: "json",
         success: function (res) {
             const total = parseFloat(res.KilosTotalBase);
-            
+
             // 1.Tarjetas Superiores
             document.getElementById("kpi-total-base").innerText = total.toLocaleString('es-AR', { maximumFractionDigits: 2 });
 
@@ -327,6 +327,35 @@ function CargarKPIsCalidad() {
             document.getElementById("cat-rsu").innerText = res.KgsRSU.toLocaleString('es-AR');
             document.getElementById("cat-vidrio").innerText = res.KgsVidrio.toLocaleString('es-AR');
             document.getElementById("cat-otro").innerText = res.KgsOtro.toLocaleString('es-AR');
+
+
+            //BACKTICKS DE RESERVA 
+            // const pctCartonPapel = total > 0 ? (parseFloat(res.KgsCartonPapel) / total * 100) : 0;
+            // const pctMadera = total > 0 ? (parseFloat(res.KgsMadera) / total * 100) : 0;
+            // const pctPlastico = total > 0 ? (parseFloat(res.KgPlasticos) / total * 100) : 0;
+            // const pctMetal = total > 0 ? (parseFloat(res.KgsMetal) / total * 100) : 0;
+            // const pctRSU = total > 0 ? (parseFloat(res.KgsRSU) / total * 100) : 0;
+            // const pctVidrio = total > 0 ? (parseFloat(res.KgsVidrio) / total * 100) : 0;
+            // const pctOtro = total > 0 ? (parseFloat(res.KgsOtro) / total * 100) : 0;
+
+            // const kgCartonPapelTexto = res.KgsCartonPapel.toLocaleString('es-AR');
+            // const kgMaderaTexto = res.KgsMadera.toLocaleString('es-AR');
+            // const kgPlasticoTexto = res.KgPlasticos.toLocaleString('es-AR');
+            // const kgMetalTexto = res.KgsMetal.toLocaleString('es-AR');
+            // const kgRSUTexto = res.KgsRSU.toLocaleString('es-AR');
+            // const kgVidrioTexto = res.KgsVidrio.toLocaleString('es-AR');
+            // const kgOtroTexto = res.KgsOtro.toLocaleString('es-AR');
+
+            // // SALIDA: Ej.: "39.279 Kg (52.95%)"
+            // document.getElementById("cat-carton-papel").innerText = `${kgCartonPapelTexto} Kg (${pctCartonPapel.toFixed(1)}%)`;
+            // document.getElementById("cat-madera").innerText = `${kgMaderaTexto} Kg (${pctMadera.toFixed(1)}%)`;
+            // document.getElementById("cat-plastico").innerText = `${kgPlasticoTexto} Kg (${pctPlastico.toFixed(1)}%)`;
+            // document.getElementById("cat-metal").innerText = `${kgMetalTexto} Kg (${pctMetal.toFixed(1)}%)`;
+            // document.getElementById("cat-rsu").innerText = `${kgRSUTexto} Kg (${pctRSU.toFixed(1)}%)`;
+            // document.getElementById("cat-vidrio").innerText = `${kgVidrioTexto} Kg (${pctVidrio.toFixed(1)}%)`;
+            // document.getElementById("cat-otro").innerText = `${kgOtroTexto} Kg (${pctOtro.toFixed(1)}%)`;
+
+
         },
         error: function (err) {
             console.error("Error al cargar KPIs de calidad e inferiores:", err);
@@ -341,7 +370,7 @@ function CargarKPIsCalidad() {
 //         dataType: "json",
 //         success: function (res) {
 //             const total = parseFloat(res.KilosTotalBase);
-            
+
 //             // Inyectamos el total bruto en la tarjeta celeste
 //             document.getElementById("kpi-total-base").innerText = total.toLocaleString('es-AR', { maximumFractionDigits: 2 });
 

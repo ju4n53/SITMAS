@@ -173,16 +173,24 @@
                         <div class="row g-4">
                             <div class="col-md-10">
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="form-label mt-3">Origen</label>
-                                        <select class="form-select" id="id-origen"></select>
-                                        <div class="error-msg">Seleccione un origen</div>
+                                    <div class="col-md-6 dropdown">
+                                        <label class="form-label mt-3 fw-bold">Origen</label>
+                                        <input type="text" class="form-control" id="search-origen"
+                                            placeholder="Escriba para buscar origen..." autocomplete="off" maxlength="4">
+                                        <input type="hidden" id="id-origen" required>
+                                        <ul class="dropdown-menu w-100 shadow-sm" id="lista-origen"
+                                            style="max-height: 200px; overflow-y: auto;"></ul>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label mt-3">Subtipo</label>
-                                        <select class="form-select" id="select-SbTpMaterial"></select>
-                                        <div class="error-msg">Seleccione subtipo</div>
+
+                                    <div class="col-md-6 dropdown">
+                                        <label class="form-label mt-3 fw-bold">Subtipo</label>
+                                        <input type="text" class="form-control" id="search-SbTpMaterial"
+                                            placeholder="Escriba para buscar subtipo..." autocomplete="off" maxlength="4">
+                                        <input type="hidden" id="select-SbTpMaterial" required>
+                                        <ul class="dropdown-menu w-100 shadow-sm" id="lista-SbTpMaterial"
+                                            style="max-height: 200px; overflow-y: auto;"></ul>
                                     </div>
+
                                     <div class="col-md-6">
                                         <label class="form-label mt-3">Peso (kg)</label>
                                         <input type="number" class="form-control" step="0.1" id="input-peso">

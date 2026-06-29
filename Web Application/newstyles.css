@@ -510,3 +510,17 @@ h3 {
     border-radius: 12px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
 }
+
+ /* Mejora para Tabla Rígida e Intersección con Sidebar */
+/* 1.contenedor principal e hijos encojen */
+.main-layout main {
+    min-width: 0;
+    flex: 1;
+}
+
+/* tabla responsiva:nuevo ancho dinámico */
+#pag-informes .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+}
