@@ -330,30 +330,30 @@ function CargarKPIsCalidad() {
 
 
             //BACKTICKS DE RESERVA 
-            // const pctCartonPapel = total > 0 ? (parseFloat(res.KgsCartonPapel) / total * 100) : 0;
-            // const pctMadera = total > 0 ? (parseFloat(res.KgsMadera) / total * 100) : 0;
-            // const pctPlastico = total > 0 ? (parseFloat(res.KgPlasticos) / total * 100) : 0;
-            // const pctMetal = total > 0 ? (parseFloat(res.KgsMetal) / total * 100) : 0;
-            // const pctRSU = total > 0 ? (parseFloat(res.KgsRSU) / total * 100) : 0;
-            // const pctVidrio = total > 0 ? (parseFloat(res.KgsVidrio) / total * 100) : 0;
-            // const pctOtro = total > 0 ? (parseFloat(res.KgsOtro) / total * 100) : 0;
+            const pctCartonPapel = total > 0 ? (parseFloat(res.KgsCartonPapel) / total * 100) : 0;
+            const pctMadera = total > 0 ? (parseFloat(res.KgsMadera) / total * 100) : 0;
+            const pctPlastico = total > 0 ? (parseFloat(res.KgPlasticos) / total * 100) : 0;
+            const pctMetal = total > 0 ? (parseFloat(res.KgsMetal) / total * 100) : 0;
+            const pctRSU = total > 0 ? (parseFloat(res.KgsRSU) / total * 100) : 0;
+            const pctVidrio = total > 0 ? (parseFloat(res.KgsVidrio) / total * 100) : 0;
+            const pctOtro = total > 0 ? (parseFloat(res.KgsOtro) / total * 100) : 0;
 
-            // const kgCartonPapelTexto = res.KgsCartonPapel.toLocaleString('es-AR');
-            // const kgMaderaTexto = res.KgsMadera.toLocaleString('es-AR');
-            // const kgPlasticoTexto = res.KgPlasticos.toLocaleString('es-AR');
-            // const kgMetalTexto = res.KgsMetal.toLocaleString('es-AR');
-            // const kgRSUTexto = res.KgsRSU.toLocaleString('es-AR');
-            // const kgVidrioTexto = res.KgsVidrio.toLocaleString('es-AR');
-            // const kgOtroTexto = res.KgsOtro.toLocaleString('es-AR');
+            const kgCartonPapelTexto = res.KgsCartonPapel.toLocaleString('es-AR');
+            const kgMaderaTexto = res.KgsMadera.toLocaleString('es-AR');
+            const kgPlasticoTexto = res.KgPlasticos.toLocaleString('es-AR');
+            const kgMetalTexto = res.KgsMetal.toLocaleString('es-AR');
+            const kgRSUTexto = res.KgsRSU.toLocaleString('es-AR');
+            const kgVidrioTexto = res.KgsVidrio.toLocaleString('es-AR');
+            const kgOtroTexto = res.KgsOtro.toLocaleString('es-AR');
 
-            // // SALIDA: Ej.: "39.279 Kg (52.95%)"
-            // document.getElementById("cat-carton-papel").innerText = `${kgCartonPapelTexto} Kg (${pctCartonPapel.toFixed(1)}%)`;
-            // document.getElementById("cat-madera").innerText = `${kgMaderaTexto} Kg (${pctMadera.toFixed(1)}%)`;
-            // document.getElementById("cat-plastico").innerText = `${kgPlasticoTexto} Kg (${pctPlastico.toFixed(1)}%)`;
-            // document.getElementById("cat-metal").innerText = `${kgMetalTexto} Kg (${pctMetal.toFixed(1)}%)`;
-            // document.getElementById("cat-rsu").innerText = `${kgRSUTexto} Kg (${pctRSU.toFixed(1)}%)`;
-            // document.getElementById("cat-vidrio").innerText = `${kgVidrioTexto} Kg (${pctVidrio.toFixed(1)}%)`;
-            // document.getElementById("cat-otro").innerText = `${kgOtroTexto} Kg (${pctOtro.toFixed(1)}%)`;
+            // SALIDA: Ej.: "39.279 Kg (52.95%)"
+            document.getElementById("cat-carton-papel").innerText = `${kgCartonPapelTexto} Kg (${pctCartonPapel.toFixed(1)}%)`;
+            document.getElementById("cat-madera").innerText = `${kgMaderaTexto} Kg (${pctMadera.toFixed(1)}%)`;
+            document.getElementById("cat-plastico").innerText = `${kgPlasticoTexto} Kg (${pctPlastico.toFixed(1)}%)`;
+            document.getElementById("cat-metal").innerText = `${kgMetalTexto} Kg (${pctMetal.toFixed(1)}%)`;
+            document.getElementById("cat-rsu").innerText = `${kgRSUTexto} Kg (${pctRSU.toFixed(1)}%)`;
+            document.getElementById("cat-vidrio").innerText = `${kgVidrioTexto} Kg (${pctVidrio.toFixed(1)}%)`;
+            document.getElementById("cat-otro").innerText = `${kgOtroTexto} Kg (${pctOtro.toFixed(1)}%)`;
 
 
         },
@@ -410,3 +410,75 @@ function ManejarErrorFetch(err) {
     const tbody = document.getElementById("tbody-reporte-dinamico");
     tbody.innerHTML = `<tr><td colspan="12" class="text-center text-danger py-4">❌ Error al comunicar con la API de Reportes. Revise el estado del servidor.</td></tr>`;
 }
+
+
+function ExportarListadoPDF() {
+    // 1. Accedemos a las clases globales de jsPDF (ya que trabaja con módulos web)
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); // 'l' establece orientación Horizontal (Landscape) para que entren todas las columnas
+
+    // 2. Obtener el título dinámico actual del informe
+    const tituloReporte = document.getElementById("titulo-reporte-dinamico").innerText;
+    
+    // 3. Obtener la sesión para la firma del auditor en el pie de página
+    const sesionUsuario = JSON.parse(localStorage.getItem('usuarioSesion')) || { nombre: "Anónimo" };
+
+    // --- DISEÑO ESTÉTICO DEL ENCABEZADO ---
+    doc.setFillColor(67, 97, 238); // Color azul institucional de SITMAS
+    doc.rect(0, 0, 297, 25, 'F'); // Barra superior de color
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("SITMAS - Sistema de Gestión de Residuos", 14, 16);
+
+    // Subtítulo del informe fuera de la barra
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(13);
+    doc.text(tituloReporte, 14, 34);
+
+    // Fecha de generación del informe técnico
+    doc.setFontSize(9);
+    doc.setFont("Helvetica", "normal");
+    const fechaActual = new Date().toLocaleString('es-AR');
+    doc.text(`Fecha de Emisión: ${fechaActual}`, 220, 34);
+
+    // --- CONSTRUCCIÓN AUTOMÁTICA DE LA TABLA ---
+    // jsPDF AutoTable leerá de forma automatizada las celdas directamente de tu estructura HTML actual
+    doc.autoTable({
+        html: '.table', // Apunta a tu tabla con clase Bootstrap '.table'
+        startY: 40,     // Margen de inicio respecto al encabezado superior
+        styles: {
+            font: 'Helvetica',
+            fontSize: 9,
+            cellPadding: 3
+        },
+        headStyles: {
+            fillColor: [50, 50, 50], // Fondo oscuro para las cabeceras dinámicas
+            textColor: [255, 255, 255],
+            fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+            fillColor: [245, 247, 251] // Filas con color intercalado suave para lectura ágil
+        },
+        didDrawPage: function (data) {
+            // --- PIE DE PÁGINA DE AUDITORÍA EN CADA HOJA ---
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(8);
+            
+            // Texto izquierdo de auditoría de planta
+            doc.text(`Informe auditado por: ${sesionUsuario.nombre}`, 14, 200);
+            
+            // Numeración de páginas dinámicas a la derecha
+            let strPagina = "Página " + doc.internal.getNumberOfPages();
+            doc.text(strPagina, 260, 200);
+        }
+    });
+
+    // --- DESCARGA AUTOMÁTICA ---
+    // Genera un nombre de archivo limpio reemplazando espacios por guiones
+    const nombreArchivo = `SITMAS-${tituloReporte.replace(/ /g, "_")}.pdf`;
+    doc.save(nombreArchivo);
+}
+
+

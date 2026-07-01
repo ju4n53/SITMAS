@@ -134,6 +134,10 @@
                                     <option value="Salidas" selected>4. Movimientos de Salida y Consumo</option>
                                 </select>
                             </div>
+                            <button class="btn btn-danger d-flex align-items-center gap-1"
+                                onclick="ExportarListadoPDF()" style="height: 40px;">
+                                <span class="material-symbols-outlined fs-5">download</span> PDF
+                            </button>
                         </div>
 
 
@@ -322,6 +326,10 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ⬇️ LIBRERÍAS DE EXPORTACIÓN REQUERIDAS ⬇️ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
     <script src="../Js/alerts_config.js"></script>
     <script src="../Js/traz_reportes.js"></script>
     <script src="../Js/logout.js"></script>

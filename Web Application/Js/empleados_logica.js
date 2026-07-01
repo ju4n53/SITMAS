@@ -273,6 +273,9 @@ function RegistrarEmpleado(e) {
 
             // Limpiamos el formulario para una nueva carga limpia
             $("#collapseForm form")[0].reset();
+
+            //Estado inicial seteado para nuevo ingreso
+            $("#id_estado").val("1");
         },
         error: function (err) {
             console.error("Error en RegistrarEmpleado:", err);
@@ -388,6 +391,8 @@ function CargarComboEstadoEmpleado() {
             let select = $("#id_estado");
             select.empty().append('<option value="">Seleccione Estado</option>');
             data.forEach(i => select.append(`<option value="${i.Id}">${i.EstadoEmpleado}</option>`));
+            //seleccion por defecto del estado Activo en un ingreso nuevo
+            select.val("1");
         }
     });
 }
