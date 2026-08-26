@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <Use64BitIISExpress />
+    <Use64BitIISExpress>false</Use64BitIISExpress>
     <IISExpressSSLPort>44325</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -187,6 +187,7 @@
     <Compile Include="Controllers\CargoController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DestinoController.cs" />
+    <Compile Include="Controllers\DetalleHojaRutaController.cs" />
     <Compile Include="Controllers\DetalleIngresoController.cs" />
     <Compile Include="Controllers\EmpleadoController.cs" />
     <Compile Include="Controllers\EstadoEmpleadoController.cs" />
@@ -223,6 +224,7 @@
     <Compile Include="Models\Cargos.cs" />
     <Compile Include="Models\DashboardData.cs" />
     <Compile Include="Models\Destino.cs" />
+    <Compile Include="Models\DetalleHojaRuta.cs" />
     <Compile Include="Models\DetalleIngreso.cs" />
     <Compile Include="Models\Empleado.cs" />
     <Compile Include="Models\Estado_Empleado.cs" />

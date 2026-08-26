@@ -411,7 +411,7 @@ function ManejarErrorFetch(err) {
     tbody.innerHTML = `<tr><td colspan="12" class="text-center text-danger py-4">❌ Error al comunicar con la API de Reportes. Revise el estado del servidor.</td></tr>`;
 }
 
-
+//PDF EXPORTACIÓN DE INFORMES
 function ExportarListadoPDF() {
     // 1. Accedemos a las clases globales de jsPDF (ya que trabaja con módulos web)
     const { jsPDF } = window.jspdf;

@@ -1,104 +1,185 @@
 ﻿using API_SITMAS.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/hojaruta")]
     public class HojaRutaController : ApiController
     {
-        // GET: api/HojaRuta
+        // GET: api/hojaruta (Listar todas las cabeceras)
         [HttpGet]
-        public List<HojaRuta> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            HojaRuta oHojaRuta = new HojaRuta();
-
-            DataTable dt = oHojaRuta.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<HojaRuta>>(listaJson);
-
-            return Lista;
-
+            try
+            {
+                HojaRuta oHojaRuta = new HojaRuta();
+                List<HojaRuta> lista = oHojaRuta.SelectAll();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // GET: api/Area/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
-
-        // POST: api/HojaRuta
+        // POST: api/hojaruta (Crear una cabecera)
         [HttpPost]
-        public void Insertar([FromBody] HojaRuta value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] HojaRuta value)
         {
-            HojaRuta oHojaRuta = new HojaRuta();
-            oHojaRuta.HojaRutaFecha = value.HojaRutaFecha;
-            oHojaRuta.Id_Vehiculo = value.Id_Vehiculo;
-            oHojaRuta.Id_Chofer = value.Id_Chofer;
-            oHojaRuta.Id_Estado = value.Id_Estado;
+            if (value == null) return BadRequest("Los datos enviados no son válidos.");
 
-            oHojaRuta.Insertar();
+            try
+            {
+                int nuevoId = value.Insertar();
+                return Ok(new { IdGenerado = nuevoId, Mensaje = "Hoja de Ruta creada con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // PUT: api/HojaRuta/5
-        [HttpPost]
-        public void Modificar(int id, [FromBody] HojaRuta value)
+        // PUT: api/hojaruta/5 (Modificar cabecera)
+        [HttpPut]
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] HojaRuta value)
         {
+            if (value == null) return BadRequest("Los datos enviados no son válidos.");
 
-            HojaRuta oHojaRuta = new HojaRuta();
-            oHojaRuta.Id = id;
-            oHojaRuta.HojaRutaFecha = value.HojaRutaFecha;
-            oHojaRuta.Id_Vehiculo = value.Id_Vehiculo;
-            oHojaRuta.Id_Chofer = value.Id_Chofer;
-            oHojaRuta.Id_Estado = value.Id_Estado;
+            try
+            {
+                value.Id = id;
+                bool actualizado = value.Modificar();
+                if (!actualizado) return NotFound();
 
-            oHojaRuta.Modificar();
+                return Ok(new { Mensaje = "Hoja de Ruta actualizada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // DELETE: api/HojaRuta/5
-        [HttpPost]
-
-        public void Borrar(int id)
+        // DELETE: api/hojaruta/5 (Eliminar cabecera y sus detalles en cascada)
+        [HttpDelete]
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
         {
+            try
+            {
+                HojaRuta oHojaRuta = new HojaRuta { Id = id };
+                bool eliminado = oHojaRuta.Borrar();
+                if (!eliminado) return NotFound();
 
-            HojaRuta oHojaRuta = new HojaRuta();
-            oHojaRuta.Id = id;
-
-            oHojaRuta.Borrar();
-
+                return Ok(new { Mensaje = "Hoja de Ruta eliminada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
-
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
-
-        //}
-
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using API_SITMAS.Models;
+//using Newtonsoft.Json;
+//using System;
+//using System.Collections.Generic;
+//using System.Data;
+//using System.Linq;
+//using System.Net;
+//using System.Net.Http;
+//using System.Web.Http;
+
+//namespace API_SITMAS.Controllers
+//{
+//    public class HojaRutaController : ApiController
+//    {
+//        // GET: api/HojaRuta
+//        [HttpGet]
+//        public List<HojaRuta> ListarTodo()
+//        {
+//            HojaRuta oHojaRuta = new HojaRuta();
+
+//            DataTable dt = oHojaRuta.SelectAll();
+//            var listaJson = JsonConvert.SerializeObject(dt);
+
+//            var Lista = JsonConvert.DeserializeObject<List<HojaRuta>>(listaJson);
+
+//            return Lista;
+
+//        }
+
+//        // POST: api/HojaRuta
+//        [HttpPost]
+//        public void Insertar([FromBody] HojaRuta value)
+//        {
+//            HojaRuta oHojaRuta = new HojaRuta();
+//            oHojaRuta.HojaRutaFecha = value.HojaRutaFecha;
+//            oHojaRuta.Id_Vehiculo = value.Id_Vehiculo;
+//            oHojaRuta.Id_Chofer = value.Id_Chofer;
+//            oHojaRuta.Id_Estado = value.Id_Estado;
+
+//            oHojaRuta.Insertar();
+//        }
+
+//        // PUT: api/HojaRuta/5
+//        [HttpPost]
+//        public void Modificar(int id, [FromBody] HojaRuta value)
+//        {
+
+//            HojaRuta oHojaRuta = new HojaRuta();
+//            oHojaRuta.Id = id;
+//            oHojaRuta.HojaRutaFecha = value.HojaRutaFecha;
+//            oHojaRuta.Id_Vehiculo = value.Id_Vehiculo;
+//            oHojaRuta.Id_Chofer = value.Id_Chofer;
+//            oHojaRuta.Id_Estado = value.Id_Estado;
+
+//            oHojaRuta.Modificar();
+//        }
+
+//        // DELETE: api/HojaRuta/5
+//        [HttpPost]
+
+//        public void Borrar(int id)
+//        {
+
+//            HojaRuta oHojaRuta = new HojaRuta();
+//            oHojaRuta.Id = id;
+
+//            oHojaRuta.Borrar();
+
+//        }
+
+
+
+//    }
+//}
