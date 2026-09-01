@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITMAS - Panel Principal</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../newstyles.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../Js/access_control.js"></script>
+</head>
+
+<body class="min-vh-100 d-flex flex-column">
+
+    <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
+        <div>
+            <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
+        </div>
+
+        <div class="info-right d-flex align-items-center gap-3">
+            <div class="text-end d-flex flex-column"> <span>Hola, <span class="data" id="header-user">---</span></span>
+                <span>Eres: <span class="data" id="header-role">---</span></span>
+
+                <a href="#" class="text-danger small fw-bold" onclick="cerrarSesion(event)">
+                    ❌ Cerrar Sesión
+                </a>
+            </div>
+
+            <div class="role-icon"></div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-body-content flex-grow-1">
+        <div class="info-bar border-bottom">
+            <span class="text-uppercase tracking-wider">Gestión de hojas de ruta</span>
+        </div>
+
+        <main class="container-fluid p-4">
+
+            <!-- Contenedor dinámico de alertas/mensajes de feedback -->
+            <div id="alertContainer"></div>
+
+            <div class="row g-4">
+
+                <!-- ======================================================= -->
+                <!-- 1. HOJA DE RUTA (CABECERA)                              -->
+                <!-- ======================================================= -->
+                <div class="col-12">
+                    <div class="sitmas-card">
+                        <div class="accordion-header d-flex justify-content-between align-items-center" role="button"
+                            data-bs-toggle="collapse" href="#collapseHojaRuta">
+                            <h2 class="mb-0" id="tituloFormHDR">Cargar Hoja de Ruta</h2>
+                            <span class="icon-arrow">▼</span>
+                        </div>
+
+                        <div id="collapseHojaRuta" class="collapse show">
+                            <!-- FORMULARIO CABECERA -->
+                            <div class="pt-4">
+                                <form id="formHojaRuta">
+                                    <!-- Input oculto clave para alternar entre Crear (0) y Modificar (ID) -->
+                                    <input type="hidden" id="hdnIdHojaRuta" value="0">
+
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold" for="fecha_hdr">Fecha</label>
+                                            <input type="date" class="form-control" id="fecha_hdr" required>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold" for="id_vehiculo">Vehículo</label>
+                                            <select class="form-select" id="id_vehiculo" required>
+                                                <option value="">Cargando vehículos...</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold" for="id_chofer">Chofer / Empleado</label>
+                                            <select class="form-select" id="id_chofer" required>
+                                                <option value="">Cargando choferes...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-3 d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-secondary px-4"
+                                            id="btnLimpiarForm">Cancelar / Limpiar</button>
+                                        <button type="submit" class="btn btn-sitmas-success px-5" id="btnGuardarHDR">➕
+                                            Crear Hoja de Ruta</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- BARRA DE BÚSQUEDA RÁPIDA -->
+                            <div class="row pt-4">
+                                <div class="col-md-4 offset-md-8">
+                                    <input type="text" id="inputBusquedaHDR" class="form-control"
+                                        placeholder="🔍 Buscar Hoja de Ruta...">
+                                </div>
+                            </div>
+
+                            <!-- TABLA CABECERA -->
+                            <div class="table-responsive pt-3">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Vehículo</th>
+                                            <th>Chofer</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyHojaRuta">
+                                        <!-- Se renderiza dinámicamente con GetAllHojasRuta() -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================================= -->
+                <!-- 2. DETALLE HOJA DE RUTA (PARADAS)                       -->
+                <!-- ======================================================= -->
+                <div class="col-12" id="seccionDetalle">
+                    <div class="sitmas-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="mb-0">Detalles / Paradas de Hoja de Ruta</h2>
+                        </div>
+
+                        <!-- FORMULARIO DETALLE -->
+                        <form id="formDetalle" onsubmit="GuardarDetalle(); return false;">
+                            <!-- Inputs Ocultos -->
+                            <input type="hidden" id="dt_id" value="">
+                            <input type="hidden" id="hdr_id_seleccionado" value="">
+
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Tipo Movimiento</label>
+                                    <input type="number" class="form-control" id="dt_id_tipo_mov" required
+                                        placeholder="ID Mov">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Recurso Mov.</label>
+                                    <input type="number" class="form-control" id="dt_id_recurso_mov" required
+                                        placeholder="ID Recurso">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Origen</label>
+                                    <input type="number" class="form-control" id="dt_id_origen" required
+                                        placeholder="ID Origen">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Tipo Material</label>
+                                    <input type="number" class="form-control" id="dt_id_tipo_material" required
+                                        placeholder="ID Material">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Hora Estimada</label>
+                                    <input type="time" class="form-control" id="dt_hora_estimada" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Estado</label>
+                                    <input type="number" class="form-control" id="dt_id_estado" required
+                                        placeholder="ID Estado">
+                                </div>
+                            </div>
+
+                            <div class="pt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary px-4"
+                                    onclick="LimpiarFormularioDetalle()">Cancelar</button>
+                                <button type="submit" class="btn btn-primary px-4" id="btnGuardarDetalle">Guardar
+                                    Parada</button>
+                            </div>
+                        </form>
+
+                        <!-- TABLA DETALLE -->
+                        <div class="table-responsive pt-4">
+                            <table class="table table-striped align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nro Detalle</th>
+                                        <th>Hoja de ruta</th>
+                                        <th>Tipo Mov.</th>
+                                        <th>Recurso</th>
+                                        <th>Origen</th>
+                                        <th>Material</th>
+                                        <th>Hora</th>
+                                        <th>Estado</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyDetallesHDR">
+                                    <!-- Se renderiza dinámicamente con ListarDetallesPorHojaRuta(id) -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+
+    <footer class="footer-liston">
+        <div class="container text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-4 align-items-center">
+                <img src="/assets/footer-logos.png" alt="Ente BioCórdoba" class="logo-inst">
+            </div>
+        </div>
+    </footer>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="../Js/alerts_config.js"></script>
+<script src="../Js/hojaRuta_logica.js"></script>
+<script src="../Js/detalleHojaRuta_logica.js"></script>
+<script src="../Js/logout.js"></script>
+
+
+
+</html>
