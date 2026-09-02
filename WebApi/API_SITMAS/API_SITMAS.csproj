@@ -204,11 +204,13 @@
     <Compile Include="Controllers\MovimientoSalidaController.cs" />
     <Compile Include="Controllers\OrigenController.cs" />
     <Compile Include="Controllers\PermisosController.cs" />
+    <Compile Include="Controllers\RecursoMovilizadoController.cs" />
     <Compile Include="Controllers\ReportesDataController.cs" />
     <Compile Include="Controllers\ReporteTrazabilidadController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\Rol_PermisoController.cs" />
     <Compile Include="Controllers\SbTp_MaterialController.cs" />
+    <Compile Include="Controllers\TipoMovimientoController.cs" />
     <Compile Include="Controllers\TpVinculacionController.cs" />
     <Compile Include="Controllers\TP_MaterialController.cs" />
     <Compile Include="Controllers\Tp_VehiculoController.cs" />
@@ -240,11 +242,13 @@
     <Compile Include="Models\MovimientoSalida.cs" />
     <Compile Include="Models\Origen.cs" />
     <Compile Include="Models\Permisos.cs" />
+    <Compile Include="Models\RecursoMovilizado.cs" />
     <Compile Include="Models\ReportesData.cs" />
     <Compile Include="Models\ReporteTrazabilidad.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\Rol_Permiso.cs" />
     <Compile Include="Models\SbTp_Material.cs" />
+    <Compile Include="Models\TipoMovimiento.cs" />
     <Compile Include="Models\TpVinculacion.cs" />
     <Compile Include="Models\Tp_Material.cs" />
     <Compile Include="Models\Tp_Vehiculo.cs" />

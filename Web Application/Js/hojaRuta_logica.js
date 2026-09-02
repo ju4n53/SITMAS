@@ -61,7 +61,7 @@ function CargarComboVehiculos() {
             $select.empty().append('<option value="">Seleccione Vehículo (Patente)</option>');
             data.forEach(v => {
                 // Adaptar propiedades al DTO real de Vehículo (ej: v.Id, v.Patente)
-                $select.append(`<option value="${v.Id}">${v.Patente}</option>`);
+                $select.append(`<option value="${v.Id}">${v.Id} - ${v.Patente}</option>`);
             });
         }
     });
