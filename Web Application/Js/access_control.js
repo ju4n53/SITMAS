@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (document.getElementById('sidebar-logistica')) document.getElementById('sidebar-logistica').classList.remove('d-none');
             if (document.getElementById('pageVehiculo')) document.getElementById('pageVehiculo').classList.remove('d-none');
             if (document.getElementById('pageHojasRuta')) document.getElementById('pageHojasRuta').classList.remove('d-none');
+            if (document.getElementById('pageOdometro')) document.getElementById('pageOdometro').classList.remove('d-none');
         }
 
         // Si es el Administrador técnico con acceso a las configuraciones

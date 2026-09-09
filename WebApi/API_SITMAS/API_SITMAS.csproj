@@ -205,6 +205,7 @@
     <Compile Include="Controllers\OrigenController.cs" />
     <Compile Include="Controllers\PermisosController.cs" />
     <Compile Include="Controllers\RecursoMovilizadoController.cs" />
+    <Compile Include="Controllers\RegistroOdometroController.cs" />
     <Compile Include="Controllers\ReportesDataController.cs" />
     <Compile Include="Controllers\ReporteTrazabilidadController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="Models\Origen.cs" />
     <Compile Include="Models\Permisos.cs" />
     <Compile Include="Models\RecursoMovilizado.cs" />
+    <Compile Include="Models\RegistroOdometro.cs" />
     <Compile Include="Models\ReportesData.cs" />
     <Compile Include="Models\ReporteTrazabilidad.cs" />
     <Compile Include="Models\Roles.cs" />
