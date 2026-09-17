@@ -1,49 +1,69 @@
-/* ==========================================================
-   SITMAS - Interceptor Global de Alerts para Estilizado Heredado
-   ========================================================== */
+/* ==========================================================================
+   SITMAS - Módulo Centralizado de Alertas Visuales (SweetAlert2)
+   ========================================================================== */
 
-// Guardamos una copia del alert nativo por si alguna vez la necesitamos
-const alertNativo = window.alert;
+function mostrarAlerta(mensaje, tipo = "info", titulo = "") {
+    let iconType = "info";
+    let defaultTitle = "Aviso";
 
-// Sobrescribimos la función global alert
-window.alert = function (mensaje) {
-    let tipoIcono = 'info'; // Por defecto
-    let mensajeLimpio = mensaje;
-    let titulo = 'SITMAS - Notificación';
-
-    // Clasificación dinámica según los caracteres que ya usás en tu lógica JS
-    if (mensaje.includes('✅') || mensaje.toLowerCase().includes('éxito') || mensaje.toLowerCase().includes('correctamente')) {
-        tipoIcono = 'success';
-        titulo = 'Operación Exitosa';
-        mensajeLimpio = mensaje.replace('✅', '').trim();
-    } else if (mensaje.includes('❌') || mensaje.toLowerCase().includes('error') || mensaje.toLowerCase().includes('no encontrado')) {
-        tipoIcono = 'error';
-        titulo = 'Atención';
-        mensajeLimpio = mensaje.replace('❌', '').trim();
-    } else if (mensaje.toLowerCase().includes('ingrese') || mensaje.toLowerCase().includes('primero')) {
-        tipoIcono = 'warning';
-        titulo = 'Dato Requerido';
+    switch (tipo) {
+        case "success":
+            iconType = "success";
+            defaultTitle = "¡Operación Exitosa!";
+            break;
+        case "danger":
+        case "error":
+            iconType = "error";
+            defaultTitle = "¡Atención!";
+            break;
+        case "warning":
+            iconType = "warning";
+            defaultTitle = "Dato Requerido";
+            break;
+        case "info":
+            iconType = "info";
+            defaultTitle = "Información";
+            break;
     }
 
-    // Disparamos el modal estético heredando los colores de la paleta EMEC/BioCórdoba
+    // Limpiamos emojis del mensaje si venían en la cadena
+    const mensajeLimpio = mensaje.replace(/[✅❌⚠️📍]/g, '').trim();
+
+    Swal.fire({
+        title: titulo || defaultTitle,
+        text: mensajeLimpio,
+        icon: iconType,
+        confirmButtonText: "Entendido",
+        confirmButtonColor: "#78BE20", // Verde BioCórdoba
+        customClass: {
+            popup: 'sitmas-modal-popup',
+            confirmButton: 'btn btn-sitmas-success px-4'
+        },
+        buttonsStyling: false
+    });
+}
+
+/**
+ * Confirmación modal previa a acciones destructivas (DELETE)
+ */
+function confirmarAccion(titulo, texto, funcionConfirmar) {
     Swal.fire({
         title: titulo,
-        text: mensajeLimpio,
-        icon: tipoIcono,
-        confirmButtonText: 'Entendido',
-        confirmButtonColor: '#78BE20', // Tu variable var(--verde-bio)
-        background: '#ffffff',
-        borderRadius: '12px',
+        text: texto,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
         customClass: {
-            popup: 'sitmas-alert-popup',
-            title: 'sitmas-alert-title',
-            confirmButton: 'btn-sitmas-success px-4 py-2' // Hereda directamente tus estilos de botones
+            confirmButton: 'btn btn-danger me-2',
+            cancelButton: 'btn btn-secondary'
         },
-        showClass: {
-            popup: 'animate__animated animate__fadeInUp animate__faster' // Animación sutil de entrada
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutDown animate__faster'
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            funcionConfirmar();
         }
     });
-};
+}
