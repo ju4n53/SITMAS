@@ -185,6 +185,8 @@
     <Compile Include="Controllers\AreaController.cs" />
     <Compile Include="Controllers\BarrioController.cs" />
     <Compile Include="Controllers\CargoController.cs" />
+    <Compile Include="Controllers\CombustibleController.cs" />
+    <Compile Include="Controllers\ConsumoCombustibleController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DestinoController.cs" />
     <Compile Include="Controllers\DetalleHojaRutaController.cs" />
@@ -225,6 +227,8 @@
     <Compile Include="Models\Areas.cs" />
     <Compile Include="Models\Barrios.cs" />
     <Compile Include="Models\Cargos.cs" />
+    <Compile Include="Models\Combustible.cs" />
+    <Compile Include="Models\ConsumoCombustible.cs" />
     <Compile Include="Models\DashboardData.cs" />
     <Compile Include="Models\Destino.cs" />
     <Compile Include="Models\DetalleHojaRuta.cs" />
