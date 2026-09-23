@@ -9,7 +9,7 @@ const URL_API_HDR_LISTA = "https://localhost:44325/api/hojaruta";
 // Endpoints auxiliares para los Combos
 const URL_API_TIPO_MOV = "https://localhost:44325/api/tipomovimientos";
 const URL_API_RECURSOS = "https://localhost:44325/api/recursosmovilizados";
-const URL_API_ORIGEN = "https://localhost:44325/api/Origen/ListarTodo";
+const URL_API_ORIGEN = "https://localhost:44325/api/Origen";
 const URL_API_MATERIAL = "https://localhost:44325/api/TP_Material/ListarTodo";
 const URL_API_ESTADO_PARADA = "https://localhost:44325/api/EST_HDR/ListarTodo";
 

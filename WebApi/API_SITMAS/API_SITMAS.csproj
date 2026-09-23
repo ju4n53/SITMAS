@@ -217,6 +217,7 @@
     <Compile Include="Controllers\TpVinculacionController.cs" />
     <Compile Include="Controllers\TP_MaterialController.cs" />
     <Compile Include="Controllers\Tp_VehiculoController.cs" />
+    <Compile Include="Controllers\UbicacionGeoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Controllers\Usuario_RolController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
@@ -258,6 +259,7 @@
     <Compile Include="Models\TpVinculacion.cs" />
     <Compile Include="Models\Tp_Material.cs" />
     <Compile Include="Models\Tp_Vehiculo.cs" />
+    <Compile Include="Models\UbicacionGeo.cs" />
     <Compile Include="Models\Usuarios.cs" />
     <Compile Include="Models\Usuario_Rol.cs" />
     <Compile Include="Models\Vehiculo.cs" />

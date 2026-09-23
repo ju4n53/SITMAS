@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (document.getElementById('pageHojasRuta')) document.getElementById('pageHojasRuta').classList.remove('d-none');
             if (document.getElementById('pageOdometro')) document.getElementById('pageOdometro').classList.remove('d-none');
             if (document.getElementById('pageCombustible')) document.getElementById('pageCombustible').classList.remove('d-none');
+            if (document.getElementById('pageMapaUbicacion')) document.getElementById('pageMapaUbicacion').classList.remove('d-none');
         }
 
         // Si es el Administrador técnico con acceso a las configuraciones

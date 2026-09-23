@@ -4,13 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITMAS - Panel Principal</title>
+    <title>SITMAS - Mapa de Ubicación y Paradas</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../newstyles.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
     <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">
+
+    <!-- 🗺️ LEAFLET CSS (MAPA INTERACTIVO) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- CSS de Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+   
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../Js/access_control.js"></script>
 </head>
@@ -75,7 +83,6 @@
 
                         <a class="nav-link small ps-4 d-none" id="pageCombustible"
                             href="../Pages/consumoCombustible.html">Consumo de Combustible</a>
-
                         <a class="nav-link small ps-4 d-none" id="pageMapaUbicacion"
                             href="../Pages/mapa_ubicacion.html">Mapa de Ubicación</a>
                     </div>
@@ -115,44 +122,102 @@
             </ul>
         </aside>
 
-        <div class="main-body-content flex-grow-1 d-flex flex-column">
-
-            <div class="info-bar border-bottom p-3">
-                <span class="text-uppercase tracking-wider">Panel de inicio</span>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="main-body-content flex-grow-1">
+            <div class="info-bar border-bottom d-flex justify-content-between align-items-center pe-4">
+                <span class="text-uppercase tracking-wider">Carga Rápida de Paradas en Mapa</span>
+                <a href="../Pages/HojaRuta.html" class="btn btn-outline-secondary btn-sm">
+                    ⬅ Volver a Gestión Hojas de Ruta
+                </a>
             </div>
 
             <main class="container-fluid p-4">
-                <div class="row g-4">
 
-                    <div class="col-12">
+                <div id="alertContainer"></div>
+
+                <div class="row g-3">
+                    <!-- PANEL IZQUIERDO: FORMULARIO LIGERO DE CONTEXTO -->
+                    <div class="col-lg-4">
+                        <div class="sitmas-card h-100">
+                            <h2 class="mb-3">📍 Asignar Parada</h2>
+                            <p class="text-muted small">Seleccione la Hoja de Ruta destino y luego haga clic
+                                directamente en el mapa sobre la ubicación deseada.</p>
+
+                            <form id="formParadaMapa">
+                                <input type="hidden" id="map_id_ubicacion_geo" value="0">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">1. Hoja de Ruta Destino</label>
+                                    <select class="form-select" id="map_id_hoja_ruta" required>
+                                        <option value="">Cargando Hojas de Ruta...</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">2. Tipo Movimiento</label>
+                                    <select class="form-select" id="map_id_tipo_mov" required>
+                                        <option value="">Cargando Tipos...</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">3. Hora Estimada</label>
+                                    <input type="time" class="form-control" id="map_hora_estimada" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-success">Punto Marcado en Mapa:</label>
+                                    <textarea class="form-control bg-light" id="map_txt_descripcion" rows="2" readonly
+                                        placeholder="Haga clic en el mapa para capturar las coordenadas..."></textarea>
+                                </div>
+
+                                <div class="d-grid gap-2 pt-2">
+                                    <button type="submit" class="btn btn-sitmas-success" id="btnGuardarParadaMapa">
+                                        ➕ Guardar Parada en Hoja
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="ResetearFormularioMapa()">
+                                        Limpiar Seleccion
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- PANEL DERECHO: VISOR DEL MAPA Y TABLA DE RESUMEN -->
+                    <div class="col-lg-8">
+                        <div class="sitmas-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h2 class="mb-0">🗺️ Mapa de Recorrido</h2>
+                                <small class="text-muted">OpenStreetMap / Leaflet</small>
+                            </div>
+                            <div id="mapaInteractiveContainer" style="height: 420px; width: 100%; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <!-- TABLA RESUMEN EN TIEMPO REAL -->
                         <div class="sitmas-card">
-                            <h2 class="mb-3 text-success">📦 Stock de Materiales Disponibles en Planta</h2>
-                            <p class="text-muted small">Kilogramos netos listos para su procesamiento o egreso,
-                                calculados post-clasificación (Peso Útil).</p>
-                            <div style="position: relative; height: 350px; width: 100%;">
-                                <canvas id="chartStockActual"></canvas>
+                            <h3 class="h6 fw-bold mb-3">Paradas asociadas a la Hoja de Ruta seleccionada</h3>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Hora</th>
+                                            <th>Tipo Mov.</th>
+                                            <th>Lugar / Descripción GPS</th>
+                                            <th class="text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyParadasMapa">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">Seleccione una Hoja de Ruta
+                                                para ver sus paradas.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2 class="mb-3">Volumen de Ingresos (Peso Bruto)</h2>
-                            <div style="position: relative; height: 320px; width: 100%;">
-                                <canvas id="chartPesoBruto"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2 class="mb-3">Eficiencia de Clasificación (Bruto vs Útil)</h2>
-                            <div style="position: relative; height: 320px; width: 100%;">
-                                <canvas id="chartRendimiento"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
 
                 </div>
             </main>
@@ -160,20 +225,23 @@
     </div>
 
     <footer class="footer-liston">
-        <div class="logos-container">
-            <img src="../assets/footer-logos.png" alt="Logos Institucionales" class="logo-inst">
+        <div class="container text-center">
+            <img src="/assets/footer-logos.png" alt="Ente BioCórdoba" class="logo-inst">
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 🗺️ LEAFLET JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+     <!-- JS de Leaflet Routing Machine (va después de leaflet.js) -->
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
     <script src="../Js/alerts_config.js"></script>
-
-    <script src="../Js/dashboard_graficos.js"></script>
+    <script src="../Js/mapaUbicacion_logica.js"></script>
     <script src="../Js/logout.js"></script>
+
 </body>
 
 </html>
