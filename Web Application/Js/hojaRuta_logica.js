@@ -22,7 +22,7 @@ $(document).ready(function () {
     });
 
     // 3. Validaciones dinámicas de entrada
-    ConfigurarValidacionesFormulario();
+    //ConfigurarValidacionesFormulario();
 
     // 4. Buscador reactivo en vivo sobre la tabla
     $("#inputBusquedaHDR").on("keyup", function () {
@@ -249,7 +249,7 @@ function ResetearFormulario() {
     $("#tituloFormHDR").text("Cargar Hoja de Ruta");
 }
 
-function ConfigurarValidacionesFormulario() {
-    const hoy = new Date().toISOString().split("T")[0];
-    $("#fecha_hdr").attr("max", hoy); // Evita seleccionar fechas futuras
-}
+// function ConfigurarValidacionesFormulario() {
+//     const hoy = new Date().toISOString().split("T")[0];
+//     $("#fecha_hdr").attr("max", hoy); // Evita seleccionar fechas futuras
+// }

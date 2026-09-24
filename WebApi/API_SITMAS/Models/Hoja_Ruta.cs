@@ -21,6 +21,9 @@ namespace API_SITMAS.Models
         public string Vehiculo { get; set; }
         public string ChoferNombreCompleto { get; set; }
 
+        // 📏 NUEVA PROPIEDAD: Distancia Total de la Hoja de Ruta
+        public decimal Distancia_Total_Estimada_Km { get; set; }
+
         /// <summary>
         /// Obtiene todas las Hojas de Ruta registradas.
         /// </summary>
@@ -43,7 +46,10 @@ namespace API_SITMAS.Models
                             Id = Convert.ToInt32(reader["Id_HojaRuta"]),
                             FechaFormateada = reader["FechaFormateada"] != DBNull.Value ? reader["FechaFormateada"].ToString() : string.Empty,
                             Vehiculo = reader["Vehiculo"] != DBNull.Value ? reader["Vehiculo"].ToString() : "Sin Vehículo",
-                            ChoferNombreCompleto = reader["ChoferNombreCompleto"] != DBNull.Value ? reader["ChoferNombreCompleto"].ToString() : "Sin Chofer"
+                            ChoferNombreCompleto = reader["ChoferNombreCompleto"] != DBNull.Value ? reader["ChoferNombreCompleto"].ToString() : "Sin Chofer",
+
+                            // 📏 Mapeo del campo calculado por el Trigger desde la Vista
+                            Distancia_Total_Estimada_Km = reader["Distancia_Total_Estimada_Km"] != DBNull.Value ? Convert.ToDecimal(reader["Distancia_Total_Estimada_Km"]) : 0m
                         });
                     }
                 }
@@ -58,7 +64,6 @@ namespace API_SITMAS.Models
         {
             HojaRuta oHojaRuta = null;
 
-            // Consultamos directamente la tabla o un SP individual para obtener los IDs del Vehículo y Chofer
             string query = "SELECT Id, HojaRutaFecha, Id_Vehiculo, Id_Chofer FROM dbo.Hoja_Ruta WHERE Id = @Id";
 
             using (SqlConnection sqlCnn = new SqlConnection(connectionString))
@@ -95,7 +100,6 @@ namespace API_SITMAS.Models
             {
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
-                // Mapeo seguro con validación de enteros para FKs
                 sqlCom.Parameters.AddWithValue("@HojaRutaFecha", HojaRutaFecha);
                 sqlCom.Parameters.AddWithValue("@Id_Vehiculo", Id_Vehiculo > 0 ? (object)Id_Vehiculo : DBNull.Value);
                 sqlCom.Parameters.AddWithValue("@Id_Chofer", Id_Chofer > 0 ? (object)Id_Chofer : DBNull.Value);
@@ -141,3 +145,149 @@ namespace API_SITMAS.Models
         }
     }
 }
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Configuration;
+//using System.Data;
+//using System.Data.SqlClient;
+
+//namespace API_SITMAS.Models
+//{
+//    public class HojaRuta
+//    {
+//        private readonly string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
+
+//        // Entidades y claves foráneas (para INSERT, UPDATE y carga de combos en Front)
+//        public int Id { get; set; }
+//        public DateTime HojaRutaFecha { get; set; }
+//        public int Id_Vehiculo { get; set; }
+//        public int Id_Chofer { get; set; }
+
+//        // Propiedades de lectura e información descriptiva (desde la Vista o JOIN)
+//        public string FechaFormateada { get; set; }
+//        public string Vehiculo { get; set; }
+//        public string ChoferNombreCompleto { get; set; }
+
+//        /// <summary>
+//        /// Obtiene todas las Hojas de Ruta registradas.
+//        /// </summary>
+//        public List<HojaRuta> SelectAll()
+//        {
+//            var lista = new List<HojaRuta>();
+
+//            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+//            using (SqlCommand sqlCom = new SqlCommand("sp_ListarHDR", sqlCnn))
+//            {
+//                sqlCom.CommandType = CommandType.StoredProcedure;
+//                sqlCnn.Open();
+
+//                using (SqlDataReader reader = sqlCom.ExecuteReader())
+//                {
+//                    while (reader.Read())
+//                    {
+//                        lista.Add(new HojaRuta
+//                        {
+//                            Id = Convert.ToInt32(reader["Id_HojaRuta"]),
+//                            FechaFormateada = reader["FechaFormateada"] != DBNull.Value ? reader["FechaFormateada"].ToString() : string.Empty,
+//                            Vehiculo = reader["Vehiculo"] != DBNull.Value ? reader["Vehiculo"].ToString() : "Sin Vehículo",
+//                            ChoferNombreCompleto = reader["ChoferNombreCompleto"] != DBNull.Value ? reader["ChoferNombreCompleto"].ToString() : "Sin Chofer"
+//                        });
+//                    }
+//                }
+//            }
+//            return lista;
+//        }
+
+//        /// <summary>
+//        /// Obtiene una Hoja de Ruta específica por su ID incluyendo las claves foráneas para edición.
+//        /// </summary>
+//        public HojaRuta ObtenerPorId(int id)
+//        {
+//            HojaRuta oHojaRuta = null;
+
+//            // Consultamos directamente la tabla o un SP individual para obtener los IDs del Vehículo y Chofer
+//            string query = "SELECT Id, HojaRutaFecha, Id_Vehiculo, Id_Chofer FROM dbo.Hoja_Ruta WHERE Id = @Id";
+
+//            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+//            using (SqlCommand sqlCom = new SqlCommand(query, sqlCnn))
+//            {
+//                sqlCom.CommandType = CommandType.Text;
+//                sqlCom.Parameters.AddWithValue("@Id", id);
+
+//                sqlCnn.Open();
+//                using (SqlDataReader reader = sqlCom.ExecuteReader())
+//                {
+//                    if (reader.Read())
+//                    {
+//                        oHojaRuta = new HojaRuta
+//                        {
+//                            Id = Convert.ToInt32(reader["Id"]),
+//                            HojaRutaFecha = Convert.ToDateTime(reader["HojaRutaFecha"]),
+//                            Id_Vehiculo = reader["Id_Vehiculo"] != DBNull.Value ? Convert.ToInt32(reader["Id_Vehiculo"]) : 0,
+//                            Id_Chofer = reader["Id_Chofer"] != DBNull.Value ? Convert.ToInt32(reader["Id_Chofer"]) : 0
+//                        };
+//                    }
+//                }
+//            }
+//            return oHojaRuta;
+//        }
+
+//        /// <summary>
+//        /// Inserta una nueva cabecera y retorna el ID autogenerado.
+//        /// </summary>
+//        public int Insertar()
+//        {
+//            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+//            using (SqlCommand sqlCom = new SqlCommand("sp_InsertarHDR", sqlCnn))
+//            {
+//                sqlCom.CommandType = CommandType.StoredProcedure;
+
+//                // Mapeo seguro con validación de enteros para FKs
+//                sqlCom.Parameters.AddWithValue("@HojaRutaFecha", HojaRutaFecha);
+//                sqlCom.Parameters.AddWithValue("@Id_Vehiculo", Id_Vehiculo > 0 ? (object)Id_Vehiculo : DBNull.Value);
+//                sqlCom.Parameters.AddWithValue("@Id_Chofer", Id_Chofer > 0 ? (object)Id_Chofer : DBNull.Value);
+
+//                sqlCnn.Open();
+//                return Convert.ToInt32(sqlCom.ExecuteScalar());
+//            }
+//        }
+
+//        /// <summary>
+//        /// Modifica los datos de una cabecera de Hoja de Ruta existente.
+//        /// </summary>
+//        public bool Modificar()
+//        {
+//            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+//            using (SqlCommand sqlCom = new SqlCommand("sp_ActualizarHDR", sqlCnn))
+//            {
+//                sqlCom.CommandType = CommandType.StoredProcedure;
+//                sqlCom.Parameters.AddWithValue("@Id", Id);
+//                sqlCom.Parameters.AddWithValue("@HojaRutaFecha", HojaRutaFecha);
+//                sqlCom.Parameters.AddWithValue("@Id_Vehiculo", Id_Vehiculo > 0 ? (object)Id_Vehiculo : DBNull.Value);
+//                sqlCom.Parameters.AddWithValue("@Id_Chofer", Id_Chofer > 0 ? (object)Id_Chofer : DBNull.Value);
+
+//                sqlCnn.Open();
+//                return sqlCom.ExecuteNonQuery() > 0;
+//            }
+//        }
+
+//        /// <summary>
+//        /// Realiza la eliminación física de la cabecera (y por ON DELETE CASCADE sus detalles).
+//        /// </summary>
+//        public bool Borrar()
+//        {
+//            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+//            using (SqlCommand sqlCom = new SqlCommand("sp_EliminarHDR", sqlCnn))
+//            {
+//                sqlCom.CommandType = CommandType.StoredProcedure;
+//                sqlCom.Parameters.AddWithValue("@Id", Id);
+
+//                sqlCnn.Open();
+//                return sqlCom.ExecuteNonQuery() > 0;
+//            }
+//        }
+//    }
+//}
