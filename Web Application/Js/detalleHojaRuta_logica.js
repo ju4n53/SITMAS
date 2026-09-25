@@ -14,8 +14,8 @@ const URL_API_MATERIAL = "https://localhost:44325/api/TP_Material/ListarTodo";
 const URL_API_ESTADO_PARADA = "https://localhost:44325/api/EST_HDR/ListarTodo";
 
 // 📍 Coordenadas de Referencia Base (Ej: Sede EMEC / Punto de Partida predeterminado)
-const EMEC_LAT = -31.465829;
-const EMEC_LON = -64.127313;
+const EMEC_LAT = -31.466122;
+const EMEC_LON = -64.127283;
 
 // Variables globales en memoria para almacenamiento temporal de alto rendimiento
 let listaParadasMemoria = [];
