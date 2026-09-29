@@ -12,7 +12,7 @@ namespace API_SITMAS.Models
 
         // Identificadores y Claves Foráneas
         public int Id_Detalle_HDR { get; set; }
-        public int Id_HojaRuta { get; set; }
+        public int? Id_HojaRuta { get; set; }
         public int Id_TipoMovimiento { get; set; }
         public int Id_RecursoMov { get; set; }
         public int? Id_Origen { get; set; }
@@ -85,6 +85,50 @@ namespace API_SITMAS.Models
             return lista;
         }
 
+
+        /// <summary>
+        /// Obtiene todas las paradas pendientes que aún no tienen Hoja de Ruta asignada.
+        /// </summary>
+        public List<DetalleHojaRuta> ObtenerPendientes()
+        {
+            var lista = new List<DetalleHojaRuta>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("sp_ListarDetallesPendientes", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCnn.Open();
+                using (SqlDataReader reader = sqlCom.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new DetalleHojaRuta
+                        {
+                            Id_Detalle_HDR = Convert.ToInt32(reader["Id_Detalle"]),
+                            Id_HojaRuta = reader["Numero_HojaRuta"] != DBNull.Value ? Convert.ToInt32(reader["Numero_HojaRuta"]) : (int?)null,
+
+                            Id_TipoMovimiento = reader["Id_TipoMovimiento"] != DBNull.Value ? Convert.ToInt32(reader["Id_TipoMovimiento"]) : 0,
+                            Id_RecursoMov = reader["Id_RecursoMov"] != DBNull.Value ? Convert.ToInt32(reader["Id_RecursoMov"]) : 0,
+                            Id_Origen = reader["Id_Origen"] != DBNull.Value ? Convert.ToInt32(reader["Id_Origen"]) : 0,
+                            Id_TipoMaterial = reader["Id_TipoMaterial"] != DBNull.Value ? Convert.ToInt32(reader["Id_TipoMaterial"]) : 0,
+                            Id_Estado = reader["Id_Estado"] != DBNull.Value ? Convert.ToInt32(reader["Id_Estado"]) : 0,
+
+                            Latitud = reader["Latitud"] != DBNull.Value ? Convert.ToDecimal(reader["Latitud"]) : (decimal?)null,
+                            Longitud = reader["Longitud"] != DBNull.Value ? Convert.ToDecimal(reader["Longitud"]) : (decimal?)null,
+
+                            DistanciaDesdeAnterior_Km = reader["DistanciaDesdeAnterior_Km"] != DBNull.Value ? Convert.ToDecimal(reader["DistanciaDesdeAnterior_Km"]) : 0m,
+
+                            TipoMovimiento = reader["TipoMovimiento"] != DBNull.Value ? reader["TipoMovimiento"].ToString() : string.Empty,
+                            Origen = reader["Origen"] != DBNull.Value ? reader["Origen"].ToString() : string.Empty,
+                            TipoMaterial = reader["TipoMaterial"] != DBNull.Value ? reader["TipoMaterial"].ToString() : string.Empty
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
         /// <summary>
         /// Inserta una nueva parada/detalle en la Hoja de Ruta.
         /// </summary>
@@ -95,7 +139,7 @@ namespace API_SITMAS.Models
             {
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
-                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta);
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta.HasValue && Id_HojaRuta.Value > 0 ? (object)Id_HojaRuta.Value : DBNull.Value);
                 sqlCom.Parameters.AddWithValue("@Id_TipoMovimiento", Id_TipoMovimiento);
                 sqlCom.Parameters.AddWithValue("@Id_RecursoMov", Id_RecursoMov > 0 ? (object)Id_RecursoMov : DBNull.Value);
                 sqlCom.Parameters.AddWithValue("@Id_Origen", Id_Origen > 0 ? (object)Id_Origen : DBNull.Value);
@@ -123,7 +167,7 @@ namespace API_SITMAS.Models
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
                 sqlCom.Parameters.AddWithValue("@Id_Detalle_HDR", Id_Detalle_HDR);
-                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta);
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta.HasValue && Id_HojaRuta.Value > 0 ? (object)Id_HojaRuta.Value : DBNull.Value);
                 sqlCom.Parameters.AddWithValue("@Id_TipoMovimiento", Id_TipoMovimiento);
                 sqlCom.Parameters.AddWithValue("@Id_RecursoMov", Id_RecursoMov > 0 ? (object)Id_RecursoMov : DBNull.Value);
                 sqlCom.Parameters.AddWithValue("@Id_Origen", Id_Origen > 0 ? (object)Id_Origen : DBNull.Value);
@@ -155,8 +199,35 @@ namespace API_SITMAS.Models
                 return sqlCom.ExecuteNonQuery() > 0;
             }
         }
+
+        /// <summary>
+        /// Asigna una parada pendiente a una Hoja de Ruta y actualiza su estado.
+        /// </summary>
+        public bool AsignarAHojaRuta(int idHojaRuta, decimal distanciaTramo, int idEstadoAsignado)
+        {
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("SP_AsignarParada_HojaRuta", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                // Pasamos los parámetros que definimos en el SP
+                sqlCom.Parameters.AddWithValue("@IdDetalle", Id_Detalle_HDR);
+                sqlCom.Parameters.AddWithValue("@IdHojaRuta", idHojaRuta);
+                sqlCom.Parameters.AddWithValue("@DistanciaTramo", distanciaTramo);
+                sqlCom.Parameters.AddWithValue("@IdEstadoAsignado", idEstadoAsignado);
+
+                sqlCnn.Open();
+                // Ejecutamos y verificamos si afectó filas
+                return sqlCom.ExecuteNonQuery() > 0;
+            }
+        }
+
     }
 }
+
+
+
+
 
 
 //using System;

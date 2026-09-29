@@ -28,6 +28,23 @@ namespace API_SITMAS.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("pendientes")]
+        public IHttpActionResult ObtenerPendientes()
+        {
+            try
+            {
+                DetalleHojaRuta oDetalle = new DetalleHojaRuta();
+                List<DetalleHojaRuta> lista = oDetalle.ObtenerPendientes();
+
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
         [HttpPost]
         [Route("")]
         public IHttpActionResult Insertar([FromBody] DetalleHojaRuta value)
@@ -100,6 +117,42 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
+
+        public class AsignacionDto
+        {
+            public int IdHojaRuta { get; set; }
+            public decimal DistanciaTramo { get; set; }
+            public int IdEstadoAsignado { get; set; }
+        }
+
+        [HttpPatch] // Usamos PATCH porque es una actualización parcial
+        [Route("{idDetalle:int}/asignar")]
+        public IHttpActionResult AsignarParada(int idDetalle, [FromBody] AsignacionDto datosAsignacion)
+        {
+            if (datosAsignacion == null || idDetalle <= 0)
+                return BadRequest("Datos de asignación inválidos.");
+
+            try
+            {
+                DetalleHojaRuta oDetalle = new DetalleHojaRuta { Id_Detalle_HDR = idDetalle };
+                bool exito = oDetalle.AsignarAHojaRuta(
+                    datosAsignacion.IdHojaRuta,
+                    datosAsignacion.DistanciaTramo,
+                    datosAsignacion.IdEstadoAsignado
+                );
+
+                if (!exito)
+                    return NotFound();
+
+                return Ok(new { Mensaje = "Parada asignada y distancias actualizadas correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
     }
 }
 
