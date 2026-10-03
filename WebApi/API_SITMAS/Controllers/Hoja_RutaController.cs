@@ -1,6 +1,7 @@
 ﻿using API_SITMAS.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
@@ -154,6 +155,61 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
+
+        // DTO exclusivamente para recibir el usuario desde el Frontend
+        public class InicioViajeDto
+        {
+            public int IdUsuario { get; set; }
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/iniciar")]
+        public IHttpActionResult Iniciar(int id, [FromBody] InicioViajeDto datos)
+        {
+            if (datos == null || datos.IdUsuario <= 0)
+                return BadRequest("Debe proporcionar un ID de usuario válido.");
+
+            try
+            {
+                HojaRuta oHoja = new HojaRuta();
+                oHoja.IniciarViaje(id, datos.IdUsuario);
+
+                return Ok(new { Mensaje = "¡Viaje iniciado con éxito! Conduce con cuidado." });
+            }
+            catch (SqlException sqlEx)
+            {
+                // Aquí capturamos los RAISERROR que programamos en SQL Server
+                // Ej: "Esta hoja de ruta ya fue iniciada..."
+                return BadRequest(sqlEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/finalizar")]
+        public IHttpActionResult Finalizar(int id)
+        {
+            try
+            {
+                HojaRuta oHoja = new HojaRuta();
+                oHoja.FinalizarViaje(id);
+
+                return Ok(new { Mensaje = "Viaje finalizado correctamente. ¡Buen trabajo!" });
+            }
+            catch (SqlException sqlEx)
+            {
+                // Capturamos el error si intentan finalizar algo que no estaba "En curso"
+                return BadRequest(sqlEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
     }
 }
 

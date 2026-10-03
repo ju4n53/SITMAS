@@ -149,6 +149,44 @@ namespace API_SITMAS.Models
                 return sqlCom.ExecuteNonQuery() > 0;
             }
         }
+
+        /// <summary>
+        /// Llama al SP para iniciar el viaje, validando estado y asignando el chofer.
+        /// </summary>
+        public void IniciarViaje(int idHojaRuta, int idUsuario)
+        {
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("sp_IniciarHojaRuta", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", idHojaRuta);
+                sqlCom.Parameters.AddWithValue("@Id_Usuario", idUsuario);
+
+                sqlCnn.Open();
+                // Usamos ExecuteNonQuery porque es un UPDATE. 
+                // Si el SP arroja un RAISERROR, C# lo capturará como una SqlException.
+                sqlCom.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Llama al SP para finalizar el viaje y cerrar todas sus tareas en curso.
+        /// </summary>
+        public void FinalizarViaje(int idHojaRuta)
+        {
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("sp_FinalizarHojaRuta", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", idHojaRuta);
+
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+            }
+        }
+
     }
 }
 
