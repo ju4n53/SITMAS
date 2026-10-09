@@ -25,6 +25,26 @@ namespace API_SITMAS.Controllers
             }
         }
 
+        /// <summary>
+        /// URL de consumo: api/hojaruta/hoy
+        /// </summary>
+        [HttpGet]
+        [Route("hoy")]
+        public IHttpActionResult ListarHoy()
+        {
+            try
+            {
+                HojaRuta oHojaRuta = new HojaRuta();
+                List<HojaRuta> lista = oHojaRuta.SelectHoy();
+
+                return Ok(lista); // Si no hay rutas, devuelve una lista vacía [], lo cual es correcto.
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
         [HttpGet]
         [Route("{id:int}")]
         public IHttpActionResult ObtenerPorId(int id)
@@ -188,20 +208,32 @@ namespace API_SITMAS.Controllers
             }
         }
 
+
+        // DTO para recibir la distancia al finalizar
+        public class FinalizarViajeDto
+        {
+            public decimal DistanciaTotal { get; set; }
+        }
+
         [HttpPatch]
         [Route("{id:int}/finalizar")]
-        public IHttpActionResult Finalizar(int id)
+        public IHttpActionResult Finalizar(int id, [FromBody] FinalizarViajeDto datos)
         {
+            if (id <= 0)
+                return BadRequest("El ID de la Hoja de Ruta no es válido.");
+
             try
             {
+                decimal distancia = datos != null ? datos.DistanciaTotal : 0m;
+
                 HojaRuta oHoja = new HojaRuta();
-                oHoja.FinalizarViaje(id);
+                oHoja.FinalizarViaje(id, distancia);
 
                 return Ok(new { Mensaje = "Viaje finalizado correctamente. ¡Buen trabajo!" });
             }
             catch (SqlException sqlEx)
             {
-                // Capturamos el error si intentan finalizar algo que no estaba "En curso"
+                // Capturamos las excepciones lanzadas por RAISERROR en SQL Server
                 return BadRequest(sqlEx.Message);
             }
             catch (Exception ex)
@@ -209,8 +241,31 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
-
     }
+
+        //[HttpPatch]
+        //[Route("{id:int}/finalizar")]
+        //public IHttpActionResult Finalizar(int id)
+        //{
+        //    try
+        //    {
+        //        HojaRuta oHoja = new HojaRuta();
+        //        oHoja.FinalizarViaje(id);
+
+        //        return Ok(new { Mensaje = "Viaje finalizado correctamente. ¡Buen trabajo!" });
+        //    }
+        //    catch (SqlException sqlEx)
+        //    {
+        //        // Capturamos el error si intentan finalizar algo que no estaba "En curso"
+        //        return BadRequest(sqlEx.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return InternalServerError(ex);
+        //    }
+        //}
+
+    //}
 }
 
 
