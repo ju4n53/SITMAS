@@ -16,6 +16,7 @@ namespace API_SITMAS.Models
         public DateTime FechaRegOdom { get; set; }
         public decimal InicioOdom { get; set; }
         public decimal FinalOdom { get; set; }
+        public int? Id_HojaRuta { get; set; }
 
         // Propiedades de lectura / descriptivas (obtenidas desde JOIN en Stored Procedure)
         public string Patente { get; set; }
@@ -67,12 +68,12 @@ namespace API_SITMAS.Models
         }
 
         /// <summary>
-        /// Inserta un nuevo registro de odómetro ejecutando las validaciones del Stored Procedure.
+        /// Inserta un registro MANUAL desde el panel de administración.
         /// </summary>
         public bool Insertar()
         {
             using (SqlConnection sqlCnn = new SqlConnection(connectionString))
-            using (SqlCommand sqlCom = new SqlCommand("sp_InsertarRegistroOdometro", sqlCnn))
+            using (SqlCommand sqlCom = new SqlCommand("sp_InsertarRegistroOdometro_Manual", sqlCnn))
             {
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
@@ -80,13 +81,16 @@ namespace API_SITMAS.Models
                 sqlCom.Parameters.AddWithValue("@InicioOdom", InicioOdom);
                 sqlCom.Parameters.AddWithValue("@FinalOdom", FinalOdom);
 
+                // El gran truco para manejar nulos en ADO.NET:
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value);
+
                 sqlCnn.Open();
                 return sqlCom.ExecuteNonQuery() > 0;
             }
         }
 
         /// <summary>
-        /// Actualiza un registro de odómetro existente.
+        /// Actualiza un registro MANUALMENTE.
         /// </summary>
         public bool Modificar()
         {
@@ -100,10 +104,57 @@ namespace API_SITMAS.Models
                 sqlCom.Parameters.AddWithValue("@InicioOdom", InicioOdom);
                 sqlCom.Parameters.AddWithValue("@FinalOdom", FinalOdom);
 
+                // También lo agregamos aquí por si el admin necesita vincular o desvincular una hoja de ruta
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value);
+
                 sqlCnn.Open();
                 return sqlCom.ExecuteNonQuery() > 0;
             }
         }
+
+
+        ///// <summary>
+        ///// Inserta un nuevo registro de odómetro ejecutando las validaciones del Stored Procedure.
+        ///// </summary>
+        //public bool Insertar()
+        //{
+        //    using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+        //    using (SqlCommand sqlCom = new SqlCommand("sp_InsertarRegistroOdometro_Manual", sqlCnn))
+        //    {
+        //        sqlCom.CommandType = CommandType.StoredProcedure;
+
+        //        sqlCom.Parameters.AddWithValue("@IdVehiculo", IdVehiculo);
+        //        sqlCom.Parameters.AddWithValue("@InicioOdom", InicioOdom);
+        //        sqlCom.Parameters.AddWithValue("@FinalOdom", FinalOdom);
+        //        sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta);
+
+        //        sqlCnn.Open();
+        //        return sqlCom.ExecuteNonQuery() > 0;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Actualiza un registro de odómetro existente.
+        ///// </summary>
+        //public bool Modificar()
+        //{
+        //    using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+        //    using (SqlCommand sqlCom = new SqlCommand("sp_ActualizarRegistroOdometro", sqlCnn))
+        //    {
+        //        sqlCom.CommandType = CommandType.StoredProcedure;
+
+        //        sqlCom.Parameters.AddWithValue("@IdRegistroOdomet", IdRegistroOdomet);
+        //        sqlCom.Parameters.AddWithValue("@IdVehiculo", IdVehiculo);
+        //        sqlCom.Parameters.AddWithValue("@InicioOdom", InicioOdom);
+        //        sqlCom.Parameters.AddWithValue("@FinalOdom", FinalOdom);
+        //        sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta);
+
+        //        sqlCnn.Open();
+        //        return sqlCom.ExecuteNonQuery() > 0;
+        //    }
+        //}
+
+
 
         /// <summary>
         /// Elimina físicamente un registro de odómetro por su ID.
@@ -115,6 +166,46 @@ namespace API_SITMAS.Models
             {
                 sqlCom.CommandType = CommandType.StoredProcedure;
                 sqlCom.Parameters.AddWithValue("@IdRegistroOdomet", IdRegistroOdomet);
+
+                sqlCnn.Open();
+                return sqlCom.ExecuteNonQuery() > 0;
+            }
+        }
+
+        /// <summary>
+        /// Operación exclusiva del Chofer al INICIAR la hoja de ruta.
+        /// </summary>
+        public int IniciarRutaChofer()
+        {
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("sp_InsertarRegistroOdometro", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.AddWithValue("@IdVehiculo", IdVehiculo);
+                sqlCom.Parameters.AddWithValue("@Id_HojaRuta", Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value);
+                sqlCom.Parameters.AddWithValue("@InicioOdom", InicioOdom);
+                // Recuerda que nuestro SP de inicio ya no pide FinalOdom
+
+                sqlCnn.Open();
+                // Usamos ExecuteScalar para obtener el ID recién creado, nos servirá para el frontend
+                object result = sqlCom.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+        /// <summary>
+        /// Operación exclusiva del Chofer al FINALIZAR la hoja de ruta.
+        /// </summary>
+        public bool FinalizarRutaChofer()
+        {
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("sp_FinalizarViaje_Odometro", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.AddWithValue("@IdRegistroOdomet", IdRegistroOdomet);
+                sqlCom.Parameters.AddWithValue("@FinalOdom", FinalOdom);
 
                 sqlCnn.Open();
                 return sqlCom.ExecuteNonQuery() > 0;

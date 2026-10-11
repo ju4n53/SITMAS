@@ -74,24 +74,13 @@ namespace API_SITMAS.Models
                         {
                             // 👈 Mapeamos: Propiedad de C# = Columna de la Vista SQL
                             Id = Convert.ToInt32(reader["Numero_HojaRuta"]),
-
                             HojaRutaFecha = Convert.ToDateTime(reader["HojaRutaFecha"]),
-
                             Id_Vehiculo = reader["Id_Vehiculo"] != DBNull.Value ? Convert.ToInt32(reader["Id_Vehiculo"]) : 0,
-
-                            // La vista devuelve "Patente", pero en C# la propiedad se llama "Vehiculo"
                             Vehiculo = reader["Patente"] != DBNull.Value ? reader["Patente"].ToString() : "Sin Vehículo",
-
                             Id_Chofer = reader["Id_Chofer"] != DBNull.Value ? Convert.ToInt32(reader["Id_Chofer"]) : (int?)null,
-
-                            // La vista devuelve "Nombre_Chofer"
                             ChoferNombreCompleto = reader["Nombre_Chofer"] != DBNull.Value ? reader["Nombre_Chofer"].ToString() : "Sin Chofer",
-
                             Id_Estado = reader["Id_Estado"] != DBNull.Value ? Convert.ToInt32(reader["Id_Estado"]) : (int?)null,
-
-                            // La vista devuelve "Estado_Descripcion"
                             Estado = reader["Estado_Descripcion"] != DBNull.Value ? reader["Estado_Descripcion"].ToString() : "Pendiente",
-
                             Distancia_Total_Estimada_Km = reader["Distancia_Total_Estimada_Km"] != DBNull.Value ? Convert.ToDecimal(reader["Distancia_Total_Estimada_Km"]) : 0m
                         });
                     }
