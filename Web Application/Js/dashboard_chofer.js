@@ -142,22 +142,66 @@ function ObtenerClaseColorEstado(estadoNombre) {
 }
 
 async function IniciarViaje(idHojaRuta, idVehiculo) {
-    // 1. Pedimos el kilometraje con SweetAlert
+   
+   // 1. Buscamos el último odómetro usando tu endpoint existente
+    let ultimoValorConocido = 0;
+    try {
+        const historial = await $.ajax({
+            type: "GET",
+            url: `${URL_API_REGISTRO_ODOMETRO}?idVehiculo=${idVehiculo}`,
+            dataType: "json"
+        });
+        
+        // Si hay historial, tomamos el FinalOdom del primer registro (el más reciente)
+        if (historial && historial.length > 0) {
+            ultimoValorConocido = historial[0].FinalOdom;
+        }
+    } catch (err) {
+        console.warn("No se pudo obtener el historial previo, se iniciará en 0.");
+    }
+
+    // 2. Pedimos el kilometraje precargando el valor
     const { value: kilometrajeInicial, isConfirmed } = await Swal.fire({
         title: '¿Iniciar Viaje?',
-        text: "Ingresa el valor actual del odómetro del vehículo:",
+        text: "Verifique e ingrese el valor actual del odómetro:",
         icon: 'question',
         input: 'number',
-        inputAttributes: { min: 0, step: 0.1 },
+        inputValue: ultimoValorConocido, // ¡MAGIA! Precargamos el dato aquí
+        inputAttributes: { min: ultimoValorConocido, step: 0.1 },
         showCancelButton: true,
         confirmButtonText: 'Sí, Iniciar',
         cancelButtonText: 'Cancelar',
         inputValidator: (value) => {
-            if (!value || value <= 0) return '¡Debes ingresar un kilometraje válido!';
+            if (!value || value < ultimoValorConocido) {
+                return `El valor debe ser igual o mayor a ${ultimoValorConocido} Km.`;
+            }
+            // Validación visual frontal (180 km de tolerancia)
+            if (value - ultimoValorConocido > 180) {
+                return 'El salto de kilometraje es inusualmente alto. Revise los números ingresados.';
+            }
         }
     });
 
     if (!isConfirmed) return;
+   
+    // // 1. Pedimos el kilometraje con SweetAlert
+    // const { value: kilometrajeInicial, isConfirmed } = await Swal.fire({
+    //     title: '¿Iniciar Viaje?',
+    //     text: "Ingresa el valor actual del odómetro del vehículo:",
+    //     icon: 'question',
+    //     input: 'number',
+    //     inputAttributes: { min: 0, step: 0.1 },
+    //     showCancelButton: true,
+    //     confirmButtonText: 'Sí, Iniciar',
+    //     cancelButtonText: 'Cancelar',
+    //     inputValidator: (value) => {
+    //         if (!value || value <= 0) return '¡Debes ingresar un kilometraje válido!';
+    //     }
+    // });
+
+    // if (!isConfirmed) return;
+
+
 
     try {
         Swal.fire({ title: 'Iniciando viaje...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
@@ -178,6 +222,7 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
 
         // 3. Guardamos el ID generado en la "guantera" del navegador
         localStorage.setItem(`odometro_hdr_${idHojaRuta}`, respOdometro.IdRegistroOdomet);
+        localStorage.setItem(`odometro_inicio_${idHojaRuta}`, kilometrajeInicial); // NUEVO
 
         // 4. Tu lógica original para iniciar la Hoja de Ruta
         const dtoHoja = { IdUsuario: idUsuarioReal }; // idUsuarioReal viene de tu variable global
@@ -196,41 +241,6 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
         Swal.fire('Atención', msg, 'error');
     }
 }
-
-
-
-// function IniciarViaje(idHojaRuta) {
-//     Swal.fire({
-//         title: '¿Iniciar Viaje?',
-//         text: "Quedarás registrado como el chofer de esta hoja de ruta.",
-//         icon: 'question',
-//         showCancelButton: true,
-//         confirmButtonText: 'Sí, Iniciar',
-//         cancelButtonText: 'Cancelar'
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             const dto = { IdUsuario: idUsuarioReal };
-//             $.ajax({
-//                 type: "PATCH",
-//                 url: `${URL_API_HOJAS_RUTA}/${idHojaRuta}/iniciar`,
-//                 data: JSON.stringify(dto),
-//                 contentType: "application/json; charset=utf-8",
-//                 dataType: "json",
-//                 success: function (respuesta) {
-//                     Swal.fire('¡Éxito!', respuesta.Mensaje, 'success');
-//                     CargarHojasDeRutaDelDia(); 
-//                 },
-//                 error: function (err) {
-//                     Swal.fire('Atención', 'No se pudo iniciar el viaje.', 'warning');
-//                 }
-//             });
-//         }
-//     });
-// }
-
-
-
-
 
 /* ==========================================================================
    B. LÓGICA DEL MAPA DINÁMICO (Renderizado y Funciones)
@@ -566,33 +576,74 @@ function LimpiarMapaYRuta() {
    ========================================================================== */
 
 async function FinalizarViaje(idHojaRuta) {
-    // 1. Buscamos el ID inicial en la guantera
-    let idOdomet = localStorage.getItem('odometro_hdr_' + idHojaRuta);
     
+    // 1. Buscamos los datos en la guantera
+    let idOdomet = localStorage.getItem('odometro_hdr_' + idHojaRuta);
+    let odomInicio = parseFloat(localStorage.getItem('odometro_inicio_' + idHojaRuta)) || 0;
+
     if (!idOdomet) {
         Swal.fire('Atención', 'No se encontró el registro inicial del odómetro. Contacte al administrador.', 'error');
         return; 
     }
 
+    // Calculamos el valor estimado (Inicio + GPS)
+    let valorEstimado = odomInicio + distanciaFinalCalculada;
+    // Redondeamos a 2 decimales para que se vea prolijo
+    valorEstimado = parseFloat(valorEstimado.toFixed(2));
+
     // 2. Pedimos el odómetro final
     const { value: kilometrajeFinal, isConfirmed } = await Swal.fire({
         title: '¿Finalizar Viaje?',
-        text: `Ingresa el valor FINAL del odómetro. Se registrarán ${distanciaFinalCalculada} Km de GPS.`,
+        text: `El GPS calculó ${distanciaFinalCalculada} Km. Revisa el tablero e ingresa el Odómetro Final real:`,
         icon: 'warning',
         input: 'number',
-        inputAttributes: { min: 0, step: 0.1 },
+        inputValue: valorEstimado, // ¡La UX en acción! Precargamos la estimación
+        inputAttributes: { min: odomInicio, step: 0.1 },
         showCancelButton: true,
         confirmButtonColor: '#10b981',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, Finalizar',
         cancelButtonText: 'Cancelar',
         inputValidator: (value) => {
-            if (!value || value <= 0) return '¡Debes ingresar un kilometraje válido!';
+            if (!value || value < odomInicio) {
+                return `¡El valor no puede ser menor al inicial (${odomInicio} Km)!`;
+            }
+            if ((value - odomInicio) > 180) {
+                return 'El salto de kilometraje supera los 180 Km permitidos. Revise el número.';
+            }
         }
     });
 
     if (!isConfirmed) return;
+    
+    // // 1. Buscamos el ID inicial en la guantera
+    // let idOdomet = localStorage.getItem('odometro_hdr_' + idHojaRuta);
+    
+    // if (!idOdomet) {
+    //     Swal.fire('Atención', 'No se encontró el registro inicial del odómetro. Contacte al administrador.', 'error');
+    //     return; 
+    // }
 
+    // // 2. Pedimos el odómetro final
+    // const { value: kilometrajeFinal, isConfirmed } = await Swal.fire({
+    //     title: '¿Finalizar Viaje?',
+    //     text: `Ingresa el valor FINAL del odómetro. Se registrarán ${distanciaFinalCalculada} Km de GPS.`,
+    //     icon: 'warning',
+    //     input: 'number',
+    //     inputAttributes: { min: 0, step: 0.1 },
+    //     showCancelButton: true,
+    //     confirmButtonColor: '#10b981',
+    //     cancelButtonColor: '#d33',
+    //     confirmButtonText: 'Sí, Finalizar',
+    //     cancelButtonText: 'Cancelar',
+    //     inputValidator: (value) => {
+    //         if (!value || value <= 0) return '¡Debes ingresar un kilometraje válido!';
+    //     }
+    // });
+
+    // if (!isConfirmed) return;
+
+    
     try {
         Swal.fire({ title: 'Procesando fin de viaje...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
