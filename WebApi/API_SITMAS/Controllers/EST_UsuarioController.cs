@@ -81,19 +81,5 @@ namespace API_SITMAS.Controllers
 
         }
 
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
-
-        //}
-
     }
 }

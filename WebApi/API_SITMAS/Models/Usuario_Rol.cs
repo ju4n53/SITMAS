@@ -54,33 +54,6 @@ namespace API_SITMAS.Models
 
         }
 
-        //public DataTable SelectId()
-        //{
-
-
-        //    string sqlSentencia = "sp_VerEmpleadoId";
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-        //    sqlCnn.Close();
-
-        //    return ds.Tables[0];
-
-        //}
 
         public void Insertar()
         {
@@ -154,32 +127,6 @@ namespace API_SITMAS.Models
 
 
         }
-
-
-        //public DataTable VistalistadoEmpleados()
-        //{
-
-        //    string sqlSentencia = "sp_ListarEmpleadosDetallados";
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-        //    sqlCnn.Close();
-
-        //    return ds.Tables[0];
-
-        //}
 
         #endregion
     }

@@ -184,24 +184,6 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
 
     if (!isConfirmed) return;
    
-    // // 1. Pedimos el kilometraje con SweetAlert
-    // const { value: kilometrajeInicial, isConfirmed } = await Swal.fire({
-    //     title: '¿Iniciar Viaje?',
-    //     text: "Ingresa el valor actual del odómetro del vehículo:",
-    //     icon: 'question',
-    //     input: 'number',
-    //     inputAttributes: { min: 0, step: 0.1 },
-    //     showCancelButton: true,
-    //     confirmButtonText: 'Sí, Iniciar',
-    //     cancelButtonText: 'Cancelar',
-    //     inputValidator: (value) => {
-    //         if (!value || value <= 0) return '¡Debes ingresar un kilometraje válido!';
-    //     }
-    // });
-
-    // if (!isConfirmed) return;
-
-
 
     try {
         Swal.fire({ title: 'Iniciando viaje...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
@@ -616,34 +598,7 @@ async function FinalizarViaje(idHojaRuta) {
 
     if (!isConfirmed) return;
     
-    // // 1. Buscamos el ID inicial en la guantera
-    // let idOdomet = localStorage.getItem('odometro_hdr_' + idHojaRuta);
-    
-    // if (!idOdomet) {
-    //     Swal.fire('Atención', 'No se encontró el registro inicial del odómetro. Contacte al administrador.', 'error');
-    //     return; 
-    // }
 
-    // // 2. Pedimos el odómetro final
-    // const { value: kilometrajeFinal, isConfirmed } = await Swal.fire({
-    //     title: '¿Finalizar Viaje?',
-    //     text: `Ingresa el valor FINAL del odómetro. Se registrarán ${distanciaFinalCalculada} Km de GPS.`,
-    //     icon: 'warning',
-    //     input: 'number',
-    //     inputAttributes: { min: 0, step: 0.1 },
-    //     showCancelButton: true,
-    //     confirmButtonColor: '#10b981',
-    //     cancelButtonColor: '#d33',
-    //     confirmButtonText: 'Sí, Finalizar',
-    //     cancelButtonText: 'Cancelar',
-    //     inputValidator: (value) => {
-    //         if (!value || value <= 0) return '¡Debes ingresar un kilometraje válido!';
-    //     }
-    // });
-
-    // if (!isConfirmed) return;
-
-    
     try {
         Swal.fire({ title: 'Procesando fin de viaje...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
@@ -696,80 +651,4 @@ async function FinalizarViaje(idHojaRuta) {
         Swal.fire('Atención', mensajeError, 'warning');
     }
 }
-
-
-
-// async function FinalizarViaje(idHojaRuta) {
-//     Swal.fire({
-//         title: '¿Finalizar Viaje?',
-//         text: `¿Confirmas que has regresado a la base? Se registrarán ${distanciaFinalCalculada} Km totales.`,
-//         icon: 'warning',
-//         showCancelButton: true,
-//         confirmButtonColor: '#10b981',
-//         cancelButtonColor: '#d33',
-//         confirmButtonText: 'Sí, Finalizar',
-//         cancelButtonText: 'Cancelar'
-//     }).then(async (result) => { 
-//         if (result.isConfirmed) {
-
-//             // PASO 1: Identificar la coordenada de la última parada registrada
-//             let puntoOrigenTramo = EMEC_BASE;
-//             if (listaParadasActualesMapa && listaParadasActualesMapa.length > 0) {
-//                 const ultimaParada = listaParadasActualesMapa[listaParadasActualesMapa.length - 1];
-//                 if (ultimaParada.Latitud && ultimaParada.Longitud) {
-//                     puntoOrigenTramo = { lat: parseFloat(ultimaParada.Latitud), lng: parseFloat(ultimaParada.Longitud) };
-//                 }
-//             }
-
-//             // PASO 2: "Fichar" el regreso a la base si hubo paradas previas
-//             if (puntoOrigenTramo.lat !== EMEC_BASE.lat || puntoOrigenTramo.lng !== EMEC_BASE.lng) {
-
-//                 // Calculamos los Km solo de este último tramo (Última Parada ➔ Base)
-//                 const kmRegreso = await CalcularDistanciaTramoGoogle(puntoOrigenTramo, EMEC_BASE);
-
-//                 const dtoRegreso = {
-//                     Id_Detalle_HDR: 0,
-//                     Id_HojaRuta: idHojaRuta,
-//                     Id_TipoMovimiento: 3, // Retorno
-//                     Id_RecursoMov: 0,
-//                     Id_Origen: 50, // Base EMEC (Id en la tabla Origen)
-//                     Id_Ubicacion: 25, // Base EMEC (Id en Ubicacion_Geografica)
-//                     HoraEstimada: new Date().toTimeString().slice(0, 8),
-//                     Id_Estado: 5, // Estado Finalizado
-//                     DistanciaDesdeAnterior_Km: kmRegreso
-//                 };
-
-//                 // Usamos 'await' para que el sistema espere a que se guarde este último tramo antes de continuar
-//                 await $.ajax({
-//                     type: "POST",
-//                     url: URL_API_DETALLE_HDR,
-//                     data: JSON.stringify(dtoRegreso),
-//                     contentType: "application/json; charset=utf-8"
-//                 });
-//             }
-
-//             // PASO 3: Cerrar la cabecera enviando la distancia total del circuito (variable global)
-//             const dtoFinalizar = {
-//                 DistanciaTotal: distanciaFinalCalculada
-//             };
-
-//             $.ajax({
-//                 type: "PATCH",
-//                 url: `${URL_API_HOJAS_RUTA}/${idHojaRuta}/finalizar`,
-//                 data: JSON.stringify(dtoFinalizar),
-//                 contentType: "application/json; charset=utf-8",
-//                 dataType: "json",
-//                 success: function (respuesta) {
-//                     Swal.fire('¡Excelente trabajo!', respuesta.Mensaje || 'Viaje finalizado y retorno registrado.', 'success');
-//                     distanciaFinalCalculada = 0; // Limpiamos memoria
-//                     CargarHojasDeRutaDelDia(); // Refrescamos la vista
-//                 },
-//                 error: function (err) {
-//                     const mensajeError = err.responseJSON && err.responseJSON.Message ? err.responseJSON.Message : 'No se pudo finalizar el viaje.';
-//                     Swal.fire('Atención', mensajeError, 'warning');
-//                 }
-//             });
-//         }
-//     });
-// }
 

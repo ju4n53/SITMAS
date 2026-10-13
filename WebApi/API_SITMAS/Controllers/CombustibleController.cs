@@ -10,6 +10,7 @@ namespace API_SITMAS.Controllers
     public class CombustibleController : ApiController
     {
         // GET: api/combustible
+        //[Authorize]
         [HttpGet]
         [Route("")]
         public IHttpActionResult ObtenerTodos()

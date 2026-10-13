@@ -15,10 +15,6 @@ $(document).ready(function () {
     });
 });
 
-/**
- * Función: ListarEstadoUsuario
- * Objetivo: Obtener registros y renderizar la tabla.
- */
 function ListarEstadoUsuario() {
     $.get(URL_ESTADO + "/ListarTodo", function (data) {
         $("#tbodyEstadoUsuario").empty();
@@ -37,43 +33,69 @@ function ListarEstadoUsuario() {
     });
 }
 
-/**
- * Función: GuardarEstado
- * Objetivo: Crea o actualiza un estado y muestra la alerta de éxito.
- */
 function GuardarEstado() {
     let id = $("#txtIdEstado").val();
     let data = { EstadoUsuario: $("#txtEstado").val() };
     let esEdicion = id !== "";
+
+    // 1. Recuperamos la sesión del localStorage
+    let sesionActual = JSON.parse(localStorage.getItem('usuarioSesion'));
+    
+    // 2. Extraemos el token (si no hay, mandamos string vacío para evitar errores)
+    let token = sesionActual ? sesionActual.token : "";
 
     $.ajax({
         url: esEdicion ? `${URL_ESTADO}/Modificar/${id}` : `${URL_ESTADO}/Insertar`,
         type: esEdicion ? "PUT" : "POST",
         contentType: "application/json",
         data: JSON.stringify(data),
-        success: function () {
-            // Alerta de éxito unificada
-            Swal.fire({
-                icon: 'success',
-                title: esEdicion ? '¡Estado actualizado!' : '¡Estado registrado!',
-                text: 'La operación se realizó con éxito.',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            
-            LimpiarFormulario();
-            ListarEstadoUsuario();
+        // 3. ¡Mostramos la pulsera!
+        headers: {
+            "Authorization": "Bearer " + token
         },
-        error: function() {
-            Swal.fire('Error', 'No se pudo completar la operación', 'error');
+        success: function () {
+            // ... (tu código de éxito con SweetAlert)
+        },
+        error: function(xhr) {
+            if(xhr.status === 401) {
+                Swal.fire('Acceso Denegado', 'Tu sesión expiró o no tienes permiso.', 'error');
+            } else {
+                Swal.fire('Error', 'No se pudo completar la operación', 'error');
+            }
         }
     });
 }
 
-/**
- * Función: EliminarEstado
- * Objetivo: Elimina un estado tras confirmación.
- */
+
+// function GuardarEstado() {
+//     let id = $("#txtIdEstado").val();
+//     let data = { EstadoUsuario: $("#txtEstado").val() };
+//     let esEdicion = id !== "";
+
+//     $.ajax({
+//         url: esEdicion ? `${URL_ESTADO}/Modificar/${id}` : `${URL_ESTADO}/Insertar`,
+//         type: esEdicion ? "PUT" : "POST",
+//         contentType: "application/json",
+//         data: JSON.stringify(data),
+//         success: function () {
+//             // Alerta de éxito unificada
+//             Swal.fire({
+//                 icon: 'success',
+//                 title: esEdicion ? '¡Estado actualizado!' : '¡Estado registrado!',
+//                 text: 'La operación se realizó con éxito.',
+//                 timer: 2000,
+//                 showConfirmButton: false
+//             });
+            
+//             LimpiarFormulario();
+//             ListarEstadoUsuario();
+//         },
+//         error: function() {
+//             Swal.fire('Error', 'No se pudo completar la operación', 'error');
+//         }
+//     });
+// }
+
 function EliminarEstado(id) {
     Swal.fire({
         title: '¿Estás seguro?',
@@ -97,10 +119,6 @@ function EliminarEstado(id) {
     });
 }
 
-/**
- * Función: CargarEdicion
- * Objetivo: Carga datos en formulario.
- */
 function CargarEdicion(id, nombre) {
     $("#txtIdEstado").val(id);
     $("#txtEstado").val(nombre);

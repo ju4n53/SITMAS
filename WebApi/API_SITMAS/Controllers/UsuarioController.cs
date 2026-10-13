@@ -7,8 +7,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Data.SqlClient; // Necesario para SqlConnection y SqlCommand
-using System.Configuration;   // Necesario para ConfigurationManager
+using System.Data.SqlClient; 
+using System.Configuration;
+using API_SITMAS.Security;
 
 
 namespace API_SITMAS.Controllers
@@ -88,12 +89,15 @@ namespace API_SITMAS.Controllers
                 int idUsuario = Convert.ToInt32(dt.Rows[0]["Id_Usuario"]);
                 string idEmpleado = dt.Rows[0]["Id_Empleado"].ToString();
                 string nombreMostrar = dt.Rows[0]["Usuario"].ToString();
-                string rolAsignado = dt.Rows[0]["NombreRol"].ToString();
+                //string rolAsignado = dt.Rows[0]["NombreRol"].ToString();
 
-                // 3. ¡LA NUEVA MAGIA! Instanciamos tu método corregido para traer los permisos reales
+                // 3. Obtenemos los permisos y roles
                 List<string> misPermisos = login.ObtenerPermisos(idUsuario);
+                List<string> misRoles = login.ObtenerRoles(idUsuario);
 
-                // 4. Buscamos el nombre real en la tabla Empleado (como ya lo tenías)
+                string rolAsignado = misRoles.Count > 0 ? string.Join(", ", misRoles) : "Sin Rol";
+
+                // 4. Buscamos el nombre real
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString))
                 {
                     string query = "SELECT Nombre, Apellido FROM Empleado WHERE Id = @Id";
@@ -107,18 +111,53 @@ namespace API_SITMAS.Controllers
                     }
                 }
 
-                // 5. Devolvemos el objeto completo al Frontend. ¡Mirá qué joya!
+                // 5. ¡LA MAGIA DEL TOKEN! Generamos la pulsera VIP usando nuestra nueva clase
+                string tokenGenerado = JwtTokenProvider.GenerarToken(idUsuario, nombreMostrar, rolAsignado, misPermisos);
+
+                // 6. Devolvemos el objeto al Frontend, ahora incluyendo el Token
                 return Ok(new
                 {
                     idUsuario = idUsuario,
                     nombre = nombreMostrar,
                     rol = rolAsignado,
-                    permisos = misPermisos // 👈 Facu y Ramiro van a recibir la lista de strings acá
+                    permisos = misPermisos,
+                    token = tokenGenerado // 👈 ¡Aquí está nuestra pulsera de seguridad!
                 });
             }
 
             // Si metió mal los dedos, credenciales inválidas
             return Unauthorized();
+
+
+            //    // 3. ¡LA NUEVA MAGIA! Instanciamos tu método corregido para traer los permisos reales
+            //    List<string> misPermisos = login.ObtenerPermisos(idUsuario);
+
+            //    // 4. Buscamos el nombre real en la tabla Empleado (como ya lo tenías)
+            //    using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString))
+            //    {
+            //        string query = "SELECT Nombre, Apellido FROM Empleado WHERE Id = @Id";
+            //        SqlCommand cmd = new SqlCommand(query, conn);
+            //        cmd.Parameters.AddWithValue("@Id", idEmpleado);
+            //        conn.Open();
+            //        SqlDataReader reader = cmd.ExecuteReader();
+            //        if (reader.Read())
+            //        {
+            //            nombreMostrar = reader["Nombre"].ToString() + " " + reader["Apellido"].ToString();
+            //        }
+            //    }
+
+            //    // 5. Devolvemos el objeto completo al Frontend. ¡Mirá qué joya!
+            //    return Ok(new
+            //    {
+            //        idUsuario = idUsuario,
+            //        nombre = nombreMostrar,
+            //        rol = rolAsignado,
+            //        permisos = misPermisos // 👈 Facu y Ramiro van a recibir la lista de strings acá
+            //    });
+            //}
+
+            //// Si metió mal los dedos, credenciales inválidas
+            //return Unauthorized();
         }
 
 

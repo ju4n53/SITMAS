@@ -265,43 +265,44 @@ namespace API_SITMAS.Models
             return listaPermisos;
         }
 
+        public List<string> ObtenerRoles(int idUsuario)
+        {
+            List<string> listaRoles = new List<string>();
 
-        //public DataTable VistalistadoEmpleados()
-        //{
+            using (SqlConnection conn = new SqlConnection(conectionString))
+            {
+                // Hacemos el INNER JOIN para traer el texto del rol
+                string query = @"
+            SELECT R.NombreRol 
+            FROM Usuario_Rol UR
+            INNER JOIN Rol R ON UR.Id_Rol = R.Id
+            WHERE UR.Id_Usuario = @IdUsuario";
 
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
 
-        //    string sqlSentencia = "sp_ListarEmpleadosDetallados";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-
-
-        //    sqlCnn.Close();
-
-
-        //    return ds.Tables[0];
-
-
-
-        //}
-
+                    try
+                    {
+                        conn.Open();
+                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                listaRoles.Add(dr["NombreRol"].ToString());
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error al obtener roles en la DB: " + ex.Message);
+                    }
+                }
+            }
+            return listaRoles;
+        }
 
         #endregion
-
 
     }
 }

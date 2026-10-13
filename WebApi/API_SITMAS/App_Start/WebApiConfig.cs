@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using API_SITMAS.Security;
 
 namespace API_SITMAS
 {
@@ -14,6 +15,9 @@ namespace API_SITMAS
             var cors = new EnableCorsAttribute("*", "*", "*");
             config.EnableCors(cors);
 
+            //Escaner de tokens JWT
+            config.MessageHandlers.Add(new TokenValidationHandler());
+            
             // Rutas de API web
             config.MapHttpAttributeRoutes();
 
