@@ -40,7 +40,8 @@ namespace API_SITMAS.Security
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true, // Verifica que no esté vencido
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = ClaimTypes.Role //avisamos que el rol está en el ClaimTypes.Role
                 };
 
                 // 5. ¡El escáner valida la pulsera!

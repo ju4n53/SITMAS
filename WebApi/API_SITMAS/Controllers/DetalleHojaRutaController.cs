@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Http;
+using System.Security.Claims;
 
 namespace API_SITMAS.Controllers
 {
     [RoutePrefix("api/detallehojaruta")]
+    [Authorize(Roles = "Administrador")]
     public class DetalleHojaRutaController : ApiController
     {
         [HttpGet]

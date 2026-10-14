@@ -22,7 +22,8 @@ namespace API_SITMAS.Security
             {
                 new Claim(JwtRegisteredClaimNames.Sub, idUsuario.ToString()),
                 new Claim("nombre", nombre),
-                new Claim("rol", rol)
+                new Claim(ClaimTypes.Role, rol) //la constante oficial de .NET
+                //new Claim("rol", rol)
             };
 
             // Agregamos cada permiso como un Claim individual
