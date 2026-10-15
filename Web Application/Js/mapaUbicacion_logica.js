@@ -6,7 +6,7 @@
 const URL_API_DETALLE_HDR = "https://localhost:44325/api/detallehojaruta";
 const URL_API_UBICACION_GEO = "https://localhost:44325/api/ubicaciongeografica";
 const URL_API_HDR_LISTA = "https://localhost:44325/api/hojaruta";
-const URL_API_TIPO_MOV = "https://localhost:44325/api/tipomovimientos";
+const URL_API_TIPO_MOVI = "https://localhost:44325/api/tipomovimientos";
 
 // 📍 Coordenada base predeterminada (Sede EMEC)
 const EMEC_BASE = { lat: -31.465829, lng: -64.127313 };
@@ -183,7 +183,7 @@ function CargarComboHojasRuta() {
 function CargarComboTipoMovimientos() {
     return $.ajax({
         type: "GET",
-        url: URL_API_TIPO_MOV,
+        url: URL_API_TIPO_MOVI,
         dataType: "json",
         success: function (data) {
             const $select =$("#map_id_tipo_mov");

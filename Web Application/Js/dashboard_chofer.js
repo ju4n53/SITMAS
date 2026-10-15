@@ -20,10 +20,10 @@ let rolUsuario = "";
 // Variables del Mapa
 let map = null;
 let marcadorActual = null;
-let marcadoresRuta = []; 
-let marcadorBaseEMEC = null; 
-let directionsService = null; 
-let directionsRenderer = null; 
+let marcadoresRuta = [];
+let marcadorBaseEMEC = null;
+let directionsService = null;
+let directionsRenderer = null;
 let listaParadasActualesMapa = [];
 let coordenadaTemporalClick = null;
 let idRutaActivaMapa = 0; // Guardamos el ID de la ruta en curso
@@ -42,8 +42,10 @@ $(document).ready(function () {
     nombreUsuario = sesionActual.nombre;
     rolUsuario = sesionActual.rol;
 
-    // 2. Cargar Tablero Principal
-    CargarHojasDeRutaDelDia();
+    // 2. Cargar Tablero SOLO si es chofer
+    if (rolUsuario === "Operador-Logistica") {
+        CargarHojasDeRutaDelDia();
+    }
 });
 
 /* ==========================================================================
@@ -53,10 +55,10 @@ $(document).ready(function () {
 function CargarHojasDeRutaDelDia() {
     $.ajax({
         type: "GET",
-        url: URL_API_HOJAS_RUTA + "/hoy", 
+        url: URL_API_HOJAS_RUTA + "/hoy",
         dataType: "json",
         success: function (listaRutas) {
-            const $contenedor =$("#contenedor-rutas"); 
+            const $contenedor = $("#contenedor-rutas");
             $contenedor.empty();
 
             if (!listaRutas || listaRutas.length === 0) {
@@ -81,13 +83,31 @@ function CargarHojasDeRutaDelDia() {
     });
 }
 
+
 function RenderizarVistaTarjetas(listaRutas, $contenedor) {
+    // 1. Obtener la fecha de hoy y formatearla mágicamente
+    const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const fechaCruda = new Date().toLocaleDateString('es-AR', opcionesFecha);
+
+    // Opcional: Ponemos la primera letra en mayúscula para que se vea más profesional
+    const fechaFormateada = fechaCruda.charAt(0).toUpperCase() + fechaCruda.slice(1);
+
+    // 2. Inyectamos el encabezado ocupando todo el ancho (col-12) antes de las tarjetas
+    $contenedor.append(`
+        <div class="col-12 mb-1">
+            <h5 class="text-secondary fw-bold border-bottom pb-2">
+                📅 Rutas programadas para: <span class="text-primary">${fechaFormateada}</span>
+            </h5>
+        </div>
+    `);
+
+    // 3. Tu lógica original para dibujar cada tarjeta
     listaRutas.forEach(ruta => {
         let botonHTML = '';
-        let estadoBadgeClass = ObtenerClaseColorEstado(ruta.Estado); 
+        let estadoBadgeClass = ObtenerClaseColorEstado(ruta.Estado);
         const esMiRuta = (ruta.ChoferNombreCompleto === nombreUsuario);
 
-        if (ruta.Id_Estado === 2) { 
+        if (ruta.Id_Estado === 2) {
             if (rolUsuario === "Administrador") {
                 botonHTML = `<button class="btn btn-outline-primary w-100 mt-3 fw-bold" disabled>Lista para ser iniciada por un chofer</button>`;
             } else {
@@ -95,7 +115,7 @@ function RenderizarVistaTarjetas(listaRutas, $contenedor) {
                                 <span class="material-symbols-outlined align-middle me-1">play_arrow</span> INICIAR VIAJE
                              </button>`;
             }
-        } 
+        }
         else if (ruta.Id_Estado === 3) {
             botonHTML = `<button class="btn btn-secondary w-100 mt-3 fw-bold" disabled>
                             En curso por ${ruta.ChoferNombreCompleto || 'otro chofer'}
@@ -104,7 +124,7 @@ function RenderizarVistaTarjetas(listaRutas, $contenedor) {
         else if (ruta.Id_Estado === 4 || ruta.Id_Estado === 5) {
             botonHTML = `<button class="btn btn-outline-success w-100 mt-3 fw-bold" disabled>Viaje Completado</button>`;
         } else {
-             botonHTML = `<button class="btn btn-outline-secondary w-100 mt-3 fw-bold" disabled>Aún no asignado</button>`;
+            botonHTML = `<button class="btn btn-outline-secondary w-100 mt-3 fw-bold" disabled>Aún no asignado</button>`;
         }
 
         const tarjetaHTML = `
@@ -131,6 +151,57 @@ function RenderizarVistaTarjetas(listaRutas, $contenedor) {
     });
 }
 
+
+// function RenderizarVistaTarjetas(listaRutas, $contenedor) {
+//     listaRutas.forEach(ruta => {
+//         let botonHTML = '';
+//         let estadoBadgeClass = ObtenerClaseColorEstado(ruta.Estado); 
+//         const esMiRuta = (ruta.ChoferNombreCompleto === nombreUsuario);
+
+//         if (ruta.Id_Estado === 2) { 
+//             if (rolUsuario === "Administrador") {
+//                 botonHTML = `<button class="btn btn-outline-primary w-100 mt-3 fw-bold" disabled>Lista para ser iniciada por un chofer</button>`;
+//             } else {
+//                 botonHTML = `<button class="btn btn-success w-100 mt-3 fw-bold" onclick="IniciarViaje(${ruta.Id}, ${ruta.Id_Vehiculo})">
+//                                 <span class="material-symbols-outlined align-middle me-1">play_arrow</span> INICIAR VIAJE
+//                              </button>`;
+//             }
+//         } 
+//         else if (ruta.Id_Estado === 3) {
+//             botonHTML = `<button class="btn btn-secondary w-100 mt-3 fw-bold" disabled>
+//                             En curso por ${ruta.ChoferNombreCompleto || 'otro chofer'}
+//                          </button>`;
+//         }
+//         else if (ruta.Id_Estado === 4 || ruta.Id_Estado === 5) {
+//             botonHTML = `<button class="btn btn-outline-success w-100 mt-3 fw-bold" disabled>Viaje Completado</button>`;
+//         } else {
+//              botonHTML = `<button class="btn btn-outline-secondary w-100 mt-3 fw-bold" disabled>Aún no asignado</button>`;
+//         }
+
+//         const tarjetaHTML = `
+//             <div class="col-12 col-md-6 col-xl-4 mb-3">
+//                 <div class="card h-100 border-top border-4 border-success shadow-sm">
+//                     <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 pt-3 pb-0">
+//                         <h5 class="mb-0 text-success fw-bold">HR #${ruta.Id}</h5>
+//                         <span class="badge ${estadoBadgeClass}">${ruta.Estado || 'Pendiente'}</span>
+//                     </div>
+//                     <div class="card-body">
+//                         <div class="mb-2 text-muted small">
+//                             <span class="material-symbols-outlined align-middle" style="font-size: 16px;">local_shipping</span>
+//                             <span class="ms-1 fw-medium">Vehículo:</span> <span class="text-dark">${ruta.Vehiculo || 'Sin Asignar'}</span>
+//                         </div>
+//                         <div class="mb-3 text-muted small">
+//                             <span class="material-symbols-outlined align-middle" style="font-size: 16px;">route</span>
+//                             <span class="ms-1 fw-medium">Distancia Total:</span> <span class="text-dark">${ruta.Distancia_Total_Estimada_Km || 0} Km</span>
+//                         </div>
+//                         ${botonHTML}
+//                     </div>
+//                 </div>
+//             </div>`;
+//         $contenedor.append(tarjetaHTML);
+//     });
+// }
+
 function ObtenerClaseColorEstado(estadoNombre) {
     if (!estadoNombre) return "bg-secondary";
     const est = estadoNombre.toLowerCase();
@@ -142,8 +213,8 @@ function ObtenerClaseColorEstado(estadoNombre) {
 }
 
 async function IniciarViaje(idHojaRuta, idVehiculo) {
-   
-   // 1. Buscamos el último odómetro usando tu endpoint existente
+
+    // 1. Buscamos el último odómetro usando tu endpoint existente
     let ultimoValorConocido = 0;
     try {
         const historial = await $.ajax({
@@ -151,7 +222,7 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
             url: `${URL_API_REGISTRO_ODOMETRO}?idVehiculo=${idVehiculo}`,
             dataType: "json"
         });
-        
+
         // Si hay historial, tomamos el FinalOdom del primer registro (el más reciente)
         if (historial && historial.length > 0) {
             ultimoValorConocido = historial[0].FinalOdom;
@@ -183,14 +254,14 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
     });
 
     if (!isConfirmed) return;
-   
+
 
     try {
         Swal.fire({ title: 'Iniciando viaje...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
         // 2. Enviamos el dato a la nueva API
         const dtoOdometro = {
-            IdVehiculo: idVehiculo, 
+            IdVehiculo: idVehiculo,
             Id_HojaRuta: idHojaRuta,
             InicioOdom: parseFloat(kilometrajeInicial)
         };
@@ -216,7 +287,7 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
         });
 
         Swal.fire('¡Éxito!', 'Viaje iniciado y odómetro registrado correctamente.', 'success');
-        CargarHojasDeRutaDelDia(); 
+        CargarHojasDeRutaDelDia();
 
     } catch (error) {
         const msg = (error.responseJSON && error.responseJSON.Message) ? error.responseJSON.Message : 'Ocurrió un error al iniciar el viaje.';
@@ -319,8 +390,8 @@ function InicializarMapa() {
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
         map: map,
-        suppressMarkers: true, 
-        polylineOptions: { strokeColor: '#78BE20', strokeWeight: 6, strokeOpacity: 0.8 } 
+        suppressMarkers: true,
+        polylineOptions: { strokeColor: '#78BE20', strokeWeight: 6, strokeOpacity: 0.8 }
     });
 
     map.addListener('click', function (e) {
@@ -352,7 +423,7 @@ function CargarComboTipoMovimientos() {
         url: URL_API_TIPO_MOV,
         dataType: "json",
         success: function (data) {
-            const $select =$("#map_id_tipo_mov");
+            const $select = $("#map_id_tipo_mov");
             $select.empty().append('<option value="">Seleccione Tipo</option>');
             if (Array.isArray(data)) {
                 data.forEach(v => {
@@ -395,7 +466,7 @@ function ObtenerParadasRuta(idHojaRuta) {
         dataType: "json",
         success: function (lista) {
             listaParadasActualesMapa = lista || [];
-            const $tbody =$("#tbodyParadasMapa");
+            const $tbody = $("#tbodyParadasMapa");
             $tbody.empty();
             LimpiarMapaYRuta();
 
@@ -432,24 +503,24 @@ function ObtenerParadasRuta(idHojaRuta) {
                 }
             });
 
-            const peticion = { 
-                origin: EMEC_BASE, 
-                destination: EMEC_BASE, 
-                waypoints: waypointsIntermedios, 
-                optimizeWaypoints: false, 
-                travelMode: google.maps.TravelMode.DRIVING 
+            const peticion = {
+                origin: EMEC_BASE,
+                destination: EMEC_BASE,
+                waypoints: waypointsIntermedios,
+                optimizeWaypoints: false,
+                travelMode: google.maps.TravelMode.DRIVING
             };
-            
-            directionsService.route(peticion, function (resultado, estado) {
-                 if (estado === google.maps.DirectionsStatus.OK) {
-                     directionsRenderer.setDirections(resultado);
-                     let totalMetros = 0;
-                     resultado.routes[0].legs.forEach(leg => totalMetros += leg.distance.value);
-        
-                     const totalKm = parseFloat((totalMetros / 1000).toFixed(2));
-                     distanciaFinalCalculada = totalKm; 
 
-                     GuardarDistanciaTotalEnBD(idHojaRuta, totalKm); 
+            directionsService.route(peticion, function (resultado, estado) {
+                if (estado === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(resultado);
+                    let totalMetros = 0;
+                    resultado.routes[0].legs.forEach(leg => totalMetros += leg.distance.value);
+
+                    const totalKm = parseFloat((totalMetros / 1000).toFixed(2));
+                    distanciaFinalCalculada = totalKm;
+
+                    GuardarDistanciaTotalEnBD(idHojaRuta, totalKm);
                 }
             });
         }
@@ -478,7 +549,7 @@ async function GuardarParadaDesdeMapa() {
 
     const dto = {
         Id_Detalle_HDR: 0,
-        Id_HojaRuta: idRutaActivaMapa, 
+        Id_HojaRuta: idRutaActivaMapa,
         Id_TipoMovimiento: idTipoMov > 0 ? idTipoMov : 1,
         Id_RecursoMov: 0,
         Id_Origen: 0,
@@ -499,7 +570,7 @@ async function GuardarParadaDesdeMapa() {
             $("#map_txt_descripcion").val("");
             $("#map_hora_estimada").val("");
             if (marcadorActual) marcadorActual.setMap(null);
-            
+
             ObtenerParadasRuta(idRutaActivaMapa);
         }
     });
@@ -507,10 +578,10 @@ async function GuardarParadaDesdeMapa() {
 
 function EliminarParadaExpress(idDetalle) {
     Swal.fire({
-        title: '¿Eliminar Parada?', 
-        text: 'Se borrará del mapa y de la ruta actual.', 
-        icon: 'warning', 
-        showCancelButton: true, 
+        title: '¿Eliminar Parada?',
+        text: 'Se borrará del mapa y de la ruta actual.',
+        icon: 'warning',
+        showCancelButton: true,
         confirmButtonColor: '#d33',
         confirmButtonText: 'Sí, borrar'
     }).then((result) => {
@@ -539,11 +610,11 @@ async function CalcularDistanciaTramoGoogle(origen, destino) {
 }
 
 function GuardarDistanciaTotalEnBD(idHojaRuta, totalKm) {
-    $.ajax({ 
-        type: "PATCH", 
-        url: `${URL_API_HOJAS_RUTA}/${idHojaRuta}/distanciatotal`, 
-        data: JSON.stringify({ DistanciaTotal: totalKm }), 
-        contentType: "application/json; charset=utf-8" 
+    $.ajax({
+        type: "PATCH",
+        url: `${URL_API_HOJAS_RUTA}/${idHojaRuta}/distanciatotal`,
+        data: JSON.stringify({ DistanciaTotal: totalKm }),
+        contentType: "application/json; charset=utf-8"
     });
 }
 
@@ -558,14 +629,14 @@ function LimpiarMapaYRuta() {
    ========================================================================== */
 
 async function FinalizarViaje(idHojaRuta) {
-    
+
     // 1. Buscamos los datos en la guantera
     let idOdomet = localStorage.getItem('odometro_hdr_' + idHojaRuta);
     let odomInicio = parseFloat(localStorage.getItem('odometro_inicio_' + idHojaRuta)) || 0;
 
     if (!idOdomet) {
         Swal.fire('Atención', 'No se encontró el registro inicial del odómetro. Contacte al administrador.', 'error');
-        return; 
+        return;
     }
 
     // Calculamos el valor estimado (Inicio + GPS)
@@ -597,7 +668,7 @@ async function FinalizarViaje(idHojaRuta) {
     });
 
     if (!isConfirmed) return;
-    
+
 
     try {
         Swal.fire({ title: 'Procesando fin de viaje...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
@@ -614,8 +685,8 @@ async function FinalizarViaje(idHojaRuta) {
         if (puntoOrigenTramo.lat !== EMEC_BASE.lat || puntoOrigenTramo.lng !== EMEC_BASE.lng) {
             const kmRegreso = await CalcularDistanciaTramoGoogle(puntoOrigenTramo, EMEC_BASE);
             const dtoRegreso = {
-                Id_Detalle_HDR: 0, Id_HojaRuta: idHojaRuta, Id_TipoMovimiento: 3, 
-                Id_RecursoMov: 0, Id_Origen: 50, Id_Ubicacion: 25, 
+                Id_Detalle_HDR: 0, Id_HojaRuta: idHojaRuta, Id_TipoMovimiento: 3,
+                Id_RecursoMov: 0, Id_Origen: 50, Id_Ubicacion: 25,
                 HoraEstimada: new Date().toTimeString().slice(0, 8),
                 Id_Estado: 5, DistanciaDesdeAnterior_Km: kmRegreso
             };
@@ -626,7 +697,7 @@ async function FinalizarViaje(idHojaRuta) {
         const dtoOdometroFinal = { FinalOdom: parseFloat(kilometrajeFinal) };
         await $.ajax({
             type: "PUT",
-            url: `${URL_API_REGISTRO_ODOMETRO}/finalizar-ruta/${idOdomet}`, 
+            url: `${URL_API_REGISTRO_ODOMETRO}/finalizar-ruta/${idOdomet}`,
             data: JSON.stringify(dtoOdometroFinal),
             contentType: "application/json"
         });
@@ -641,8 +712,8 @@ async function FinalizarViaje(idHojaRuta) {
         });
 
         // 6. Limpieza final
-        localStorage.removeItem('odometro_hdr_' + idHojaRuta); 
-        distanciaFinalCalculada = 0; 
+        localStorage.removeItem('odometro_hdr_' + idHojaRuta);
+        distanciaFinalCalculada = 0;
         Swal.fire('¡Excelente trabajo!', 'Viaje finalizado y retorno registrado con éxito.', 'success');
         CargarHojasDeRutaDelDia();
 

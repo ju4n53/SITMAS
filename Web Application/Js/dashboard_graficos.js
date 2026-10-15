@@ -2,9 +2,31 @@ const API_URL = "https://localhost:44325/api/Dashboard"; // Revisa si tu puerto 
 
 // Esperamos a que la página cargue por completo
 document.addEventListener("DOMContentLoaded", function () {
-    cargarGraficoPesoBruto();
-    cargarGraficoRendimiento();
-    cargarGraficoStockActual();
+
+    $(document).ready(function () {
+        // 1. Validar Sesión
+        const sesionString = localStorage.getItem("usuarioSesion");
+        if (!sesionString) {
+            Swal.fire('Acceso Denegado', 'Debe iniciar sesión.', 'error');
+            // window.location.href = '../login.html'; // Descomentar cuando esté en producción
+            return;
+        }
+        sesionActual = JSON.parse(sesionString);
+        idUsuarioReal = parseInt(sesionActual.id);
+        nombreUsuario = sesionActual.nombre;
+        rolUsuario = sesionActual.rol;
+
+        // 2. Cargar Tablero SOLO si es chofer
+        if (rolUsuario === "Administrador" || rolUsuario === "Supervisor") {
+            cargarGraficoPesoBruto();
+            cargarGraficoRendimiento();
+            cargarGraficoStockActual();
+        }
+    });
+
+    // cargarGraficoPesoBruto();
+    // cargarGraficoRendimiento();
+    // cargarGraficoStockActual();
 });
 
 // 1. FUNCIÓN PARA EL GRÁFICO DE TORTA
@@ -108,13 +130,13 @@ function cargarGraficoStockActual() {
         .then(data => {
             // Extraemos los nombres de los materiales de la nueva vista
             const etiquetas = data.map(item => item.SubtipoMaterial);
-            
+
             // 👈 CAMBIO 2: ¡La clave de la automatización! 
             // Mapeamos a 'StockDisponibleKg' (que ya tiene restadas las salidas de producción, egresos y retiros)
-            const stockNetoReal = data.map(item => item.StockDisponibleKg); 
+            const stockNetoReal = data.map(item => item.StockDisponibleKg);
 
             const ctx = document.getElementById('chartStockActual').getContext('2d');
-            
+
             // 💡 TIP ANALÍTICO: Si el gráfico ya existía en pantalla, Chart.js puede quejarse al redibujar.
             // Para evitar que se duplique o parpadee si se actualiza seguido, limpiamos el canvas anterior.
             let chartStatus = Chart.getChart("chartStockActual");
@@ -123,7 +145,7 @@ function cargarGraficoStockActual() {
             }
 
             new Chart(ctx, {
-                type: 'bar', 
+                type: 'bar',
                 data: {
                     labels: etiquetas,
                     datasets: [{
@@ -140,7 +162,7 @@ function cargarGraficoStockActual() {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false 
+                            display: false
                         }
                     },
                     scales: {

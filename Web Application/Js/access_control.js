@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Si tiene permisos de logística
-        if (permisos.includes("Logistica_Lectura")) {
+        if (permisos.includes("Logistica_Escritura")) {
             if (document.getElementById('sidebar-logistica')) document.getElementById('sidebar-logistica').classList.remove('d-none');
             if (document.getElementById('pageVehiculo')) document.getElementById('pageVehiculo').classList.remove('d-none');
             if (document.getElementById('pageHojasRuta')) document.getElementById('pageHojasRuta').classList.remove('d-none');

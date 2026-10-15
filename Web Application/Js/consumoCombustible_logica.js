@@ -131,7 +131,6 @@ $(document).ready(function () {
         lista.forEach(item => {
             $tbody.append(`
                 <tr>
-                    <td><strong>#${item.Id_Consumo}</strong></td>
                     <td>#${item.IdRegistroodomet}</td>
                     <td><span class="badge bg-secondary fs-6">${item.Patente}</span></td>
                     <td>${item.Tipo_combustible}</td>

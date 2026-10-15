@@ -30,14 +30,14 @@ $(document).ready(function () {
 
 function CargarCombosAuxiliaresDetalle() {
     Promise.all([
-        CargarComboTipoMovimientos(),
+        CargarComboTipoMovimiento(),
         CargarComboOrigen(),
         CargarComboTipoMaterial(),
         CargarComboRecursosMov()
     ]);
 }
 
-function CargarComboTipoMovimientos() {
+function CargarComboTipoMovimiento() {
     return $.ajax({
         type: "GET",
         url: URL_API_TIPO_MOV,
@@ -254,6 +254,8 @@ async function ProcesarAsignacionDragDrop(evt) {
                 detail: { idHojaRuta: idHojaRutaDestino }
             });
             document.dispatchEvent(eventoActualizacion);
+
+            CargarTareasPendientes();
 
             Swal.fire({
                 icon: 'success',

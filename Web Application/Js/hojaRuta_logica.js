@@ -38,7 +38,7 @@ function CargarComboVehiculos() {
         url: URL_API_VEHICULOS,
         dataType: "json",
         success: function (data) {
-            const $select =$("#id_vehiculo");
+            const $select = $("#id_vehiculo");
             $select.empty().append('<option value="">Seleccione Vehículo (Patente)</option>');
             if (Array.isArray(data)) {
                 data.forEach(v => {
@@ -65,7 +65,7 @@ function GetAllHojasRuta() {
         url: URL_API_HDR,
         dataType: "json",
         success: function (lista) {
-            const $contenedor =$("#zonaVehiculos");
+            const $contenedor = $("#zonaVehiculos");
             $contenedor.empty();
 
             if (!lista || lista.length === 0) {
@@ -76,6 +76,7 @@ function GetAllHojasRuta() {
             lista.forEach(item => {
                 const claseEstado = ObtenerClaseColorEstado(item.Estado);
                 const estadoTexto = item.Estado || 'Pendiente';
+
 
                 const cardVehiculo = `
                     <div class="col-md-6 mb-2">
@@ -89,20 +90,50 @@ function GetAllHojasRuta() {
                             </div>
                             <div class="card-body p-2 bg-white">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <!-- 🛠️ Estado dinámico devuelto por la API -->
                                     <span class="badge ${claseEstado}">${estadoTexto}</span>
                                     <small class="fw-bold text-primary">Total: ${item.Distancia_Total_Estimada_Km || 0} Km</small>
                                 </div>
-                                <!-- Zona de soltado (Dropzone SortableJS) -->
-                                <div class="dropzone-vehiculo bg-light border rounded p-2" 
+                                <div class="dropzone-vehiculo bg-light border rounded p-2 mb-2" 
                                      id="hdr-drop-${item.Id}" 
                                      data-id-hojaruta="${item.Id}" 
                                      style="min-height: 120px; max-height: 300px; overflow-y: auto;">
-                                     <!-- Las paradas de esta cabecera se cargan aquí -->
                                 </div>
+                                
+                                <!-- ✨ ESTE ES EL NUEVO BOTÓN DE CONEXIÓN -->
+                                <button class="btn btn-sm btn-outline-primary w-100" onclick="SincronizarConMapa(${item.Id})">
+                                    📍 Trazar en Mapa
+                                </button>
                             </div>
                         </div>
                     </div>`;
+
+
+                // const cardVehiculo = `
+                //     <div class="col-md-6 mb-2">
+                //         <div class="card h-100 border-dark shadow-sm">
+                //             <div class="card-header bg-secondary text-white p-2 d-flex justify-content-between align-items-center">
+                //                 <div>
+                //                     <strong class="fs-6">HR #${item.Id}</strong> - 
+                //                     <span class="badge bg-light text-dark">${item.Vehiculo || 'Sin Vehículo'}</span>
+                //                 </div>
+                //                 <small>${item.FechaFormateada || ''}</small>
+                //             </div>
+                //             <div class="card-body p-2 bg-white">
+                //                 <div class="d-flex justify-content-between align-items-center mb-2">
+                //                     <!-- 🛠️ Estado dinámico devuelto por la API -->
+                //                     <span class="badge ${claseEstado}">${estadoTexto}</span>
+                //                     <small class="fw-bold text-primary">Total: ${item.Distancia_Total_Estimada_Km || 0} Km</small>
+                //                 </div>
+                //                 <!-- Zona de soltado (Dropzone SortableJS) -->
+                //                 <div class="dropzone-vehiculo bg-light border rounded p-2" 
+                //                      id="hdr-drop-${item.Id}" 
+                //                      data-id-hojaruta="${item.Id}" 
+                //                      style="min-height: 120px; max-height: 300px; overflow-y: auto;">
+                //                      <!-- Las paradas de esta cabecera se cargan aquí -->
+                //                 </div>
+                //             </div>
+                //         </div>
+                //     </div>`;
                 $contenedor.append(cardVehiculo);
 
                 // Cargar las paradas correspondientes a esta Hoja de Ruta
@@ -154,6 +185,19 @@ function GuardarHojaRuta() {
             mostrarAlerta("No se pudo guardar la Hoja de Ruta.", "danger");
         }
     });
+}
+
+function SincronizarConMapa(idHojaRuta) {
+    // 1. Buscamos el combo del mapa y le asignamos el ID del camión seleccionado
+    $("#map_id_hoja_ruta").val(idHojaRuta);
+
+    // 2. Disparamos artificialmente el evento "change" para que el mapa crea que el usuario lo seleccionó a mano
+    $("#map_id_hoja_ruta").trigger("change");
+
+    // 3. Hacemos un scroll suave e interactivo hacia abajo para que el usuario vea el mapa dibujándose
+    $("html, body").animate({
+        scrollTop: $("#mapaInteractiveContainer").offset().top - 100
+    }, 800);
 }
 
 
@@ -231,7 +275,7 @@ function GuardarHojaRuta() {
 //                         <div class="card h-100 border-dark shadow-sm">
 //                             <div class="card-header bg-secondary text-white p-2 d-flex justify-content-between align-items-center">
 //                                 <div>
-//                                     <strong class="fs-6">HR #${item.Id}</strong> - 
+//                                     <strong class="fs-6">HR #${item.Id}</strong> -
 //                                     <span class="badge bg-info text-dark">${item.Vehiculo || 'Sin Vehículo'}</span>
 //                                 </div>
 //                                 <small>${item.FechaFormateada || ''}</small>
@@ -242,9 +286,9 @@ function GuardarHojaRuta() {
 //                                     <small class="fw-bold text-primary">Total: ${item.Distancia_Total_Estimada_Km || 0} Km</small>
 //                                 </div>
 //                                 <!-- Zona de soltado (Dropzone SortableJS) -->
-//                                 <div class="dropzone-vehiculo bg-light border rounded p-2" 
-//                                      id="hdr-drop-${item.Id}" 
-//                                      data-id-hojaruta="${item.Id}" 
+//                                 <div class="dropzone-vehiculo bg-light border rounded p-2"
+//                                      id="hdr-drop-${item.Id}"
+//                                      data-id-hojaruta="${item.Id}"
 //                                      style="min-height: 120px; max-height: 300px; overflow-y: auto;">
 //                                      <!-- Las paradas de esta cabecera se cargan aquí -->
 //                                 </div>

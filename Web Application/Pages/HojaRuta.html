@@ -4,6 +4,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITMAS - Tablero de Hojas de Ruta y Mapa</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../newstyles.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../Js/access_control.js"></script>
+</head>
+
+<body class="min-vh-100 d-flex flex-column">
+
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
+        <div>
+            <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
+        </div>
+        <div class="info-right d-flex align-items-center gap-3">
+            <div class="text-end d-flex flex-column">
+                <span>Hola, <span class="data" id="header-user">---</span></span>
+                <span>Eres: <span class="data" id="header-role">---</span></span>
+                <a href="#" type="button" class="btn btn-danger btn-sm" onclick="cerrarSesion(event)">
+                    Cerrar Sesión
+                </a>
+            </div>
+            <div class="role-icon"></div>
+        </div>
+    </header>
+
+    <div class="main-layout flex-grow-1 d-flex">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+            <ul class="nav flex-column nav-list pt-3">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
+                        <span class="material-symbols-outlined">home</span>
+                        <span class="menu-text">INICIO</span>
+                    </a>
+                </li>
+
+                <!-- Logística -->
+                <li class="nav-item dropdown d-none" id="sidebar-logistica">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gl">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        <span class="menu-text">LOGÍSTICA</span>
+                    </a>
+                    <div id="gl" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageVehiculo"
+                            href="../Pages/log_vehiculo.html">Vehículos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageHojasRuta" href="../Pages/HojaRuta.html">Hojas de
+                            Ruta</a>
+                        <a class="nav-link small ps-4 d-none" id="pageOdometro" href="../Pages/Odometro.html">Registro
+                            de Odómetro</a>
+                        <a class="nav-link small ps-4 d-none" id="pageCombustible"
+                            href="../Pages/consumoCombustible.html">Consumo Combustible</a>
+                    </div>
+                </li>
+
+                <!-- Trazabilidad -->
+                <li class="nav-item dropdown d-none" id="sidebar-trazabilidad">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gt">
+                        <span class="material-symbols-outlined">sync</span>
+                        <span class="menu-text">TRAZABILIDAD</span>
+                    </a>
+                    <div id="gt" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageIngresoMaterial"
+                            href="../Pages/traz_material.html">Materiales</a>
+                        <a class="nav-link small ps-4 d-none" id="pageOrigen"
+                            href="../Pages/traz_empresa.html">Origen</a>
+                        <a class="nav-link small ps-4 d-none" id="pageClasificacion"
+                            href="../Pages/IngresoYClasificacion.html">Clasificación</a>
+                        <a class="nav-link small ps-4 d-none" id="pageSalida"
+                            href="../Pages/SalidasYStock.html">Salida</a>
+                        <a class="nav-link small ps-4 d-none" id="pageReportes"
+                            href="../Pages/traz_reportes.html">Reportes</a>
+                    </div>
+                </li>
+
+                <!-- Configuración -->
+                <li class="nav-item dropdown d-none" id="sidebar-configuracion">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gc">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span class="menu-text">CONFIGURACIÓN</span>
+                    </a>
+                    <div id="gc" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageConfigEstructura"
+                            href="../Pages/config_estructura.html">General</a>
+                        <a class="nav-link small ps-4 d-none" id="pageConfigAcceso"
+                            href="../Pages/config_acceso.html">Accesos</a>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-body-content flex-grow-1 p-4">
+
+            <!-- ========================================== -->
+            <!-- 🚚 SECCIÓN SUPERIOR: KANBAN DE LOGÍSTICA   -->
+            <!-- ========================================== -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="m-0 fw-bold" style="color: var(--verde-inst);">Tablero de Logística</h3>
+                <div class="d-flex gap-5">
+                    <button class="btn btn-sitmas-success btn-sm d-flex align-items-center gap-1 shadow-sm px-3"
+                        data-bs-toggle="modal" data-bs-target="#modalHojaRuta">
+                        <span class="material-symbols-outlined fs-6">add_circle</span> Nueva Cabecera
+                    </button>
+                    <button
+                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-1 shadow-sm px-3 bg-white"
+                        data-bs-toggle="modal" data-bs-target="#modalDetalle">
+                        <span class="material-symbols-outlined fs-6">pending_actions</span> Nueva Tarea
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR KANBAN -->
+            <div class="container-fluid mb-5 p-0">
+                <div class="row g-4">
+
+                    <!-- Vehículos / Dropzones (IZQUIERDA) -->
+                    <div class="col-md-8">
+                        <div class="sitmas-card h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="mb-0">Cabeceras de viaje</h3>
+                                <button class="btn btn-sm btn-outline-secondary py-1 px-3 rounded-pill"
+                                    onclick="GetAllHojasRuta()">🔄 Recargar</button>
+                            </div>
+                            <div class="p-3 rounded overflow-auto"
+                                style="max-height: 65vh; min-height: 50vh; background-color: rgba(0,0,0,0.02); border: 1px dashed #ccc;">
+                                <div class="row g-3" id="zonaVehiculos">
+                                    <!-- Tarjetas inyectadas por JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paradas Pendientes (DERECHA) -->
+                    <div class="col-md-4">
+                        <div class="sitmas-card h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="mb-0">Tareas Pendientes</h3>
+                                <span class="badge bg-success rounded-pill px-3 py-2" id="cntPendientes">0</span>
+                            </div>
+                            <div class="p-3 rounded overflow-auto" id="zonaPendientes"
+                                style="max-height: 65vh; min-height: 50vh; background-color: rgba(0,0,0,0.02); border: 1px dashed #ccc;">
+                                <!-- Tarjetas inyectadas por JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 🗺️ SECCIÓN INFERIOR: VISOR DEL MAPA        -->
+            <!-- ========================================== -->
+
+            <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+                <h3 class="m-0 fw-bold" style="color: var(--verde-inst);">Visor de Rutas y Paradas</h3>
+            </div>
+
+            <div class="container-fluid p-0">
+                <div class="row g-4">
+                    <!-- Formulario de Mapa -->
+                    <div class="col-lg-4">
+                        <div class="sitmas-card h-100">
+                            <h3 class="mb-3">📍 Paradas espontáneas</h3>
+                            <p class="text-muted small mb-4 ms-3">Seleccione el número de viaje y haga clic en el
+                                mapa.</p>
+
+                            <form id="formParadaMapa" class="ms-3">
+                                <input type="hidden" id="map_id_ubicacion_geo" value="0">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);">1. Hoja
+                                        de Ruta Destino</label>
+                                    <select class="form-select" id="map_id_hoja_ruta" required>
+                                        <option value="">Cargando Hojas de Ruta...</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);">2. Tipo
+                                        Movimiento</label>
+                                    <select class="form-select" id="map_id_tipo_mov" required>
+                                        <option value="">Cargando Tipos...</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);">3. Hora
+                                        Estimada</label>
+                                    <input type="time" class="form-control" id="map_hora_estimada" required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold" style="color: var(--verde-bio);">Punto Marcado en
+                                        Mapa:</label>
+                                    <textarea class="form-control bg-light" id="map_txt_descripcion" rows="2" readonly
+                                        placeholder="Haga clic en el mapa para capturar coordenadas..."></textarea>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-sitmas-success shadow-sm"
+                                        id="btnGuardarParadaMapa">
+                                        ➕ Guardar Parada
+                                    </button>
+                                    <button type="button" class="btn btn-light border shadow-sm btn-sm"
+                                        onclick="ResetearFormularioMapa()">
+                                        Limpiar Selección
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Mapa Interactivo y Tabla -->
+                    <div class="col-lg-8">
+                        <div class="sitmas-card mb-4 p-2">
+                            <div id="mapaInteractiveContainer" style="height: 420px; width: 100%; border-radius: 6px;">
+                            </div>
+                        </div>
+
+                        <div class="sitmas-card">
+                            <h3 class="mb-3">Paradas del viaje</h3>
+                            <div class="table-responsive ms-3">
+                                <!-- Se remueven clases restrictivas de Bootstrap para dejar que newstyles.css actúe sobre thead th -->
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Hora</th>
+                                            <th>Tipo Mov.</th>
+                                            <th>Lugar / Descripción GPS</th>
+                                            <th class="text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyParadasMapa">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-4">Seleccione una Hoja de
+                                                Ruta para ver el mapa.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FOOTER INSTITUCIONAL EMEC -->
+    <footer class="footer-liston">
+        <div class="logos-container">
+            <img src="../assets/footer-logos.png" alt="Logos Institucionales" class="logo-inst">
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODALES                                    -->
+    <!-- ========================================== -->
+    <!-- Modal Hoja Ruta -->
+    <div class="modal fade" id="modalHojaRuta" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="tituloModalHDR">➕ Crear Hoja de Ruta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form id="formHojaRuta">
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="hdnIdHojaRuta" value="0">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);"
+                                for="fecha_hdr">Fecha de Salida</label>
+                            <input type="date" class="form-control" id="fecha_hdr" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);"
+                                for="id_vehiculo">Vehículo Asignado</label>
+                            <select class="form-select" id="id_vehiculo" required>
+                                <option value="">Cargando vehículos...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-sitmas-success px-4" id="btnGuardarHDR">Guardar
+                            Cabecera</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalle Tarea -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold" id="tituloModalDetalle">📍 Cargar Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formDetalle">
+                    <div class="modal-body row g-4 p-4">
+                        <input type="hidden" id="dt_id" value="0">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);">Tipo
+                                Movimiento</label>
+                            <select class="form-select" id="dt_id_tipo_mov" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);">Lugar /
+                                Origen</label>
+                            <select class="form-select" id="dt_id_origen" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: var(--emec-celeste-dark);">Tipo
+                                Material</label>
+                            <select class="form-select" id="dt_id_tipo_material"></select>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-sitmas-success px-4" id="btnGuardarDetalle">Guardar
+                            Tarea</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+    <!-- Lógicas de Negocio Frontend -->
+    <script src="../Js/alerts_config.js"></script>
+    <script src="../Js/hojaRuta_logica.js"></script>
+    <script src="../Js/detalleHojaRuta_logica.js"></script>
+
+    <!-- 🗺️ GOOGLE MAPS API -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe7Wm5puoI09mbnI6gBOrheoV0yeJVHds&libraries=places"></script>
+
+    <!-- Lógica del Mapa Integrado -->
+    <script src="../Js/mapaUbicacion_logica.js"></script>
+    <script src="../Js/logout.js"></script>
+</body>
+
+</html>
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SITMAS - Tablero de Hojas de Ruta</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -115,10 +483,10 @@
                     </div>
                 </li>
             </ul>
-        </aside>
+        </aside> -->
 
-        <!-- CONTENIDO PRINCIPAL -->
-        <div class="main-body-content flex-grow-1 p-3">
+<!-- CONTENIDO PRINCIPAL -->
+<!-- <div class="main-body-content flex-grow-1 p-3">
 
             <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
                 <h4 class="text-uppercase m-0 fw-bold text-success">🚚 Tablero de Logística SITMAS</h4>
@@ -132,14 +500,14 @@
                         <span class="material-symbols-outlined fs-6">pending_actions</span> Nueva Tarea
                     </button>
                 </div>
-            </div>
+            </div> -->
 
-            <!-- CONTENEDOR KANBAN (TABLERO) -->
-            <div class="container-fluid">
-                <div class="row g-3">
+<!-- CONTENEDOR KANBAN (TABLERO) -->
+<!-- <div class="container-fluid">
+                <div class="row g-3"> -->
 
-                    <!-- COLUMNA IZQUIERDA: PARADAS / TAREAS PENDIENTES -->
-                    <div class="col-md-4">
+<!-- COLUMNA IZQUIERDA: PARADAS / TAREAS PENDIENTES -->
+<!-- <div class="col-md-4">
                         <div class="card border-warning shadow-sm h-100">
                             <div
                                 class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
@@ -148,13 +516,12 @@
                             </div>
                             <div class="card-body p-2 bg-light overflow-auto" id="zonaPendientes"
                                 style="max-height: 70vh; min-height: 50vh;">
-                                <!-- Se renderizan las Cards Pendientes dinámicamente -->
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <!-- COLUMNA DERECHA: CABECERAS / VEHÍCULOS (DROPZONES) -->
-                    <div class="col-md-8">
+<!-- COLUMNA DERECHA: CABECERAS / VEHÍCULOS (DROPZONES) -->
+<!-- <div class="col-md-8">
                         <div class="card border-secondary shadow-sm h-100">
                             <div
                                 class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
@@ -164,7 +531,6 @@
                             </div>
                             <div class="card-body p-2 overflow-auto" style="max-height: 70vh; min-height: 50vh;">
                                 <div class="row g-2" id="zonaVehiculos">
-                                    <!-- Se renderizan los Camiones y sus paradas asignadas dinámicamente -->
                                 </div>
                             </div>
                         </div>
@@ -174,12 +540,12 @@
             </div>
 
         </div>
-    </div>
+    </div> -->
 
-    <!-- ========================================== -->
-    <!-- MODAL 1: CREAR / EDITAR HOJA DE RUTA      -->
-    <!-- ========================================== -->
-    <div class="modal fade" id="modalHojaRuta" tabindex="-1">
+<!-- ========================================== -->
+<!-- MODAL 1: CREAR / EDITAR HOJA DE RUTA      -->
+<!-- ========================================== -->
+<!-- <div class="modal fade" id="modalHojaRuta" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
@@ -208,12 +574,12 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <!-- ========================================== -->
-    <!-- MODAL 2: CREAR TAREA PENDIENTE             -->
-    <!-- ========================================== -->
-    <div class="modal fade" id="modalDetalle" tabindex="-1">
+<!-- ========================================== -->
+<!-- MODAL 2: CREAR TAREA PENDIENTE             -->
+<!-- ========================================== -->
+<!-- <div class="modal fade" id="modalDetalle" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-warning text-dark">
@@ -235,12 +601,12 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Tipo Material</label>
                             <select class="form-select" id="dt_id_tipo_material"></select>
-                        </div>
-                        <!-- <div class="col-md-6">
+                        </div> -->
+<!-- <div class="col-md-6">
                             <label class="form-label fw-bold">Recurso Móvil</label>
                             <select class="form-select" id="dt_id_recurso_mov"></select>
                         </div> -->
-                    </div>
+<!-- </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-warning" id="btnGuardarDetalle">Guardar Tarea</button>
@@ -251,19 +617,16 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- Librería SortableJS para Drag and Drop táctil y desktop -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> -->
+<!-- Librería SortableJS para Drag and Drop táctil y desktop -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <script src="../Js/alerts_config.js"></script>
     <script src="../Js/hojaRuta_logica.js"></script>
-    <script src="../Js/detalleHojaRuta_logica.js"></script>
-    <!-- 🗺️ GOOGLE MAPS API-->
-    <script
+    <script src="../Js/detalleHojaRuta_logica.js"></script> -->
+<!-- 🗺️ GOOGLE MAPS API-->
+<!-- <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe7Wm5puoI09mbnI6gBOrheoV0yeJVHds&libraries=places"></script>
     <script src="../Js/logout.js"></script>
 </body>
 
-</html>
-
-
-
+</html> -->

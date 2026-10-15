@@ -64,10 +64,10 @@
                             de Odómetro</a>
                         <a class="nav-link small ps-4 d-none" id="pageCombustible"
                             href="../Pages/consumoCombustible.html">Consumo de Combustible</a>
-                        <a class="nav-link small ps-4 d-none" id="pageMapaUbicacion"
-                            href="../Pages/mapa_ubicacion.html">Mapa de Ubicación</a>
-                        <a class="nav-link small ps-4 d-none" id="pageRutasHoy" href="../Pages/rutas_hoy.html">Rutas de
-                            Hoy</a>
+                        <!-- <a class="nav-link small ps-4 d-none" id="pageMapaUbicacion"
+                            href="../Pages/mapa_ubicacion.html">Mapa de Ubicación</a> -->
+                        <!-- <a class="nav-link small ps-4 d-none" id="pageRutasHoy" href="../Pages/rutas_hoy.html">Rutas de
+                            Hoy</a> -->
                     </div>
                 </li>
 
@@ -121,7 +121,46 @@
                 <span class="text-uppercase tracking-wider">Panel de inicio</span>
             </div>
 
+
             <main class="container-fluid p-4">
+                <!-- PANEL ADMINISTRADOR: Gráficos (Oculto por defecto) -->
+                <div class="row g-4 d-none" id="panel-graficos">
+                    <div class="col-12">
+                        <div class="sitmas-card">
+                            <h2 class="mb-3 text-success">📦 Stock de Materiales Disponibles en Planta</h2>
+                            <p class="text-muted small">Kilogramos netos listos para su procesamiento o egreso,
+                                calculados post-clasificación (Peso Útil).</p>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <canvas id="chartStockActual"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-6">
+                        <div class="sitmas-card h-100">
+                            <h2 class="mb-3">Volumen de Ingresos (Peso Bruto)</h2>
+                            <div style="position: relative; height: 320px; width: 100%;">
+                                <canvas id="chartPesoBruto"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-6">
+                        <div class="sitmas-card h-100">
+                            <h2 class="mb-3">Eficiencia de Clasificación (Bruto vs Útil)</h2>
+                            <div style="position: relative; height: 320px; width: 100%;">
+                                <canvas id="chartRendimiento"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL CHOFER: Rutas del día (Oculto por defecto) -->
+                <div class="row g-4 d-none" id="contenedor-rutas">
+                    <!-- El JS del chofer inyectará las tarjetas o el mapa aquí -->
+                </div>
+            </main>
+
+
+            <!-- <main class="container-fluid p-4">
                 <div class="row g-4">
 
                     <div class="col-12">
@@ -155,7 +194,7 @@
 
 
                 </div>
-            </main>
+            </main> -->
         </div>
     </div>
 
@@ -166,14 +205,37 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../Js/alerts_config.js"></script>
 
+    <!-- Script de Gráficos -->
     <script src="../Js/dashboard_graficos.js"></script>
+
+    <!-- Scripts del Chofer -->
+    <script src="../Js/dashboard_chofer.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe7Wm5puoI09mbnI6gBOrheoV0yeJVHds&libraries=places"></script>
+
+    <!-- Script de Control Principal -->
     <script src="../Js/logout.js"></script>
+
+    <!-- ✨ MAGIA DEL RENDERIZADO CONDICIONAL -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sesionString = localStorage.getItem("usuarioSesion");
+            if (sesionString) {
+                const sesionActual = JSON.parse(sesionString);
+
+                // Mostramos el contenedor correcto según el rol
+                if (sesionActual.rol === "Operador-Logistica") {
+                    document.getElementById("contenedor-rutas").classList.remove("d-none");
+                } else {
+                    document.getElementById("panel-graficos").classList.remove("d-none");
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace API_SITMAS.Controllers
 {
     [RoutePrefix("api/detallehojaruta")]
-    [Authorize(Roles = "Administrador")]
+    //[Authorize(Roles = "Administrador")]
     public class DetalleHojaRutaController : ApiController
     {
         [HttpGet]
