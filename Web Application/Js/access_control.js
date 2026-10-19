@@ -1,180 +1,141 @@
-// 1. OBTENER DATOS DEL LOCALSTORAGE (Ejecución inmediata)
+// 1. OBTENER DATOS DE SESIÓN
 const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
 
-// 2. VERIFICACIÓN DE IDENTIDAD: Si no hay datos, afuera sin anestesia
 if (!sesion) {
     window.location.href = "../index.html";
 }
 
-// 🛡️ 3. PROTECCIÓN CONTRA NAVEGACIÓN MANUAL POR URL (Se ejecuta antes de pintar la pantalla)
-if (sesion) {
-    const permisos = sesion.permisos || [];
-    const paginaActual = window.location.pathname.split("/").pop();
+// 2. CONFIGURACIÓN DEL MAPA DE RUTAS (Qué ROLES entran a qué PÁGINAS)
+const rolUsuario = sesion.rol;
+const paginaActual = window.location.pathname.split("/").pop();
 
-    const reglasAcceso = {
-        "empleado.html": ["Personal_Gestion", "Usuario_Gestion"],
-        "traz_material.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-        "traz_empresa.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-        "IngresoYClasificacion.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-        "SalidasYStock.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-        "traz_reportes.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-        "log_vehiculo.html": ["Logistica_Lectura"],
-        "log_hdr.html": ["Logistica_Lectura"],
-        "config_estructura.html": ["Sistema_Configuracion"],
-        "config_acceso.html": ["Sistema_Configuracion"]
-    };
+// Agregamos "Administrador" a todas porque dijimos que él tiene pase libre a todo
+const rutasProtegidas = {
+    "empleado.html": ["R_Humanos", "Administrador"],
 
-    if (reglasAcceso[paginaActual]) {
-        const tienePermisoRequerido = reglasAcceso[paginaActual].some(p => permisos.includes(p));
+    "traz_material.html": ["Supervisor_Logistica", "Administrador"],
 
-        if (!tienePermisoRequerido) {
-            alert("⚠️ Acceso Denegado: No cuentas con los permisos necesarios para ingresar a esta sección de SITMAS.");
-            window.location.href = "landing.html";
-        }
+    "traz_empresa.html": ["Supervisor_Logistica", "R_Institucionales", "Administrador"],
+
+    "IngresoYClasificacion.html": ["Supervisor_Gestion", "Operador_Gestion", "Administrador"],
+
+    "SalidasYStock.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
+
+    "traz_reportes.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
+
+    "log_vehiculo.html": ["Mantenimiento_Vehicular", "Administrador"],
+
+    "HojaRuta.html": ["Coordinador", "Supervisor_Logistica", "Administrador"],
+
+    "odometro.html": ["Coordinador", "Supervisor_Logistica", "R_Institucionales", "Administrador"],
+
+    "consumoCombustible.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"],
+
+    "config_estructura.html": ["Administrador"],
+
+    "config_acceso.html": ["Administrador"]
+    // landing.html no está en la lista porque TODOS pueden entrar
+};
+
+// 3. MOTOR DE REDIRECCIÓN (Bloqueo de URL)
+if (rutasProtegidas[paginaActual]) {
+    // Si el rol del usuario NO está en la lista de la página actual, lo expulsamos
+    if (!rutasProtegidas[paginaActual].includes(rolUsuario)) {
+        alert("⚠️ Acceso Denegado: Tu rol de " + rolUsuario + " no tiene acceso a esta sección.");
+        window.location.href = "landing.html";
     }
 }
 
-// Esperamos a que el HTML y jQuery terminen de cargar
+// 4. MOTOR DE RENDERIZADO DEL MENÚ LATERAL (DRY Principle)
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // 🚀 4. NUEVO: CONFIGURACIÓN GLOBAL DE AJAX (El interceptor)
-    // Se ejecuta una sola vez y afecta a todas las peticiones futuras
+
+    const sesionString = localStorage.getItem("usuarioSesion");
+        if (sesionString) {
+            const sesionActual = JSON.parse(sesionString);
+
+            // Mostramos el contenedor correcto según el rol
+            if (sesionActual.rol === "Operador_Logistica") {
+                document.getElementById("contenedor-rutas").classList.remove("d-none");
+            } else {
+                document.getElementById("panel-graficos").classList.remove("d-none");
+            }
+
+            if (sesionActual.rol === "Administrador") {
+                document.getElementById("contenedor-rutas").classList.remove("d-none");
+                document.getElementById("panel-graficos").classList.remove("d-none");
+            }
+        }
+
+    // Inyección del Token en AJAX (Lo que hicimos en el paso anterior)
     if (sesion && sesion.token) {
         $.ajaxSetup({
-            beforeSend: function(xhr) {
-                // Le inyectamos la pulsera en la cabecera a cada petición
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + sesion.token);
             }
         });
     }
 
-    // 5. ACTUALIZAR HEADER CON DATOS REALES
     if (sesion) {
         document.getElementById('header-user').textContent = sesion.nombre;
-        document.getElementById('header-role').textContent = sesion.rol.toUpperCase();
+        document.getElementById('header-role').textContent = rolUsuario.replace("_", " ").toUpperCase();
 
-        const permisos = sesion.permisos || [];
+        // Mapa de qué menúes HTML se encienden según el Rol
+        const configuracionMenu = [
+            { idSidebar: 'sidebar-empleados', idItems: ['pageEmpleado'], roles: ["R_Humanos", "Administrador"] },
 
-        // Si tiene permiso para ver personal, encendemos el sidebar de empleados
-        if (permisos.includes("Personal_Gestion") || permisos.includes("Usuario_Gestion")) {
-            if (document.getElementById('sidebar-empleados')) document.getElementById('sidebar-empleados').classList.remove('d-none');
-            if (document.getElementById('pageEmpleado')) document.getElementById('pageEmpleado').classList.remove('d-none');
-        }
+            { idSidebar: 'sidebar-logistica', idItems: ['pageVehiculo'], roles: ["Mantenimiento_Vehicular", "Administrador"] },
 
-        // Si tiene permisos de trazabilidad básica o total
-        if (permisos.includes("Trazabilidad_lecturas") || permisos.includes("Trazabilidad_Escritura")) {
-            if (document.getElementById('sidebar-trazabilidad')) document.getElementById('sidebar-trazabilidad').classList.remove('d-none');
-            if (document.getElementById('pageIngresoMaterial')) document.getElementById('pageIngresoMaterial').classList.remove('d-none');
-            if (document.getElementById('pageOrigen')) document.getElementById('pageOrigen').classList.remove('d-none');
-            if (document.getElementById('pageClasificacion')) document.getElementById('pageClasificacion').classList.remove('d-none');
-            if (document.getElementById('pageSalida')) document.getElementById('pageSalida').classList.remove('d-none');
-            if (document.getElementById('pageReportes')) document.getElementById('pageReportes').classList.remove('d-none');
-        }
+            { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageOdometro', 'pageCombustible'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "R_Institucionales", "Administrador"] },
 
-        // Si tiene permisos de logística
-        if (permisos.includes("Logistica_Escritura")) {
-            if (document.getElementById('sidebar-logistica')) document.getElementById('sidebar-logistica').classList.remove('d-none');
-            if (document.getElementById('pageVehiculo')) document.getElementById('pageVehiculo').classList.remove('d-none');
-            if (document.getElementById('pageHojasRuta')) document.getElementById('pageHojasRuta').classList.remove('d-none');
-            if (document.getElementById('pageOdometro')) document.getElementById('pageOdometro').classList.remove('d-none');
-            if (document.getElementById('pageCombustible')) document.getElementById('pageCombustible').classList.remove('d-none');
-            if (document.getElementById('pageMapaUbicacion')) document.getElementById('pageMapaUbicacion').classList.remove('d-none');
-            if (document.getElementById('pageRutasHoy')) document.getElementById('pageRutasHoy').classList.remove('d-none');
-        }
+            { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageSalida', 'pageReportes'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
 
-        // Si es el Administrador técnico con acceso a las configuraciones
-        if (permisos.includes("Sistema_Configuracion")) {
-            if (document.getElementById('sidebar-configuracion')) document.getElementById('sidebar-configuracion').classList.remove('d-none');
-            if (document.getElementById('pageConfigEstructura')) document.getElementById('pageConfigEstructura').classList.remove('d-none');
-            if (document.getElementById('pageConfigAcceso')) document.getElementById('pageConfigAcceso').classList.remove('d-none');
-        }
+            { idSidebar: 'sidebar-configuracion', idItems: ['pageConfigEstructura', 'pageConfigAcceso'], roles: ["Administrador"] }
+            // Nota: Agrupé algunos para el ejemplo, debes ajustar los idItems exactos según tu HTML
+        ];
+
+        // Bucle mágico: recorremos la configuración y encendemos solo lo que corresponde
+        configuracionMenu.forEach(menu => {
+            if (menu.roles.includes(rolUsuario)) {
+                // Mostramos el contenedor principal (ej: Logística)
+                let sidebar = document.getElementById(menu.idSidebar);
+                if (sidebar) sidebar.classList.remove('d-none');
+
+                // Mostramos los sub-items específicos (ej: Vehículos, Hoja de Ruta)
+                menu.idItems.forEach(idSubItem => {
+                    let itemElement = document.getElementById(idSubItem);
+                    if (itemElement) itemElement.classList.remove('d-none');
+                });
+            }
+        });
+
+        // =========================================================================
+        // 5. MOTOR DE OCULTAMIENTO POR PERMISOS FRONTEND (Feature Toggling)
+        // =========================================================================
+
+        // Asumimos que al hacer el login, guardaste la lista de permisos en tu sesión. 
+        // Si lo llamaste de otra forma, ajusta esta variable (ej. sesion.listaPermisos)
+        const permisosUsuario = sesion.permisos || [];
+
+        // El "barrendero" busca en TODA la página cualquier elemento que tenga nuestro atributo mágico
+        const elementosProtegidos = document.querySelectorAll('[data-permiso-requerido]');
+
+        elementosProtegidos.forEach(elemento => {
+            // Leemos qué permiso pide esta vitrina y lo separamos por comas (por si pide más de uno)
+            const stringPermisos = elemento.getAttribute('data-permiso-requerido');
+            const permisosNecesarios = stringPermisos.split(',');
+
+            // Verificamos si el usuario tiene AL MENOS UNO (.some) de los permisos requeridos
+            const tienePermiso = permisosNecesarios.some(permisoRequerido => {
+                return permisosUsuario.includes(permisoRequerido.trim()); // .trim() limpia espacios extra
+            });
+
+            // Si no tiene el permiso... ¡Magia! Arrancamos el elemento de raíz.
+            if (!tienePermiso) {
+                elemento.remove(); // Usamos .remove() en vez de .hide() para que sea imposible inspeccionar el código
+            }
+        });
+
     }
 });
 
 
-
-// // 1. OBTENER DATOS DEL LOCALSTORAGE (Ejecución inmediata)
-// const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
-
-// // 2. VERIFICACIÓN DE IDENTIDAD: Si no hay datos, afuera sin anestesia
-// if (!sesion) {
-//     window.location.href = "../index.html";
-// }
-
-// // 🛡️ 3. NUEVO: PROTECCIÓN CONTRA NAVEGACIÓN MANUAL POR URL (Se ejecuta antes de pintar la pantalla)
-// if (sesion) {
-//     const permisos = sesion.permisos || [];
-//     // Obtenemos el nombre del archivo actual, por ejemplo: "empleado.html"
-//     const paginaActual = window.location.pathname.split("/").pop();
-
-//     // Creamos un mapa que dice: "Para ver este archivo, necesitás este permiso"
-//     const reglasAcceso = {
-//         "empleado.html": ["Personal_Gestion", "Usuario_Gestion"],
-//         "traz_material.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-//         "traz_empresa.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-//         "IngresoYClasificacion.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-//         "SalidasYStock.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-//         "traz_reportes.html": ["Trazabilidad_lecturas", "Trazabilidad_Escritura"],
-//         "log_vehiculo.html": ["Logistica_Lectura"],
-//         "log_hdr.html": ["Logistica_Lectura"],
-//         "config_estructura.html": ["Sistema_Configuracion"],
-//         "config_acceso.html": ["Sistema_Configuracion"]
-//     };
-
-//     // Si la página actual está restringida en nuestro mapa de reglas
-//     if (reglasAcceso[paginaActual]) {
-//         // Comprobamos si el usuario tiene al menos UNO de los permisos requeridos
-//         const tienePermisoRequerido = reglasAcceso[paginaActual].some(p => permisos.includes(p));
-
-//         if (!tienePermisoRequerido) {
-//             // Si no tiene el permiso, lo eyectamos de vuelta al panel principal con un aviso
-//             alert("⚠️ Acceso Denegado: No cuentas con los permisos necesarios para ingresar a esta sección de SITMAS.");
-//             window.location.href = "landing.html";
-//         }
-//     }
-// }
-
-// // Esperamos a que el HTML termine de cargar para tocar las etiquetas de la pantalla
-// document.addEventListener("DOMContentLoaded", () => {
-//     // 4. ACTUALIZAR HEADER CON DATOS REALES
-//     if (sesion) {
-//         document.getElementById('header-user').textContent = sesion.nombre;
-//         document.getElementById('header-role').textContent = sesion.rol.toUpperCase();
-
-//         const permisos = sesion.permisos || [];
-
-//         // Si tiene permiso para ver personal, encendemos el sidebar de empleados
-//         if (permisos.includes("Personal_Gestion") || permisos.includes("Usuario_Gestion")) {
-//             if (document.getElementById('sidebar-empleados')) document.getElementById('sidebar-empleados').classList.remove('d-none');
-//             if (document.getElementById('pageEmpleado')) document.getElementById('pageEmpleado').classList.remove('d-none');
-//         }
-
-//         // Si tiene permisos de trazabilidad básica o total
-//         if (permisos.includes("Trazabilidad_lecturas") || permisos.includes("Trazabilidad_Escritura")) {
-//             if (document.getElementById('sidebar-trazabilidad')) document.getElementById('sidebar-trazabilidad').classList.remove('d-none');
-//             if (document.getElementById('pageIngresoMaterial')) document.getElementById('pageIngresoMaterial').classList.remove('d-none');
-//             if (document.getElementById('pageOrigen')) document.getElementById('pageOrigen').classList.remove('d-none');
-//             if (document.getElementById('pageClasificacion')) document.getElementById('pageClasificacion').classList.remove('d-none');
-//             if (document.getElementById('pageSalida')) document.getElementById('pageSalida').classList.remove('d-none');
-//             if (document.getElementById('pageReportes')) document.getElementById('pageReportes').classList.remove('d-none');
-//         }
-
-//         // Si tiene permisos de logística
-//         if (permisos.includes("Logistica_Lectura")) {
-//             if (document.getElementById('sidebar-logistica')) document.getElementById('sidebar-logistica').classList.remove('d-none');
-//             if (document.getElementById('pageVehiculo')) document.getElementById('pageVehiculo').classList.remove('d-none');
-//             if (document.getElementById('pageHojasRuta')) document.getElementById('pageHojasRuta').classList.remove('d-none');
-//             if (document.getElementById('pageOdometro')) document.getElementById('pageOdometro').classList.remove('d-none');
-//             if (document.getElementById('pageCombustible')) document.getElementById('pageCombustible').classList.remove('d-none');
-//             if (document.getElementById('pageMapaUbicacion')) document.getElementById('pageMapaUbicacion').classList.remove('d-none');
-//             if (document.getElementById('pageRutasHoy')) document.getElementById('pageRutasHoy').classList.remove('d-none');
-//         }
-
-//         // Si es el Administrador técnico con acceso a las configuraciones
-//         if (permisos.includes("Sistema_Configuracion")) {
-//             if (document.getElementById('sidebar-configuracion')) document.getElementById('sidebar-configuracion').classList.remove('d-none');
-//             if (document.getElementById('pageConfigEstructura')) document.getElementById('pageConfigEstructura').classList.remove('d-none');
-//             if (document.getElementById('pageConfigAcceso')) document.getElementById('pageConfigAcceso').classList.remove('d-none');
-//         }
-//     }
-// });

@@ -65,6 +65,20 @@ function CargarComboVehiculos() {
    ========================================================================== */
 
 function GetAllRegistros() {
+    // 1. Buscamos los permisos del usuario en la "guantera" (localStorage)
+    const sesionString = localStorage.getItem("usuarioSesion");
+    let permisosUsuario = [];
+    if (sesionString) {
+        const sesionLocal = JSON.parse(sesionString);
+        permisosUsuario = sesionLocal.permisos || [];
+    }
+
+    // 2. Evaluamos si tiene permiso de escritura/modificación
+    // Ajusta estos nombres exactos según los permisos que definiste en tu base de datos
+    const puedeModificar = permisosUsuario.includes("Logistica_Escritura") ||
+        permisosUsuario.includes("Mantenimiento_Escritura") ||
+        permisosUsuario.includes("Administrador");
+
     $.ajax({
         type: "GET",
         url: URL_API_ODOMETRO,
@@ -79,6 +93,24 @@ function GetAllRegistros() {
             }
 
             lista.forEach(item => {
+                // 3. Construimos los botones SOLO si el usuario tiene el permiso
+                let botonesAccionHTML = '';
+
+                if (puedeModificar) {
+                    botonesAccionHTML = `
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="CargarParaEditar(${item.IdRegistroOdomet})" title="Editar Registro">
+                            ✏️ Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger me-1" onclick="EliminarRegistro(${item.IdRegistroOdomet})" title="Eliminar Registro">
+                            🗑️ Borrar
+                        </button>
+                    `;
+                } else {
+                    // Si no tiene permiso, mostramos un candadito o simplemente nada
+                    botonesAccionHTML = `<span class="text-muted small">Solo Lectura</span>`;
+                }
+
+                // 4. Inyectamos la variable 'botonesAccionHTML' en nuestra fila
                 const tr = `
                     <tr>
                         <td><small class="fw-bold text-secondary">${item.FechaRegOdomFormateada || 'N/A'}</small></td>
@@ -87,12 +119,7 @@ function GetAllRegistros() {
                         <td class="text-end">${item.FinalOdom.toFixed(2)} Km</td>
                         <td class="text-end fw-bold text-success">+${item.KmRecorridosDia.toFixed(2)} Km</td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary me-1" onclick="CargarParaEditar(${item.IdRegistroOdomet})" title="Editar Registro">
-                                ✏️ Editar
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger me-1" onclick="EliminarRegistro(${item.IdRegistroOdomet})" title="Eliminar Registro">
-                                🗑️ Borrar
-                            </button>
+                            ${botonesAccionHTML} 
                         </td>
                     </tr>`;
                 $tbody.append(tr);
@@ -104,6 +131,50 @@ function GetAllRegistros() {
         }
     });
 }
+
+
+
+
+// function GetAllRegistros() {
+//     $.ajax({
+//         type: "GET",
+//         url: URL_API_ODOMETRO,
+//         dataType: "json",
+//         success: function (lista) {
+//             const $tbody = $("#tbodyOdometro");
+//             $tbody.empty();
+
+//             if (!lista || lista.length === 0) {
+//                 $tbody.append('<tr><td colspan="6" class="text-center text-muted">No hay registros de odómetro guardados.</td></tr>');
+//                 return;
+//             }
+
+//             lista.forEach(item => {
+//                 const tr = `
+//                     <tr>
+//                         <td><small class="fw-bold text-secondary">${item.FechaRegOdomFormateada || 'N/A'}</small></td>
+//                         <td><span class="badge bg-secondary">${item.Patente || 'Sin Asignar'}</span></td>
+//                         <td class="text-end">${item.InicioOdom.toFixed(2)} Km</td>
+//                         <td class="text-end">${item.FinalOdom.toFixed(2)} Km</td>
+//                         <td class="text-end fw-bold text-success">+${item.KmRecorridosDia.toFixed(2)} Km</td>
+//                         <td class="text-center">
+//                             <button class="btn btn-sm btn-outline-primary me-1" onclick="CargarParaEditar(${item.IdRegistroOdomet})" title="Editar Registro">
+//                                 ✏️ Editar
+//                             </button>
+//                             <button class="btn btn-sm btn-outline-danger me-1" onclick="EliminarRegistro(${item.IdRegistroOdomet})" title="Eliminar Registro">
+//                                 🗑️ Borrar
+//                             </button>
+//                         </td>
+//                     </tr>`;
+//                 $tbody.append(tr);
+//             });
+//         },
+//         error: function (err) {
+//             console.error("SITMAS - Error en GetAllRegistros:", err);
+//             mostrarAlerta("❌ Error al consultar el historial de odómetros.", "danger");
+//         }
+//     });
+// }
 
 function GuardarRegistroOdometro() {
     const id = $("#hdnIdRegistroOdometro").val();
@@ -136,8 +207,8 @@ function GuardarRegistroOdometro() {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (respuesta) {
-            const mensajeAccion = esModificacion 
-                ? "✅ Registro de odómetro actualizado con éxito." 
+            const mensajeAccion = esModificacion
+                ? "✅ Registro de odómetro actualizado con éxito."
                 : "✅ Registro de odómetro creado con éxito.";
 
             mostrarAlerta(mensajeAccion, "success");

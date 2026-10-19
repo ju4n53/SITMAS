@@ -3,26 +3,48 @@ const API_URL = "https://localhost:44325/api/Dashboard"; // Revisa si tu puerto 
 // Esperamos a que la página cargue por completo
 document.addEventListener("DOMContentLoaded", function () {
 
+
     $(document).ready(function () {
         // 1. Validar Sesión
         const sesionString = localStorage.getItem("usuarioSesion");
-        if (!sesionString) {
-            Swal.fire('Acceso Denegado', 'Debe iniciar sesión.', 'error');
-            // window.location.href = '../login.html'; // Descomentar cuando esté en producción
-            return;
-        }
-        sesionActual = JSON.parse(sesionString);
-        idUsuarioReal = parseInt(sesionActual.id);
-        nombreUsuario = sesionActual.nombre;
-        rolUsuario = sesionActual.rol;
+        if (!sesionString) return; // Access_control ya expulsa si no hay sesión
 
-        // 2. Cargar Tablero SOLO si es chofer
-        if (rolUsuario === "Administrador" || rolUsuario === "Supervisor") {
+        // 2. Usamos 'const' locales para no contaminar la sala de conferencias
+        const sesionLocal = JSON.parse(sesionString);
+        const rolLocal = sesionLocal.rol;
+
+        // 3. Cargar Tablero SOLO si tiene permiso
+        // Fíjate que uso "Supervisor_Gestion" según tu nuevo mapa de roles
+        if (rolLocal === "Administrador" || rolLocal === "Supervisor_Gestion") {
             cargarGraficoPesoBruto();
             cargarGraficoRendimiento();
             cargarGraficoStockActual();
         }
     });
+
+
+
+
+    // $(document).ready(function () {
+    //     // 1. Validar Sesión
+    //     const sesionString = localStorage.getItem("usuarioSesion");
+    //     if (!sesionString) {
+    //         Swal.fire('Acceso Denegado', 'Debe iniciar sesión.', 'error');
+    //         // window.location.href = '../login.html'; // Descomentar cuando esté en producción
+    //         return;
+    //     }
+    //     sesionActual = JSON.parse(sesionString);
+    //     idUsuarioReal = parseInt(sesionActual.id);
+    //     nombreUsuario = sesionActual.nombre;
+    //     rolUsuario = sesionActual.rol;
+
+    //     // 2. Cargar Tablero SOLO si es chofer
+    //     if (rolUsuario === "Administrador" || rolUsuario === "Supervisor") {
+    //         cargarGraficoPesoBruto();
+    //         cargarGraficoRendimiento();
+    //         cargarGraficoStockActual();
+    //     }
+    // });
 
     // cargarGraficoPesoBruto();
     // cargarGraficoRendimiento();

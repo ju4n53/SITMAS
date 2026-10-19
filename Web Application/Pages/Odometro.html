@@ -131,7 +131,61 @@
                     <!-- ======================================================= -->
                     <!-- REGISTRO DE ODÓMETRO (FORMULARIO Y TABLA)               -->
                     <!-- ======================================================= -->
+
                     <div class="col-12">
+                        <div class="sitmas-card">
+
+                            <!-- 👈 1. ETIQUETA EN EL ENCABEZADO DEL ACORDEÓN -->
+                            <div class="accordion-header d-flex justify-content-between align-items-center"
+                                role="button" data-bs-toggle="collapse" href="#collapseOdometro"
+                                data-permiso-requerido="Logistica_Escritura, Logistica_Modificacion">
+                                <h2 class="mb-0" id="tituloFormOdometro">Cargar Registro de Odómetro</h2>
+                                <span class="icon-arrow">▼</span>
+                            </div>
+
+                            <!-- 👈 2. ETIQUETA EN EL CONTENEDOR DEL FORMULARIO -->
+                            <div id="collapseOdometro" class="collapse show"
+                                data-permiso-requerido="Logistica_Escritura, Logistica_Modificacion">
+                                <!-- FORMULARIO -->
+                                <div class="pt-4">
+                                    <form id="formOdometro">
+                                        <!-- ... Todo tu formulario original queda exactamente igual por dentro ... -->
+                                        <input type="hidden" id="hdnIdRegistroOdometro" value="0">
+
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold" for="id_vehiculo">Vehículo</label>
+                                                <select class="form-select" id="id_vehiculo" required>
+                                                    <option value="">Cargando vehículos...</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold" for="inicio_odom">Odómetro Inicial
+                                                    (Km)</label>
+                                                <input type="number" step="0.01" min="0" class="form-control"
+                                                    id="inicio_odom" required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold" for="final_odom">Odómetro Final
+                                                    (Km)</label>
+                                                <input type="number" step="0.01" min="0" class="form-control"
+                                                    id="final_odom" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="pt-3 d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-secondary px-4"
+                                                onclick="ResetearFormulario()">Cancelar</button>
+                                            <button type="submit" class="btn btn-sitmas-success px-5"
+                                                id="btnGuardarOdometro">➕ Registrar Odómetro</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+
+
+                            <!-- <div class="col-12">
                         <div class="sitmas-card">
                             <div class="accordion-header d-flex justify-content-between align-items-center"
                                 role="button" data-bs-toggle="collapse" href="#collapseOdometro">
@@ -139,12 +193,12 @@
                                 <span class="icon-arrow">▼</span>
                             </div>
 
-                            <div id="collapseOdometro" class="collapse show">
-                                <!-- FORMULARIO -->
-                                <div class="pt-4">
-                                    <form id="formOdometro">
-                                        <!-- Input oculto para alternar entre Crear (0) y Modificar (ID) -->
-                                        <input type="hidden" id="hdnIdRegistroOdometro" value="0">
+                            <div id="collapseOdometro" class="collapse show"> -->
+                            <!-- FORMULARIO -->
+                            <!-- <div class="pt-4">
+                                    <form id="formOdometro"> -->
+                            <!-- Input oculto para alternar entre Crear (0) y Modificar (ID) -->
+                            <!-- <input type="hidden" id="hdnIdRegistroOdometro" value="0">
 
                                         <div class="row g-3">
                                             <div class="col-md-4">
@@ -180,41 +234,41 @@
                                             </button>
                                         </div>
                                     </form>
-                                </div>
+                                </div> -->
 
-                                <!-- BARRA DE BÚSQUEDA Y FILTRADO RÁPIDO -->
-                                <div class="row pt-4">
-                                    <div class="col-md-4 offset-md-8">
-                                        <input type="text" id="inputBusquedaOdometro" class="form-control"
-                                            placeholder="🔍 Buscar Registro...">
-                                    </div>
+                            <!-- BARRA DE BÚSQUEDA Y FILTRADO RÁPIDO -->
+                            <div class="row pt-4">
+                                <div class="col-md-4 offset-md-8">
+                                    <input type="text" id="inputBusquedaOdometro" class="form-control"
+                                        placeholder="🔍 Buscar Registro...">
                                 </div>
+                            </div>
 
-                                <!-- TABLA DE HISTORIAL -->
-                                <div class="table-responsive pt-3">
-                                    <table class="table table-hover align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Fecha / Hora</th>
-                                                <th>Vehículo / Patente</th>
-                                                <th class="text-end">Km Inicial</th>
-                                                <th class="text-end">Km Final</th>
-                                                <th class="text-end">Recorrido Día</th>
-                                                <th class="text-center">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbodyOdometro">
-                                            <!-- Se renderiza dinámicamente con GetAllRegistros() -->
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <!-- TABLA DE HISTORIAL -->
+                            <div class="table-responsive pt-3">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fecha / Hora</th>
+                                            <th>Vehículo / Patente</th>
+                                            <th class="text-end">Km Inicial</th>
+                                            <th class="text-end">Km Final</th>
+                                            <th class="text-end">Recorrido Día</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyOdometro">
+                                        <!-- Se renderiza dinámicamente con GetAllRegistros() -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </main>
+
         </div>
+        </main>
+    </div>
     </div>
 
     <footer class="footer-liston">

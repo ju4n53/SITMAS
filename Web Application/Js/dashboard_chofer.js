@@ -12,10 +12,16 @@ const URL_API_REGISTRO_ODOMETRO = "https://localhost:44325/api/registroodometro"
 const EMEC_BASE = { lat: -31.465829, lng: -64.127313 };
 
 // Variables de Sesión
-let sesionActual = null;
-let idUsuarioReal = 0;
-let nombreUsuario = "";
-let rolUsuario = "";
+// let sesionActual = null;
+// let idUsuarioReal = 0;
+// let nombreUsuario = "";
+// let rolUsuario = "";
+
+// Usamos nombres ÚNICOS para este módulo logístico
+
+
+
+
 
 // Variables del Mapa
 let map = null;
@@ -29,24 +35,46 @@ let coordenadaTemporalClick = null;
 let idRutaActivaMapa = 0; // Guardamos el ID de la ruta en curso
 let distanciaFinalCalculada = 0; // Guardará el total del circuito (Base -> Paradas -> Base)
 
-$(document).ready(function () {
-    // 1. Validar Sesión
-    const sesionString = localStorage.getItem("usuarioSesion");
-    if (!sesionString) {
-        Swal.fire('Acceso Denegado', 'Debe iniciar sesión.', 'error');
-        // window.location.href = '../login.html'; // Descomentar cuando esté en producción
-        return;
-    }
-    sesionActual = JSON.parse(sesionString);
-    idUsuarioReal = parseInt(sesionActual.id);
-    nombreUsuario = sesionActual.nombre;
-    rolUsuario = sesionActual.rol;
+let choferIdUsuario = 0;
+let choferNombreUsuario = "";
+let choferRolUsuario = ""; // 👈 1. Agregamos esta nueva variable
 
-    // 2. Cargar Tablero SOLO si es chofer
-    if (rolUsuario === "Operador-Logistica") {
+$(document).ready(function () {
+    // 1. Extraemos los datos localmente
+    const sesionString = localStorage.getItem("usuarioSesion");
+    if (!sesionString) return;
+
+    const sesionLocal = JSON.parse(sesionString);
+    choferIdUsuario = parseInt(sesionLocal.id);
+    choferNombreUsuario = sesionLocal.nombre;
+
+    // 👈 2. Guardamos el rol en nuestra variable superior
+    choferRolUsuario = sesionLocal.rol;
+
+    // 2. Cargar Tablero (Te sugiero abrirlo también al Administrador y Coordinador si deben verlo)
+    if (choferRolUsuario === "Operador_Logistica" || choferRolUsuario === "Administrador") {
         CargarHojasDeRutaDelDia();
     }
 });
+
+// $(document).ready(function () {
+//     // 1. Validar Sesión
+//     const sesionString = localStorage.getItem("usuarioSesion");
+//     if (!sesionString) {
+//         Swal.fire('Acceso Denegado', 'Debe iniciar sesión.', 'error');
+//         // window.location.href = '../login.html'; // Descomentar cuando esté en producción
+//         return;
+//     }
+//     sesionActual = JSON.parse(sesionString);
+//     idUsuarioReal = parseInt(sesionActual.id);
+//     nombreUsuario = sesionActual.nombre;
+//     rolUsuario = sesionActual.rol;
+
+//     // 2. Cargar Tablero SOLO si es chofer
+//     if (rolUsuario === "Operador-Logistica") {
+//         CargarHojasDeRutaDelDia();
+//     }
+// });
 
 /* ==========================================================================
    A. LÓGICA DEL DASHBOARD (Decisor de Vistas)
@@ -67,7 +95,7 @@ function CargarHojasDeRutaDelDia() {
             }
 
             // Buscamos si el chofer ya tiene una ruta EN CURSO
-            const rutaEnCurso = listaRutas.find(r => r.Id_Estado === 3 && r.ChoferNombreCompleto === nombreUsuario);
+            const rutaEnCurso = listaRutas.find(r => r.Id_Estado === 3 && r.ChoferNombreCompleto === choferNombreUsuario);
 
             if (rutaEnCurso) {
                 // VISTA 1: MODO MAPA (Viaje activo)
@@ -105,10 +133,10 @@ function RenderizarVistaTarjetas(listaRutas, $contenedor) {
     listaRutas.forEach(ruta => {
         let botonHTML = '';
         let estadoBadgeClass = ObtenerClaseColorEstado(ruta.Estado);
-        const esMiRuta = (ruta.ChoferNombreCompleto === nombreUsuario);
+        const esMiRuta = (ruta.ChoferNombreCompleto === choferNombreUsuario);
 
         if (ruta.Id_Estado === 2) {
-            if (rolUsuario === "Administrador") {
+            if (choferRolUsuario === "Administrador") {
                 botonHTML = `<button class="btn btn-outline-primary w-100 mt-3 fw-bold" disabled>Lista para ser iniciada por un chofer</button>`;
             } else {
                 botonHTML = `<button class="btn btn-success w-100 mt-3 fw-bold" onclick="IniciarViaje(${ruta.Id}, ${ruta.Id_Vehiculo})">
@@ -152,55 +180,6 @@ function RenderizarVistaTarjetas(listaRutas, $contenedor) {
 }
 
 
-// function RenderizarVistaTarjetas(listaRutas, $contenedor) {
-//     listaRutas.forEach(ruta => {
-//         let botonHTML = '';
-//         let estadoBadgeClass = ObtenerClaseColorEstado(ruta.Estado); 
-//         const esMiRuta = (ruta.ChoferNombreCompleto === nombreUsuario);
-
-//         if (ruta.Id_Estado === 2) { 
-//             if (rolUsuario === "Administrador") {
-//                 botonHTML = `<button class="btn btn-outline-primary w-100 mt-3 fw-bold" disabled>Lista para ser iniciada por un chofer</button>`;
-//             } else {
-//                 botonHTML = `<button class="btn btn-success w-100 mt-3 fw-bold" onclick="IniciarViaje(${ruta.Id}, ${ruta.Id_Vehiculo})">
-//                                 <span class="material-symbols-outlined align-middle me-1">play_arrow</span> INICIAR VIAJE
-//                              </button>`;
-//             }
-//         } 
-//         else if (ruta.Id_Estado === 3) {
-//             botonHTML = `<button class="btn btn-secondary w-100 mt-3 fw-bold" disabled>
-//                             En curso por ${ruta.ChoferNombreCompleto || 'otro chofer'}
-//                          </button>`;
-//         }
-//         else if (ruta.Id_Estado === 4 || ruta.Id_Estado === 5) {
-//             botonHTML = `<button class="btn btn-outline-success w-100 mt-3 fw-bold" disabled>Viaje Completado</button>`;
-//         } else {
-//              botonHTML = `<button class="btn btn-outline-secondary w-100 mt-3 fw-bold" disabled>Aún no asignado</button>`;
-//         }
-
-//         const tarjetaHTML = `
-//             <div class="col-12 col-md-6 col-xl-4 mb-3">
-//                 <div class="card h-100 border-top border-4 border-success shadow-sm">
-//                     <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 pt-3 pb-0">
-//                         <h5 class="mb-0 text-success fw-bold">HR #${ruta.Id}</h5>
-//                         <span class="badge ${estadoBadgeClass}">${ruta.Estado || 'Pendiente'}</span>
-//                     </div>
-//                     <div class="card-body">
-//                         <div class="mb-2 text-muted small">
-//                             <span class="material-symbols-outlined align-middle" style="font-size: 16px;">local_shipping</span>
-//                             <span class="ms-1 fw-medium">Vehículo:</span> <span class="text-dark">${ruta.Vehiculo || 'Sin Asignar'}</span>
-//                         </div>
-//                         <div class="mb-3 text-muted small">
-//                             <span class="material-symbols-outlined align-middle" style="font-size: 16px;">route</span>
-//                             <span class="ms-1 fw-medium">Distancia Total:</span> <span class="text-dark">${ruta.Distancia_Total_Estimada_Km || 0} Km</span>
-//                         </div>
-//                         ${botonHTML}
-//                     </div>
-//                 </div>
-//             </div>`;
-//         $contenedor.append(tarjetaHTML);
-//     });
-// }
 
 function ObtenerClaseColorEstado(estadoNombre) {
     if (!estadoNombre) return "bg-secondary";
@@ -278,7 +257,7 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
         localStorage.setItem(`odometro_inicio_${idHojaRuta}`, kilometrajeInicial); // NUEVO
 
         // 4. Tu lógica original para iniciar la Hoja de Ruta
-        const dtoHoja = { IdUsuario: idUsuarioReal }; // idUsuarioReal viene de tu variable global
+        const dtoHoja = { IdUsuario: choferIdUsuario }; // idUsuarioReal viene de tu variable global
         await $.ajax({
             type: "PATCH",
             url: `${URL_API_HOJAS_RUTA}/${idHojaRuta}/iniciar`,

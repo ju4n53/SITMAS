@@ -25,7 +25,7 @@
         <div class="info-right d-flex align-items-center gap-3">
             <div class="text-end d-flex flex-column">
                 <span>Hola, <span class="data" id="header-user">---</span></span>
-                <span>Eres: <span class="data" id="header-role">---</span></span>
+                <span class="d-none">Eres: <span class="data" id="header-role">---</span></span>
 
                 <a href="#" type="button" class="btn btn-danger btn-sm" onclick="cerrarSesion(event)">
                     Cerrar Sesión
@@ -152,7 +152,7 @@
                         </div>
                     </div>
                 </div>
-
+                <br>
                 <!-- PANEL CHOFER: Rutas del día (Oculto por defecto) -->
                 <div class="row g-4 d-none" id="contenedor-rutas">
                     <!-- El JS del chofer inyectará las tarjetas o el mapa aquí -->
@@ -160,41 +160,6 @@
             </main>
 
 
-            <!-- <main class="container-fluid p-4">
-                <div class="row g-4">
-
-                    <div class="col-12">
-                        <div class="sitmas-card">
-                            <h2 class="mb-3 text-success">📦 Stock de Materiales Disponibles en Planta</h2>
-                            <p class="text-muted small">Kilogramos netos listos para su procesamiento o egreso,
-                                calculados post-clasificación (Peso Útil).</p>
-                            <div style="position: relative; height: 350px; width: 100%;">
-                                <canvas id="chartStockActual"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2 class="mb-3">Volumen de Ingresos (Peso Bruto)</h2>
-                            <div style="position: relative; height: 320px; width: 100%;">
-                                <canvas id="chartPesoBruto"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2 class="mb-3">Eficiencia de Clasificación (Bruto vs Útil)</h2>
-                            <div style="position: relative; height: 320px; width: 100%;">
-                                <canvas id="chartRendimiento"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-            </main> -->
         </div>
     </div>
 
@@ -221,21 +186,26 @@
     <script src="../Js/logout.js"></script>
 
     <!-- ✨ MAGIA DEL RENDERIZADO CONDICIONAL -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const sesionString = localStorage.getItem("usuarioSesion");
-            if (sesionString) {
-                const sesionActual = JSON.parse(sesionString);
+    <!-- <script>
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     const sesionString = localStorage.getItem("usuarioSesion");
+        //     if (sesionString) {
+        //         const sesionActual = JSON.parse(sesionString);
 
-                // Mostramos el contenedor correcto según el rol
-                if (sesionActual.rol === "Operador-Logistica") {
-                    document.getElementById("contenedor-rutas").classList.remove("d-none");
-                } else {
-                    document.getElementById("panel-graficos").classList.remove("d-none");
-                }
-            }
-        });
-    </script>
+        //         // Mostramos el contenedor correcto según el rol
+        //         if (sesionActual.rol === "Operador_Logistica") {
+        //             document.getElementById("contenedor-rutas").classList.remove("d-none");
+        //         } else {
+        //             document.getElementById("panel-graficos").classList.remove("d-none");
+        //         }
+
+        //         if (sesionActual.rol === "Administrador") {
+        //             document.getElementById("contenedor-rutas").classList.remove("d-none");
+        //             document.getElementById("panel-graficos").classList.remove("d-none");
+        //         }
+        //     }
+        // });
+    </script> -->
 </body>
 
 </html>
