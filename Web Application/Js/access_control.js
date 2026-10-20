@@ -49,22 +49,7 @@ if (rutasProtegidas[paginaActual]) {
 // 4. MOTOR DE RENDERIZADO DEL MENÚ LATERAL (DRY Principle)
 document.addEventListener("DOMContentLoaded", () => {
 
-    const sesionString = localStorage.getItem("usuarioSesion");
-        if (sesionString) {
-            const sesionActual = JSON.parse(sesionString);
 
-            // Mostramos el contenedor correcto según el rol
-            if (sesionActual.rol === "Operador_Logistica") {
-                document.getElementById("contenedor-rutas").classList.remove("d-none");
-            } else {
-                document.getElementById("panel-graficos").classList.remove("d-none");
-            }
-
-            if (sesionActual.rol === "Administrador") {
-                document.getElementById("contenedor-rutas").classList.remove("d-none");
-                document.getElementById("panel-graficos").classList.remove("d-none");
-            }
-        }
 
     // Inyección del Token en AJAX (Lo que hicimos en el paso anterior)
     if (sesion && sesion.token) {
@@ -83,11 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const configuracionMenu = [
             { idSidebar: 'sidebar-empleados', idItems: ['pageEmpleado'], roles: ["R_Humanos", "Administrador"] },
 
-            { idSidebar: 'sidebar-logistica', idItems: ['pageVehiculo'], roles: ["Mantenimiento_Vehicular", "Administrador"] },
+            { idSidebar: 'sidebar-logistica', idItems: ['pageRegistrosLog'], roles: ["R_Institucionales"] },
 
-            { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageOdometro', 'pageCombustible'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "R_Institucionales", "Administrador"] },
+            { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageRegistrosLog', 'pageOrigen'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"] },
 
-            { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageSalida', 'pageReportes'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
+            { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageSalida', 'pageReportes', 'pageClasificacion'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
 
             { idSidebar: 'sidebar-configuracion', idItems: ['pageConfigEstructura', 'pageConfigAcceso'], roles: ["Administrador"] }
             // Nota: Agrupé algunos para el ejemplo, debes ajustar los idItems exactos según tu HTML
@@ -112,30 +97,58 @@ document.addEventListener("DOMContentLoaded", () => {
         // 5. MOTOR DE OCULTAMIENTO POR PERMISOS FRONTEND (Feature Toggling)
         // =========================================================================
 
-        // Asumimos que al hacer el login, guardaste la lista de permisos en tu sesión. 
-        // Si lo llamaste de otra forma, ajusta esta variable (ej. sesion.listaPermisos)
-        const permisosUsuario = sesion.permisos || [];
+        aplicarSeguridadDOM();
 
-        // El "barrendero" busca en TODA la página cualquier elemento que tenga nuestro atributo mágico
-        const elementosProtegidos = document.querySelectorAll('[data-permiso-requerido]');
+        // // Asumimos que al hacer el login, guardaste la lista de permisos en tu sesión. 
+        // // Si lo llamaste de otra forma, ajusta esta variable (ej. sesion.listaPermisos)
+        // const permisosUsuario = sesion.permisos || [];
 
-        elementosProtegidos.forEach(elemento => {
-            // Leemos qué permiso pide esta vitrina y lo separamos por comas (por si pide más de uno)
-            const stringPermisos = elemento.getAttribute('data-permiso-requerido');
-            const permisosNecesarios = stringPermisos.split(',');
+        // // El "barrendero" busca en TODA la página cualquier elemento que tenga nuestro atributo mágico
+        // const elementosProtegidos = document.querySelectorAll('[data-permiso-requerido]');
 
-            // Verificamos si el usuario tiene AL MENOS UNO (.some) de los permisos requeridos
-            const tienePermiso = permisosNecesarios.some(permisoRequerido => {
-                return permisosUsuario.includes(permisoRequerido.trim()); // .trim() limpia espacios extra
-            });
+        // elementosProtegidos.forEach(elemento => {
+        //     // Leemos qué permiso pide esta vitrina y lo separamos por comas (por si pide más de uno)
+        //     const stringPermisos = elemento.getAttribute('data-permiso-requerido');
+        //     const permisosNecesarios = stringPermisos.split(',');
 
-            // Si no tiene el permiso... ¡Magia! Arrancamos el elemento de raíz.
-            if (!tienePermiso) {
-                elemento.remove(); // Usamos .remove() en vez de .hide() para que sea imposible inspeccionar el código
-            }
-        });
+        //     // Verificamos si el usuario tiene AL MENOS UNO (.some) de los permisos requeridos
+        //     const tienePermiso = permisosNecesarios.some(permisoRequerido => {
+        //         return permisosUsuario.includes(permisoRequerido.trim()); // .trim() limpia espacios extra
+        //     });
+
+        //     // Si no tiene el permiso... ¡Magia! Arrancamos el elemento de raíz.
+        //     if (!tienePermiso) {
+        //         elemento.remove(); // Usamos .remove() en vez de .hide() para que sea imposible inspeccionar el código
+        //     }
+        // });
 
     }
+
 });
 
+// =========================================================================
+// NUEVA FUNCIÓN GLOBAL: El "Walkie-Talkie" del Guardián
+// =========================================================================
+window.aplicarSeguridadDOM = function () {
+    // Volvemos a leer la sesión por si acaso
+    const sesionActual = JSON.parse(localStorage.getItem('usuarioSesion'));
+    if (!sesionActual) return;
 
+    const permisosUsuario = sesionActual.permisos || [];
+
+    // El "barrendero" busca en TODO el DOM actual
+    const elementosProtegidos = document.querySelectorAll('[data-permiso-requerido]');
+
+    elementosProtegidos.forEach(elemento => {
+        const stringPermisos = elemento.getAttribute('data-permiso-requerido');
+        const permisosNecesarios = stringPermisos.split(',');
+
+        const tienePermiso = permisosNecesarios.some(permisoRequerido => {
+            return permisosUsuario.includes(permisoRequerido.trim());
+        });
+
+        if (!tienePermiso) {
+            elemento.remove(); // Desaparece sin dejar rastro
+        }
+    });
+};
