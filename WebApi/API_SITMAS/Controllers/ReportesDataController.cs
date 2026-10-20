@@ -106,5 +106,27 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
+
+
+        [HttpGet]
+        [Route("EstadisticasVehiculos")]
+        public IHttpActionResult GetEstadisticasVehiculos(
+          [FromUri] DateTime? fechaDesde = null,
+          [FromUri] DateTime? fechaHasta = null,
+          [FromUri] string patente = null)
+        {
+            try
+            {
+                // El controlador solo llama al método del objeto pasándole los parámetros
+                var resultado = ReporteEstadisticasVehiculo.ObtenerEstadisticas(fechaDesde, fechaHasta, patente);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
     }
 }

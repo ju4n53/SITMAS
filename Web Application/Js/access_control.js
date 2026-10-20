@@ -27,6 +27,8 @@ const rutasProtegidas = {
 
     "HojaRuta.html": ["Coordinador", "Supervisor_Logistica", "Administrador"],
 
+    "reportes_logistica.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"],
+
     "odometro.html": ["Coordinador", "Supervisor_Logistica", "R_Institucionales", "Administrador"],
 
     "consumoCombustible.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"],
@@ -70,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             { idSidebar: 'sidebar-logistica', idItems: ['pageRegistrosLog'], roles: ["R_Institucionales"] },
 
-            { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageRegistrosLog', 'pageOrigen'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"] },
+            { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageRegistrosLog', 'pageReportesLog'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"] },
 
             { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageSalida', 'pageReportes', 'pageClasificacion'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
 

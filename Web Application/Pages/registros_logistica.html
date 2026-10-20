@@ -58,8 +58,8 @@
                             Ruta</a>
                         <a class="nav-link small ps-4 d-none" id="pageRegistrosLog"
                             href="../Pages/registros_logistica.html">Registros</a>
-                        <a class="nav-link small ps-4 d-none" id="pageOrigen"
-                            href="../Pages/traz_empresa.html">Empresas</a>
+                        <a class="nav-link small ps-4 d-none" id="pageReportesLog"
+                            href="../Pages/reportes_logistica.html">Reportes</a>
                     </div>
                 </li>
 
@@ -160,39 +160,30 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="../Js/alerts_config.js"></script>
     <script src="../Js/odometro_logica.js"></script>
+    <script src="../Js/consumoCombustible_logica.js"></script>
     <script src="../Js/logout.js"></script>
 
     <script>
         $(document).ready(function () {
-            // 1. EL ESTRENO: Cuando la página carga por primera vez, 
-            // llamamos al módulo de Odómetro por defecto para que no se vea vacío.
+            // Estreno: Cargamos Odómetro por defecto
             OdometroModulo.cargarEn("contenedor-dinamico-logistica");
 
-            // 2. ESCUCHAMOS LA PESTAÑA ODÓMETRO
+            // Pestaña Odómetro
             $('#tab-odometro').on('click', function (e) {
                 e.preventDefault();
-
-                // Cambiamos el diseño visual de las pestañas
                 $('.nav-link').removeClass('active');
                 $(this).addClass('active');
 
-                // ¡Acción! Cargamos el módulo en el contenedor
                 OdometroModulo.cargarEn("contenedor-dinamico-logistica");
             });
 
-            // 3. ESCUCHAMOS LA PESTAÑA COMBUSTIBLE
+            // Pestaña Combustible
             $('#tab-combustible').on('click', function (e) {
                 e.preventDefault();
-
-                // Cambiamos el diseño visual de las pestañas
                 $('.nav-link').removeClass('active');
                 $(this).addClass('active');
 
-                // Aquí limpiamos el contenedor temporalmente hasta que tengan el CombustibleModulo listo
-                $('#contenedor-dinamico-logistica').html('<div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando Módulo de Combustible...</p></div>');
-
-                // Cuando armen su otro módulo, lo llamarán así:
-                // CombustibleModulo.cargarEn("contenedor-dinamico-logistica");
+                CombustibleModulo.cargarEn("contenedor-dinamico-logistica");
             });
         });
     </script>

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
-using System.Configuration;
 
 namespace API_SITMAS.Models
 {
@@ -99,4 +100,47 @@ namespace API_SITMAS.Models
             }
         }
     }
+
+
+    public class ReporteEstadisticasVehiculo
+    {
+        private static string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
+
+        // Propiedades idénticas a las columnas devueltas por el SP
+        public int IdVehiculo { get; set; }
+        public string Patente { get; set; }
+        public decimal Total_Distancia { get; set; }
+        public decimal Total_Costo_Combustible { get; set; }
+        public int Total_HojasRuta { get; set; }
+
+        public static List<ReporteEstadisticasVehiculo> ObtenerEstadisticas(DateTime? fechaDesde, DateTime? fechaHasta, string patente)
+        {
+            string sqlSentencia = "sp_ReporteEstadisticas_Log";
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+
+                    // Asignamos parámetros manejando nulos correctamente
+                    sqlCom.Parameters.AddWithValue("@FechaDesde", (object)fechaDesde ?? DBNull.Value);
+                    sqlCom.Parameters.AddWithValue("@FechaHasta", (object)fechaHasta ?? DBNull.Value);
+                    sqlCom.Parameters.AddWithValue("@Patente", (object)patente ?? DBNull.Value);
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(sqlCom))
+                    {
+                        DataTable dt = new DataTable();
+                        sqlCnn.Open();
+                        da.Fill(dt);
+
+                        string json = JsonConvert.SerializeObject(dt);
+                        return JsonConvert.DeserializeObject<List<ReporteEstadisticasVehiculo>>(json);
+                    }
+                }
+            }
+        }
+    }
+
+
+
 }

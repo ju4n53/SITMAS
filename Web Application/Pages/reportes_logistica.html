@@ -58,8 +58,8 @@
                             Ruta</a>
                         <a class="nav-link small ps-4 d-none" id="pageRegistrosLog"
                             href="../Pages/registros_logistica.html">Registros</a>
-                        <a class="nav-link small ps-4 d-none" id="pageOrigen"
-                            href="../Pages/traz_empresa.html">Empresas</a>
+                            <a class="nav-link small ps-4 d-none" id="pageReportesLog"
+                                href="../Pages/reportes_logistica.html">Reportes</a>
                     </div>
                 </li>
 
@@ -115,17 +115,37 @@
 
             <main class="container-fluid p-4">
 
-                <!-- Contenedor dinámico de alertas/mensajes de feedback -->
-                <div id="alertContainer"></div>
+                <!-- GRÁFICO 1: KILÓMETROS RECORRIDOS Y HOJAS DE RUTA POR PATENTE -->
+                <div class="col-12 col-xl-6">
+                    <div class="sitmas-card h-100">
+                        <h2 class="mb-3">Uso de Vehículos (Kms y Hojas de Ruta)</h2>
+                        <p class="text-muted small">Comparativa de distancia recorrida y gestión operativa por
+                            unidad.</p>
+                        <div style="position: relative; height: 320px; width: 100%;">
+                            <canvas id="chartUsoVehiculos"></canvas>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="row g-4">
-
-
+                <!-- GRÁFICO 2: COSTO DE COMBUSTIBLE POR PATENTE -->
+                <div class="col-12 col-xl-6">
+                    <div class="sitmas-card h-100">
+                        <h2 class="mb-3">Consumo de Combustible ($) por Vehículo</h2>
+                        <p class="text-muted small">Gasto monetario histórico acumulado según el rango de fechas
+                            seleccionado.</p>
+                        <div style="position: relative; height: 320px; width: 100%;">
+                            <canvas id="chartConsumoCombustible"></canvas>
+                        </div>
+                    </div>
                 </div>
 
 
-            </main>
+
         </div>
+
+
+        </main>
+    </div>
     </div>
 
     <footer class="footer-liston">
@@ -140,6 +160,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="../Js/alerts_config.js"></script>
+    <script src="../Js/reportes_combustible.js"></script>
     <script src="../Js/logout.js"></script>
 
 </body>
