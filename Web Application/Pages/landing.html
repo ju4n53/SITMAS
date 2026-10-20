@@ -190,6 +190,9 @@
                 } else {
                     document.getElementById("panel-graficos").classList.remove("d-none");
                 }
+                if (sesionActual.rol === "R_Institucionales") {
+                    document.getElementById("panel-graficos").classList.remove("d-none");
+                }
 
                 if (sesionActual.rol === "Administrador") {
                     document.getElementById("contenedor-rutas").classList.remove("d-none");

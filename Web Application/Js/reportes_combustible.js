@@ -115,40 +115,40 @@ function renderizarGraficoUso(data) {
     });
 }
 
-// // 2. GRÁFICO DE BARRAS: Costo de Combustible por Patente
-// function renderizarGraficoCombustible(data) {
-//     const etiquetas = data.map(item => item.Patente);
-//     const costos = data.map(item => item.Total_Costo_Combustible);
+// 2. GRÁFICO DE BARRAS: Costo de Combustible por Patente
+function renderizarGraficoCombustible(data) {
+    const etiquetas = data.map(item => item.Patente);
+    const costos = data.map(item => item.Total_Costo_Combustible);
 
-//     const ctx = document.getElementById('chartConsumoCombustible');
-//     if (!ctx) return;
+    const ctx = document.getElementById('chartConsumoCombustible');
+    if (!ctx) return;
 
-//     let chartStatus = Chart.getChart("chartConsumoCombustible");
-//     if (chartStatus !== undefined) {
-//         chartStatus.destroy();
-//     }
+    let chartStatus = Chart.getChart("chartConsumoCombustible");
+    if (chartStatus !== undefined) {
+        chartStatus.destroy();
+    }
 
-//     new Chart(ctx, {
-//         type: 'bar',
-//         data: {
-//             labels: etiquetas,
-//             datasets: [{
-//                 label: 'Costo Total Combustible (\$)',
-//                 data: costos,
-//                 backgroundColor: '#ff9f1c', // Naranja institucional
-//                 borderRadius: 4
-//             }]
-//         },
-//         options: {
-//             responsive: true,
-//             maintainAspectRatio: false,
-//             scales: {
-//                 y: {
-//                     beginAtZero: true,
-//                     title: { display: true, text: 'Costo Total (\$)' }
-//                 }
-//             }
-//         }
-//     });
-// }
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: etiquetas,
+            datasets: [{
+                label: 'Costo Total Combustible (\$)',
+                data: costos,
+                backgroundColor: '#ff9f1c', // Naranja institucional
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Costo Total (\$)' }
+                }
+            }
+        }
+    });
+}
 

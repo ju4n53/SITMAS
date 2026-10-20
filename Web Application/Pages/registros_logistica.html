@@ -132,11 +132,13 @@
                                     <a class="nav-link" id="tab-combustible" href="#"
                                         style="cursor: pointer;">Combustible</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-empresas" href="#" style="cursor: pointer;">Empresas</a>
+                                </li>
                             </ul>
 
-                            <!-- El "Escenario" o contenedor padre estático (El guardia de seguridad) -->
                             <div id="contenedor-dinamico-logistica">
-                                <!-- Aquí JavaScript inyectará el HTML del Odómetro o del Combustible -->
+                                <!-- Aquí JavaScript inyectará el HTML del Odómetro o del Combustible o empresas-->
                             </div>
                         </div>
                     </div>
@@ -158,9 +160,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- 🗺️ GOOGLE MAPS API (Con librería de Geocodificación) -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe7Wm5puoI09mbnI6gBOrheoV0yeJVHds&libraries=places"></script>
     <script src="../Js/alerts_config.js"></script>
     <script src="../Js/odometro_logica.js"></script>
     <script src="../Js/consumoCombustible_logica.js"></script>
+    <script src="../Js/traz_origen_logica.js"></script>
     <script src="../Js/logout.js"></script>
 
     <script>
@@ -184,6 +190,15 @@
                 $(this).addClass('active');
 
                 CombustibleModulo.cargarEn("contenedor-dinamico-logistica");
+            });
+
+            // Pestaña Empresas
+            $('#tab-empresas').on('click', function (e) {
+                e.preventDefault();
+                $('.nav-link').removeClass('active');
+                $(this).addClass('active');
+
+                EmpresasModulo.cargarEn("contenedor-dinamico-logistica");
             });
         });
     </script>
