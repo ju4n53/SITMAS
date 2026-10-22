@@ -224,5 +224,42 @@ namespace API_SITMAS.Models
             }
         }
 
+        public List<HojaRuta> SelectPorRangoFechas(DateTime fechaDesde, DateTime fechaHasta)
+        {
+            var lista = new List<HojaRuta>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            using (SqlCommand sqlCom = new SqlCommand("sp_ListarHDR_PorRangoFechas", sqlCnn))
+            {
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                // Pasamos los parámetros de fecha al SP
+                sqlCom.Parameters.AddWithValue("@FechaDesde", fechaDesde.Date);
+                sqlCom.Parameters.AddWithValue("@FechaHasta", fechaHasta.Date);
+
+                sqlCnn.Open();
+
+                using (SqlDataReader reader = sqlCom.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new HojaRuta
+                        {
+                            Id = Convert.ToInt32(reader["Numero_HojaRuta"]),
+                            HojaRutaFecha = Convert.ToDateTime(reader["HojaRutaFecha"]),
+                            Id_Vehiculo = reader["Id_Vehiculo"] != DBNull.Value ? Convert.ToInt32(reader["Id_Vehiculo"]) : 0,
+                            Vehiculo = reader["Patente"] != DBNull.Value ? reader["Patente"].ToString() : "Sin Vehículo",
+                            Id_Chofer = reader["Id_Chofer"] != DBNull.Value ? Convert.ToInt32(reader["Id_Chofer"]) : (int?)null,
+                            ChoferNombreCompleto = reader["Nombre_Chofer"] != DBNull.Value ? reader["Nombre_Chofer"].ToString() : "Sin Chofer",
+                            Id_Estado = reader["Id_Estado"] != DBNull.Value ? Convert.ToInt32(reader["Id_Estado"]) : (int?)null,
+                            Estado = reader["Estado_Descripcion"] != DBNull.Value ? reader["Estado_Descripcion"].ToString() : "Pendiente",
+                            Distancia_Total_Estimada_Km = reader["Distancia_Total_Estimada_Km"] != DBNull.Value ? Convert.ToDecimal(reader["Distancia_Total_Estimada_Km"]) : 0m
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
     }
 }

@@ -30,6 +30,7 @@ namespace API_SITMAS.Models
         public string UsuarioRegistro { get; set; }
         public string Camionero { get; set; }
         public string Vehiculo { get; set; }
+        public int? Id_HojaRuta { get; set; }
 
 
         #endregion
@@ -83,6 +84,7 @@ namespace API_SITMAS.Models
                 sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
                 sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
                 sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
+                sqlCom.Parameters.Add("@Id_HojaRuta", SqlDbType.Int).Value = Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value;
 
                 sqlCnn.Open();
                 // ExecuteScalar ejecuta el SP y captura el SELECT SCOPE_IDENTITY()
@@ -111,6 +113,8 @@ namespace API_SITMAS.Models
                 sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
                 sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
                 sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
+                sqlCom.Parameters.Add("@Id_HojaRuta", SqlDbType.Int).Value = Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value;
+
 
                 sqlCnn.Open();
                 sqlCom.ExecuteNonQuery();

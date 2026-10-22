@@ -18,6 +18,10 @@ $(document).ready(function () {
     // Ejecutamos la carga del usuario logueado en todas las solapas correspondientes
     EstablecerUsuarioLogueado();
 
+
+
+
+
     // Escuchamos el submit del formulario exclusivo de la Pestaña 1
     $("#form-ingreso-cabecera").on("submit", function (e) {
         e.preventDefault();
@@ -35,6 +39,12 @@ $(document).ready(function () {
         e.preventDefault();
         RegistrarClasificacionMaterial();
     });
+
+
+
+
+
+
 
     // Origen
     InicializarBuscadorEfectivo(
@@ -102,6 +112,16 @@ function InicializarBuscadorEfectivo(idInput, idLista, idHidden, urlApi, propId,
     });
 }
 
+
+
+
+
+
+
+
+
+
+
 /// --- FUNCIÓN AUXILIAR: CARGAR AUDITORÍA DE USUARIO EN PANTALLA ---
 function EstablecerUsuarioLogueado() {
     const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
@@ -119,6 +139,12 @@ function EstablecerUsuarioLogueado() {
     $("#form-ingreso-cabecera #input-usuario").val(nombreUsuario); // Input de Pestaña 1
     $("#input-usuario-clasif").val(nombreUsuario);                // Input Nuevo de Pestaña 3
 }
+
+
+
+
+
+
 
 function ComboOrigen() {
     $.ajax({
@@ -192,6 +218,21 @@ function ComboDestino() {
     });
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // --- 1. FUNCIÓN: REGISTRAR INGRESO (Pestaña 1 - CORREGIDA) ---
 function RegistrarIngreso() {
     const sesion = JSON.parse(localStorage.getItem('usuarioSesion'));
@@ -237,6 +278,24 @@ function CargarSelectReferenciaIngreso(idIngreso) {
     selectClasif.empty();
     selectClasif.append(`<option value="${idIngreso}" selected>Ingreso Actual Múltiple (#${idIngreso})</option>`);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --- 2. FUNCIÓN: REGISTRAR DETALLE DE MATERIAL (Pestaña 2 - CORREGIDA) ---
 function RegistrarDetalleMaterial() {
@@ -293,6 +352,25 @@ function RegistrarDetalleMaterial() {
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --- 3.1 NUEVA FUNCIÓN CONECTORA: ALIMENTAR PESTAÑA 3 DESDE TU ENDPOINT POR CABECERA ---
 function CargarMaterialesPendientesClasificar(idCabecera) {
@@ -402,6 +480,21 @@ function RegistrarClasificacionMaterial() {
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --- 4. FUNCIÓN: LISTAR VISTA HISTÓRICA (Pestaña 4 - Informes) ---
 // --- 4. FUNCIÓN: LISTAR VISTA DE TRAZABILIDAD COMPLETA (Pestaña 4 - Informes) ---

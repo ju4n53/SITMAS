@@ -13,28 +13,37 @@ namespace API_SITMAS.Models
     public class Detalle_Ingreso
     {
 
-
-        #region Atributos
+        #region Propìedades
 
         private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
-
-        #endregion
-
-        #region Propìedades
-
+        #region Propiedades
         public int IdDetalleIngreso { get; set; }
         public int Id_Ingreso_Material { get; set; }
-        public int Id_SubTipo_Material { get; set; }
+        public int Id_Tipo_Material { get; set; } // 👈 Ahora apunta a TipoMaterial
         public decimal PesoBruto { get; set; }
         public string Observaciones { get; set; }
         public string EstadoDtIng { get; set; }
         public int Id_Origen { get; set; }
-        public string Origen { get; set; }
+        public int? Id_Detalle_HDR { get; set; } // 👈 El puente a la tarea de la Hoja de Ruta
 
-        // Propiedades auxiliares de la vista legible
+        // Propiedad auxiliar de la vista
         public string Tipo { get; set; }
-        public string Subtipo { get; set; }
+        #endregion
+
+        //public int IdDetalleIngreso { get; set; }
+        //public int Id_Ingreso_Material { get; set; }
+        //public int Id_SubTipo_Material { get; set; }
+        //public decimal PesoBruto { get; set; }
+        //public string Observaciones { get; set; }
+        //public string EstadoDtIng { get; set; }
+        //public int Id_Origen { get; set; }
+        //public string Origen { get; set; }
+
+        //// Propiedades auxiliares de la vista legible
+        //public string Tipo { get; set; }
+        //public string Subtipo { get; set; }
+        //public int? Id_Detalle_HDR { get; set; }
 
 
 
@@ -73,11 +82,10 @@ namespace API_SITMAS.Models
 
         }
 
-        
+
 
         public void Insertar()
         {
-
             string sqlSentencia = "sp_InsertarDetalle_Ingreso";
             using (SqlConnection sqlCnn = new SqlConnection(conectionString))
             {
@@ -85,22 +93,45 @@ namespace API_SITMAS.Models
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
                 sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value = Id_Ingreso_Material;
-                sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
+                sqlCom.Parameters.Add("@IdTipoMaterial", SqlDbType.Int).Value = Id_Tipo_Material;
                 sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
                 sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
                 sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
+                sqlCom.Parameters.Add("@Id_Detalle_HDR", SqlDbType.Int).Value = Id_Detalle_HDR.HasValue ? (object)Id_Detalle_HDR.Value : DBNull.Value;
 
                 sqlCnn.Open();
                 sqlCom.ExecuteNonQuery();
             }
-
-
         }
+
+        //public void Insertar()
+        //{
+
+        //    string sqlSentencia = "sp_InsertarDetalle_Ingreso";
+        //    using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+        //    {
+        //        SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+        //        sqlCom.CommandType = CommandType.StoredProcedure;
+
+        //        sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value = Id_Ingreso_Material;
+        //        sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
+        //        sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
+        //        sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
+        //        sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
+        //        sqlCom.Parameters.Add("@Id_Detalle_HDR", SqlDbType.Int).Value = Id_Detalle_HDR.HasValue ? (object)Id_Detalle_HDR.Value : DBNull.Value;
+
+
+        //        sqlCnn.Open();
+        //        sqlCom.ExecuteNonQuery();
+        //    }
+
+
+        //}
+
 
 
         public void Modificar()
         {
-
             string sqlSentencia = "sp_ActualizarDetalle_Ingreso";
             using (SqlConnection sqlCnn = new SqlConnection(conectionString))
             {
@@ -108,17 +139,40 @@ namespace API_SITMAS.Models
                 sqlCom.CommandType = CommandType.StoredProcedure;
 
                 sqlCom.Parameters.Add("@IdDetalleIngreso", SqlDbType.Int).Value = IdDetalleIngreso;
-                sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
+                sqlCom.Parameters.Add("@IdTipoMaterial", SqlDbType.Int).Value = Id_Tipo_Material;
                 sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
                 sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
                 sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
+                sqlCom.Parameters.Add("@Id_Detalle_HDR", SqlDbType.Int).Value = Id_Detalle_HDR.HasValue ? (object)Id_Detalle_HDR.Value : DBNull.Value;
 
                 sqlCnn.Open();
                 sqlCom.ExecuteNonQuery();
             }
-
-
         }
+
+        //public void Modificar()
+        //{
+
+        //    string sqlSentencia = "sp_ActualizarDetalle_Ingreso";
+        //    using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+        //    {
+        //        SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+        //        sqlCom.CommandType = CommandType.StoredProcedure;
+
+        //        sqlCom.Parameters.Add("@IdDetalleIngreso", SqlDbType.Int).Value = IdDetalleIngreso;
+        //        sqlCom.Parameters.Add("@IdSubTipoMaterial", SqlDbType.Int).Value = Id_SubTipo_Material;
+        //        sqlCom.Parameters.Add("@PesoBruto", SqlDbType.Decimal).Value = PesoBruto;
+        //        sqlCom.Parameters.Add("@Observaciones", SqlDbType.VarChar, 100).Value = (object)Observaciones ?? DBNull.Value;
+        //        sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
+        //        sqlCom.Parameters.Add("@Id_Detalle_HDR", SqlDbType.Int).Value = Id_Detalle_HDR.HasValue ? (object)Id_Detalle_HDR.Value : DBNull.Value;
+
+
+        //        sqlCnn.Open();
+        //        sqlCom.ExecuteNonQuery();
+        //    }
+
+
+        //}
 
 
         public void Borrar()

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITMAS - Panel Principal</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../newstyles.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../Js/access_control.js"></script>
+</head>
+
+<body class="min-vh-100 d-flex flex-column">
+
+    <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
+        <div>
+            <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
+        </div>
+
+        <div class="info-right d-flex align-items-center gap-3">
+            <div class="text-end d-flex flex-column"> <span>Hola, <span class="data" id="header-user">---</span></span>
+                <span>Eres: <span class="data" id="header-role">---</span></span>
+
+                <a href="#" type="button" class="btn btn-danger btn-sm" onclick="cerrarSesion(event)">
+                    Cerrar Sesión
+                </a>
+            </div>
+
+            <div class="role-icon"></div>
+        </div>
+    </header>
+
+    <!-- Se añade el contenedor general flex de Bootstrap para asegurar la alineación horizontal fija -->
+    <div class="main-layout flex-grow-1">
+
+        <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+            <ul class="nav flex-column nav-list pt-3">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
+                        <span class="material-symbols-outlined">home</span>
+                        <span class="menu-text">INICIO</span>
+                    </a>
+                </li>
+
+
+                <li class="nav-item dropdown d-none" id="sidebar-logistica">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gl">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        <span class="menu-text">LOGÍSTICA</span>
+                    </a>
+                    <div id="gl" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageHojasRuta" href="../Pages/HojaRuta.html">Hojas de
+                            Ruta</a>
+                        <a class="nav-link small ps-4 d-none" id="pageRegistrosLog"
+                            href="../Pages/registros_logistica.html">Registros</a>
+                        <a class="nav-link small ps-4 d-none" id="pageReportesLog"
+                            href="../Pages/reportes_logistica.html">Reportes</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown d-none" id="sidebar-trazabilidad">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gt">
+                        <span class="material-symbols-outlined">sync</span>
+                        <span class="menu-text">TRAZABILIDAD</span>
+                    </a>
+                    <div id="gt" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageClasificacion"
+                            href="../Pages/gestion_trazabilidad.html">Gestion</a>
+                        <!-- <a class="nav-link small ps-4 d-none" id="pageSalida"
+                            href="../Pages/SalidasYStock.html">Salida</a> -->
+                        <a class="nav-link small ps-4 d-none" id="pageReportes"
+                            href="../Pages/reportes_trazabilidad.html">Reportes</a>
+                    </div>
+                </li>
+
+                <li class="nav-item d-none" id="sidebar-empleados">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gp">
+                        <span class="material-symbols-outlined">group</span>
+                        <span class="menu-text">PERSONAL</span>
+                    </a>
+                    <div id="gp" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageEmpleado"
+                            href="../Pages/empleado.html">Empleados</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown d-none" id="sidebar-configuracion">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gc">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span class="menu-text">CONFIGURACIÓN</span>
+                    </a>
+                    <div id="gc" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageConfigEstructura"
+                            href="../Pages/config_estructura.html">General</a>
+                        <a class="nav-link small ps-4 d-none" id="pageConfigAcceso"
+                            href="../Pages/config_acceso.html">Accesos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageVehiculo"
+                            href="../Pages/log_vehiculo.html">Vehículos</a>
+                        <a class="nav-link small ps-4 d-none" id="pageIngresoMaterial"
+                            href="../Pages/traz_material.html">Materiales</a>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+
+
+
+        <main class="container-fluid p-4">
+           <!-- <div id="alertContainer"></div> -->
+
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="sitmas-card">
+                        <ul class="nav nav-tabs border-0" id="trazabilidadTabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="tab-ingreso" href="#"
+                                    style="cursor: pointer;">Ingreso</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-secondary" id="tab-detalle" href="#"
+                                    style="cursor: pointer;">Detalle</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-secondary" id="tab-clasificacion" href="#"
+                                    style="cursor: pointer;">Clasificación</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-secondary" id="tab-salida" href="#"
+                                    style="cursor: pointer;">Salida</a>
+                            </li>
+                        </ul>
+
+                        <div id="contenedor-dinamico-trazabilidad" class="tab-content-wrapper flex-grow-1 mt-4"></div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="footer-liston">
+        <div class="logos-container">
+            <img src="../assets/footer-logos.png" alt="Logos Institucionales" class="logo-inst">
+        </div>
+    </footer>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="../Js/alerts_config.js"></script>
+
+<script src="../Js/ingreso_trazabilidad.js"></script>
+<script src="../Js/detalle_trazabilidad.js"></script>
+
+<script src="../Js/logout.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Estreno: Por ahora dejamos el contenedor vacío o con un mensaje de prueba
+        //$('#contenedor-dinamico-trazabilidad').html('<h4 class="text-muted mt-3">Seleccione una opción del menú...</h4>');
+
+        // Controlador central de navegación
+        $('#trazabilidadTabs .nav-link').on('click', function (e) {
+            e.preventDefault();
+
+            // Limpiamos estilos de todas las pestañas
+            $('#trazabilidadTabs .nav-link').removeClass('active').addClass('text-secondary');
+            // Activamos la pestaña seleccionada
+            $(this).removeClass('text-secondary').addClass('active');
+
+            const tabId = $(this).attr('id');
+
+            // Enrutador
+            if (tabId === 'tab-ingreso') {
+                console.log("Preparando módulo de Ingreso...");
+                IngresoModulo.cargarEn("contenedor-dinamico-trazabilidad");
+            } else if (tabId === 'tab-detalle') {
+                console.log("Preparando módulo de Detalle...");
+                DetalleModulo.cargarEn("contenedor-dinamico-trazabilidad");
+            } else if (tabId === 'tab-clasificacion') {
+                console.log("Preparando módulo de Clasificación...");
+                // ClasificacionModulo.cargarEn("contenedor-dinamico-trazabilidad");
+            } else if (tabId === 'tab-salida') {
+                console.log("Preparando módulo de Salida...");
+                // SalidaModulo.cargarEn("contenedor-dinamico-trazabilidad");
+            }
+        });
+
+        $('#tab-ingreso').trigger('click');
+    });
+</script>
+
+
+</html>
