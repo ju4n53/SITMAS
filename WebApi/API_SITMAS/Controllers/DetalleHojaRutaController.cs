@@ -1,8 +1,8 @@
 ﻿using API_SITMAS.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Web.Http;
-using System.Security.Claims;
 
 namespace API_SITMAS.Controllers
 {
@@ -44,6 +44,25 @@ namespace API_SITMAS.Controllers
             catch (Exception ex)
             {
                 return InternalServerError(ex);
+            }
+        }
+
+        // GET: api/detallehojaruta/ParaIngreso/5
+        [HttpGet]
+        [Route("ParaIngreso/{idHojaRuta}")]
+        public IHttpActionResult ParaIngreso(int idHojaRuta)
+        {
+            try
+            {
+                // 🌟 CORRECCIÓN APLICADA: Instanciamos el nombre exacto de tu clase
+                DetalleHojaRuta oDetalleHDR = new DetalleHojaRuta();
+
+                var Lista = oDetalleHDR.SelectParaIngreso(idHojaRuta);
+                return Ok(Lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -127,7 +146,7 @@ namespace API_SITMAS.Controllers
             public int IdEstadoAsignado { get; set; }
         }
 
-        [HttpPatch] // Usamos PATCH porque es una actualización parcial
+        [HttpPatch]
         [Route("{idDetalle:int}/asignar")]
         public IHttpActionResult AsignarParada(int idDetalle, [FromBody] AsignacionDto datosAsignacion)
         {
@@ -153,8 +172,188 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
-
-
     }
 }
+
+
+
+//using API_SITMAS.Models;
+//using System;
+//using System.Collections.Generic;
+//using System.Net;
+//using System.Security.Claims;
+//using System.Web.Http;
+
+//namespace API_SITMAS.Controllers
+//{
+//    [RoutePrefix("api/detallehojaruta")]
+//    //[Authorize(Roles = "Administrador")]
+//    public class DetalleHojaRutaController : ApiController
+//    {
+//        [HttpGet]
+//        [Route("hojaruta/{idHojaRuta:int}")]
+//        public IHttpActionResult ObtenerPorHojaRuta(int idHojaRuta)
+//        {
+//            if (idHojaRuta <= 0)
+//                return BadRequest("El ID de Hoja de Ruta debe ser válido.");
+
+//            try
+//            {
+//                DetalleHojaRuta oDetalle = new DetalleHojaRuta();
+//                List<DetalleHojaRuta> lista = oDetalle.ObtenerPorHojaRuta(idHojaRuta);
+
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return InternalServerError(ex);
+//            }
+//        }
+
+//        [HttpGet]
+//        [Route("pendientes")]
+//        public IHttpActionResult ObtenerPendientes()
+//        {
+//            try
+//            {
+//                DetalleHojaRuta oDetalle = new DetalleHojaRuta();
+//                List<DetalleHojaRuta> lista = oDetalle.ObtenerPendientes();
+
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return InternalServerError(ex);
+//            }
+//        }
+
+//        // GET: api/detallehojaruta/ParaIngreso/5
+//        [HttpGet]
+//        [Route("ParaIngreso/{idHojaRuta}")]
+//        public IHttpActionResult ParaIngreso(int idHojaRuta)
+//        {
+//            try
+//            {
+//                // Instancia de tu modelo (ajusta el nombre si tu clase se llama diferente)
+//                Detalle_Hoja_Ruta oDetalleHDR = new Detalle_Hoja_Ruta();
+
+//                var Lista = oDetalleHDR.SelectParaIngreso(idHojaRuta);
+//                return Ok(Lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        [HttpPost]
+//        [Route("")]
+//        public IHttpActionResult Insertar([FromBody] DetalleHojaRuta value)
+//        {
+//            if (value == null)
+//                return BadRequest("Los datos de la parada no son válidos.");
+
+//            if (!ModelState.IsValid)
+//                return BadRequest(ModelState);
+
+//            try
+//            {
+//                int nuevoId = value.Insertar();
+//                return Created(new Uri(Request.RequestUri + "/" + nuevoId), new { IdDetalleGenerado = nuevoId, Mensaje = "Parada agregada con éxito." });
+//            }
+//            catch (Exception ex)
+//            {
+//                return InternalServerError(ex);
+//            }
+//        }
+
+//        [HttpPut]
+//        [Route("{id:int}")]
+//        public IHttpActionResult Modificar(int id, [FromBody] DetalleHojaRuta value)
+//        {
+//            if (value == null)
+//                return BadRequest("Los datos enviados no son válidos.");
+
+//            if (id <= 0)
+//                return BadRequest("El ID del detalle debe ser un entero positivo.");
+
+//            if (!ModelState.IsValid)
+//                return BadRequest(ModelState);
+
+//            try
+//            {
+//                value.Id_Detalle_HDR = id;
+//                bool actualizado = value.Modificar();
+
+//                if (!actualizado)
+//                    return NotFound();
+
+//                return Ok(new { Mensaje = "Parada actualizada correctamente." });
+//            }
+//            catch (Exception ex)
+//            {
+//                return InternalServerError(ex);
+//            }
+//        }
+
+//        [HttpDelete]
+//        [Route("{id:int}")]
+//        public IHttpActionResult Borrar(int id)
+//        {
+//            if (id <= 0)
+//                return BadRequest("El ID a eliminar no es válido.");
+
+//            try
+//            {
+//                DetalleHojaRuta oDetalle = new DetalleHojaRuta { Id_Detalle_HDR = id };
+//                bool eliminado = oDetalle.Borrar();
+
+//                if (!eliminado)
+//                    return NotFound();
+
+//                return Ok(new { Mensaje = "Parada eliminada correctamente." });
+//            }
+//            catch (Exception ex)
+//            {
+//                return InternalServerError(ex);
+//            }
+//        }
+
+//        public class AsignacionDto
+//        {
+//            public int IdHojaRuta { get; set; }
+//            public decimal DistanciaTramo { get; set; }
+//            public int IdEstadoAsignado { get; set; }
+//        }
+
+//        [HttpPatch] // Usamos PATCH porque es una actualización parcial
+//        [Route("{idDetalle:int}/asignar")]
+//        public IHttpActionResult AsignarParada(int idDetalle, [FromBody] AsignacionDto datosAsignacion)
+//        {
+//            if (datosAsignacion == null || idDetalle <= 0)
+//                return BadRequest("Datos de asignación inválidos.");
+
+//            try
+//            {
+//                DetalleHojaRuta oDetalle = new DetalleHojaRuta { Id_Detalle_HDR = idDetalle };
+//                bool exito = oDetalle.AsignarAHojaRuta(
+//                    datosAsignacion.IdHojaRuta,
+//                    datosAsignacion.DistanciaTramo,
+//                    datosAsignacion.IdEstadoAsignado
+//                );
+
+//                if (!exito)
+//                    return NotFound();
+
+//                return Ok(new { Mensaje = "Parada asignada y distancias actualizadas correctamente." });
+//            }
+//            catch (Exception ex)
+//            {
+//                return InternalServerError(ex);
+//            }
+//        }
+
+
+//    }
+//}
 

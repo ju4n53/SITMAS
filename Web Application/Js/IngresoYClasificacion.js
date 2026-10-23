@@ -1,7 +1,7 @@
 // Definimos las URLs Base correspondientes a los controladores
 const URL_INGRESO = "https://localhost:44325/api/IngresoMaterial";
 const URL_DETALLE = "https://localhost:44325/api/DetalleIngreso";
-const URL_CLASIFICADO = "https://localhost:44325/api/MaterialClasificado"; // 👈 Nueva URL Base limpia
+const URL_CLASIFICADO = "https://localhost:44325/api/MaterialClasificado"; //
 const URL_REPORTE = "https://localhost:44325/api/ReporteTrazabilidad/Completo";
 
 // Variables globales para el contexto transaccional

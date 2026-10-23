@@ -22,6 +22,7 @@ namespace API_SITMAS.Models
         public string Estado { get; set; }
 
         public decimal Distancia_Total_Estimada_Km { get; set; }
+        public int YaIngresado { get; set; }
 
         public List<HojaRuta> SelectAll()
         {
@@ -253,7 +254,8 @@ namespace API_SITMAS.Models
                             ChoferNombreCompleto = reader["Nombre_Chofer"] != DBNull.Value ? reader["Nombre_Chofer"].ToString() : "Sin Chofer",
                             Id_Estado = reader["Id_Estado"] != DBNull.Value ? Convert.ToInt32(reader["Id_Estado"]) : (int?)null,
                             Estado = reader["Estado_Descripcion"] != DBNull.Value ? reader["Estado_Descripcion"].ToString() : "Pendiente",
-                            Distancia_Total_Estimada_Km = reader["Distancia_Total_Estimada_Km"] != DBNull.Value ? Convert.ToDecimal(reader["Distancia_Total_Estimada_Km"]) : 0m
+                            Distancia_Total_Estimada_Km = reader["Distancia_Total_Estimada_Km"] != DBNull.Value ? Convert.ToDecimal(reader["Distancia_Total_Estimada_Km"]) : 0m,
+                            YaIngresado = reader["YaIngresado"] != DBNull.Value ? Convert.ToInt32(reader["YaIngresado"]) : 0
                         });
                     }
                 }
