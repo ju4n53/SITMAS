@@ -18,6 +18,7 @@ namespace API_SITMAS.Models
 
         // 👈 Cajas flexibles para soportar NULLs de la base de datos
         public int? Id_Tipo_Material { get; set; }
+
         public int? Id_Detalle_HDR { get; set; }
 
         public decimal PesoBruto { get; set; }
@@ -27,6 +28,8 @@ namespace API_SITMAS.Models
 
         // Propiedad auxiliar de la vista
         public string Tipo { get; set; }
+        public string TipoMaterial { get; set; }
+        public string Origen { get; set; }
         #endregion
 
         #region Metodos
@@ -98,6 +101,43 @@ namespace API_SITMAS.Models
 
                         // Propiedad auxiliar
                         obj.Tipo = reader["Tipo"] != DBNull.Value ? reader["Tipo"].ToString() : "No Especificado";
+
+                        lista.Add(obj);
+                    }
+                }
+            }
+            return lista;
+        }
+
+
+        public List<Detalle_Ingreso> SelectPendientesClasificacion(int idIngresoMaterial)
+        {
+            List<Detalle_Ingreso> lista = new List<Detalle_Ingreso>();
+            string sqlSentencia = "sp_ListarDetalleIngreso_PendientesClasificacion";
+
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+                sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value = idIngresoMaterial;
+
+                sqlCnn.Open();
+
+                using (SqlDataReader reader = sqlCom.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Detalle_Ingreso obj = new Detalle_Ingreso();
+                        obj.IdDetalleIngreso = Convert.ToInt32(reader["IdDetalleIngreso"]);
+                        obj.Id_Ingreso_Material = Convert.ToInt32(reader["Id_Ingreso_Material"]);
+                        obj.PesoBruto = Convert.ToDecimal(reader["PesoBruto"]);
+                        obj.Observaciones = reader["Observaciones"] != DBNull.Value ? reader["Observaciones"].ToString() : string.Empty;
+                        obj.EstadoDtIng = reader["EstadoDtIng"].ToString();
+                        obj.Id_Origen = Convert.ToInt32(reader["Id_Origen"]);
+
+                        obj.Id_Tipo_Material = reader["Id_Tipo_Material"] != DBNull.Value ? Convert.ToInt32(reader["Id_Tipo_Material"]) : 0;
+                        obj.TipoMaterial = reader["TipoMaterial"] != DBNull.Value ? reader["TipoMaterial"].ToString() : "Varios";
+                        obj.Origen = reader["Origen"] != DBNull.Value ? reader["Origen"].ToString() : "Sin Origen";
 
                         lista.Add(obj);
                     }

@@ -95,8 +95,28 @@ namespace API_SITMAS.Controllers
                 return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        // GET: api/DetalleIngreso/PendientesClasificacion/5
+        [HttpGet]
+        [Route("PendientesClasificacion/{idIngreso}")]
+        public IHttpActionResult ListarPendientesClasificacion(int idIngreso)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idIngreso);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
+
+
+
 
 
 
