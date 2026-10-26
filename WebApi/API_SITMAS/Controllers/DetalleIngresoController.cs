@@ -17,8 +17,8 @@ namespace API_SITMAS.Controllers
             try
             {
                 Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
-                List<Detalle_Ingreso> Lista = oDetalleIngreso.SelectAll();
-                return Ok(Lista);
+                List<Detalle_Ingreso> lista = oDetalleIngreso.SelectAll();
+                return Ok(lista);
             }
             catch (Exception ex)
             {
@@ -34,8 +34,8 @@ namespace API_SITMAS.Controllers
             try
             {
                 Detalle_Ingreso oDetalle = new Detalle_Ingreso();
-                List<Detalle_Ingreso> Lista = oDetalle.SelectPorCabecera(idCabecera);
-                return Ok(Lista);
+                List<Detalle_Ingreso> lista = oDetalle.SelectPorCabecera(idCabecera);
+                return Ok(lista);
             }
             catch (Exception ex)
             {
@@ -112,6 +112,41 @@ namespace API_SITMAS.Controllers
                 return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        // GET: api/DetalleIngreso/PendientesPesaje?desde=2026-10-01&hasta=2026-10-25
+        [HttpGet]
+        [Route("PendientesPesaje")]
+        public IHttpActionResult GetPendientesPesaje(DateTime? desde = null, DateTime? hasta = null)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<PendientePesaje> lista = oDetalle.SelectPendientesPesaje(desde, hasta);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        // GET: api/DetalleIngreso/RemitoOrigen
+        // GET: api/DetalleIngreso/RemitoOrigen?idIngreso=5
+        [HttpGet]
+        [Route("RemitoOrigen")]
+        public IHttpActionResult GetRemitoOrigen(int? idIngreso = null)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<RemitoOrigenDTO> lista = oDetalle.SelectRemitoOrigen(idIngreso);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
 
@@ -121,58 +156,60 @@ namespace API_SITMAS.Controllers
 
 
 
+
+
+
+
+
 //using API_SITMAS.Models;
-//using Newtonsoft.Json;
 //using System;
 //using System.Collections.Generic;
-//using System.Data;
-//using System.Linq;
 //using System.Net;
-//using System.Net.Http;
 //using System.Web.Http;
+//using static API_SITMAS.Models.Detalle_Ingreso;
 
 //namespace API_SITMAS.Controllers
-
 //{
-//     [RoutePrefix("api/DetalleIngreso")]
+//    [RoutePrefix("api/DetalleIngreso")]
 //    public class DetalleIngresoController : ApiController
 //    {
 //        // GET: api/DetalleIngreso
 //        [HttpGet]
 //        [Route("")]
-//    public List<Detalle_Ingreso> ListarTodo()
+//        public IHttpActionResult ListarTodo()
 //        {
-//            Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
-
-//            DataTable dt = oDetalleIngreso.SelectAll();
-//            var listaJson = JsonConvert.SerializeObject(dt);
-
-//            var Lista = JsonConvert.DeserializeObject<List<Detalle_Ingreso>>(listaJson);
-
-//            return Lista;
-
+//            try
+//            {
+//                Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
+//                List<Detalle_Ingreso> Lista = oDetalleIngreso.SelectAll();
+//                return Ok(Lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
 //        }
 
-
-//        // GET: api/Detalle_Ingreso/PorCabecera/5
-//        // Trae los pesajes legibles asociados a un camión específico
+//        // GET: api/DetalleIngreso/PorCabecera/5
 //        [HttpGet]
 //        [Route("PorCabecera/{idCabecera}")]
-//        public List<Detalle_Ingreso> PorCabecera(int idCabecera)
+//        public IHttpActionResult PorCabecera(int idCabecera)
 //        {
-//            Detalle_Ingreso oDetalle = new Detalle_Ingreso();
-//            DataTable dt = oDetalle.SelectPorCabecera(idCabecera);
-
-//            var listaJson = JsonConvert.SerializeObject(dt);
-//            return JsonConvert.DeserializeObject<List<Detalle_Ingreso>>(listaJson);
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<Detalle_Ingreso> Lista = oDetalle.SelectPorCabecera(idCabecera);
+//                return Ok(Lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
 //        }
-
-
 
 //        // POST: api/DetalleIngreso
 //        [HttpPost]
 //        [Route("")]
-
 //        public IHttpActionResult Insertar([FromBody] Detalle_Ingreso value)
 //        {
 //            if (value == null) return BadRequest("Datos inválidos.");
@@ -183,7 +220,7 @@ namespace API_SITMAS.Controllers
 //            }
 //            catch (Exception ex)
 //            {
-//                return InternalServerError(ex);
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
 //            }
 //        }
 
@@ -201,7 +238,7 @@ namespace API_SITMAS.Controllers
 //            }
 //            catch (Exception ex)
 //            {
-//                return InternalServerError(ex);
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
 //            }
 //        }
 
@@ -219,13 +256,64 @@ namespace API_SITMAS.Controllers
 //            }
 //            catch (Exception ex)
 //            {
-//                return InternalServerError(ex);
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        // GET: api/DetalleIngreso/PendientesClasificacion/5
+//        [HttpGet]
+//        [Route("PendientesClasificacion/{idIngreso}")]
+//        public IHttpActionResult ListarPendientesClasificacion(int idIngreso)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idIngreso);
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
 //            }
 //        }
 
 
 
+//        // GET: api/DetalleIngreso/PendientesPesaje?desde=2026-10-01&hasta=2026-10-25
+//        [HttpGet]
+//        [Route("PendientesPesaje")]
+//        public IHttpActionResult GetPendientesPesaje(DateTime? desde = null, DateTime? hasta = null)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<PendientePesaje> lista = oDetalle.SelectPendientesPesaje(desde, hasta);
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
 
+
+//        // GET: api/DetalleIngreso/RemitoOrigen
+//        // GET: api/DetalleIngreso/RemitoOrigen?idIngreso=5
+//        [HttpGet]
+//        [Route("RemitoOrigen")]
+//        public IHttpActionResult GetRemitoOrigen(int? idIngreso = null)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<RemitoOrigenDTO> lista = oDetalle.SelectRemitoOrigen(idIngreso);
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
 
 //    }
 //}

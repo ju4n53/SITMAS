@@ -482,20 +482,6 @@ function RegistrarClasificacionMaterial() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // --- 4. FUNCIÓN: LISTAR VISTA HISTÓRICA (Pestaña 4 - Informes) ---
 // --- 4. FUNCIÓN: LISTAR VISTA DE TRAZABILIDAD COMPLETA (Pestaña 4 - Informes) ---
 function ListarIngresosHistoricos() {
