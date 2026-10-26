@@ -24,6 +24,30 @@
     --verde-fondo-claro: #f0f7ed;
 }
 
+.bg-em-verde {
+    background-color: #017c26;
+}
+
+.bg-em-naranja {
+    background-color: #f58220;
+}
+
+.text-em-naranja {
+    color: #f58220;
+}
+
+
+.bg-em-violeta {
+    background-color: #662d91;
+}
+
+.text-em-violeta {
+    color: #662d91;
+}
+
+
+
+
 /* --- Base --- */
 body {
     font-family: 'Maven Pro', sans-serif;
@@ -511,7 +535,7 @@ h3 {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
 }
 
- /* Mejora para Tabla Rígida e Intersección con Sidebar */
+/* Mejora para Tabla Rígida e Intersección con Sidebar */
 /* 1.contenedor principal e hijos encojen */
 .main-layout main {
     min-width: 0;

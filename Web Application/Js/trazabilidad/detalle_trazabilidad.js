@@ -7,13 +7,18 @@ const DetalleModulo = (function () {
     const URL_DETALLE_INGRESO = "https://localhost:44325/api/DetalleIngreso";
     const URL_TIPO_MATERIAL = "https://localhost:44325/api/TP_Material";
 
-    // 🔒 ESTADO PRIVADO
+    // 🔒 ESTADO PRIVADO (Memoria de trabajo del operador)
     let estado = {
         idIngresoMaterial: null,
         idHojaRuta: null,
         idDetalleHdrSeleccionado: null,
         idTipoMaterialSeleccionado: null,
-        idOrigenSeleccionado: null
+        idOrigenSeleccionado: null,
+
+        // 🗓️ Filtros de fecha para la búsqueda de pendientes
+        fechaEspecifica: '',
+        desde: '',
+        hasta: ''
     };
 
     const obtenerFechaLocalISO = function (fechaObj = new Date()) {
@@ -40,6 +45,9 @@ const DetalleModulo = (function () {
         sessionStorage.removeItem('sitmas_estado_detalle');
         estado.idIngresoMaterial = null;
         estado.idHojaRuta = null;
+        estado.fechaEspecifica = '';
+        estado.desde = '';
+        estado.hasta = '';
     };
 
     // 2. INICIALIZACIÓN
@@ -56,27 +64,14 @@ const DetalleModulo = (function () {
 
         let subTituloHeader = estado.idIngresoMaterial 
             ? `<span class="badge bg-success fs-6 me-2">Ingreso Planta #${estado.idIngresoMaterial}</span>`
-            : `<span class="badge bg-secondary fs-6 me-2">Báscula Abierta (Modo General)</span>`;
+            : `<span class="badge bg-warning fs-6 me-2">Báscula Abierta (Modo General)</span>`;
 
         let htmlEstructura = `
             <div class="row fade-in">
                 <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
                     <div>
-                        <h4 class="text-primary d-inline me-3"><i class="fas fa-balance-scale"></i> Control de Pesaje en Báscula</h4>
+                        <h4 class="text-emec-naranja d-inline me-3"><i class="fas fa-balance-scale"></i> Control de Pesaje en Báscula</h4>
                         ${subTituloHeader}
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button id="btn-buscar-fecha-detalle" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-calendar-day"></i> Fecha Específica
-                        </button>
-                        <button id="btn-buscar-rango-detalle" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-calendar-alt"></i> Buscar Rango
-                        </button>
-                        ${estado.idIngresoMaterial ? `
-                            <button id="btn-limpiar-filtro-ingreso" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-times-circle"></i> Ver Todos los Pendientes
-                            </button>
-                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -86,11 +81,30 @@ const DetalleModulo = (function () {
                 <div class="col-md-6">
                     <div class="card border-warning shadow-sm mb-4">
                         <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-clock"></i> Paradas Pendientes de Pesaje</span>
-                            <span class="badge bg-dark text-white">Top 10 Más Antiguos</span>
+                            <span><i class="fas fa-clock"></i> Pendientes (TOP 10 FIFO)</span>
+
+                            <!-- 🔘 BOTONERA DE FILTROS IDÉNTICA A CLASIFICACIÓN -->
+                            <div class="btn-group" role="group">
+                                <button id="btn-buscar-fecha-detalle" class="btn btn-outline-dark btn-sm" title="Fecha Específica">
+                                    <i class="fas fa-calendar-day"></i> Fecha
+                                </button>
+                                <button id="btn-buscar-rango-detalle" class="btn btn-outline-dark btn-sm" title="Buscar Rango">
+                                    <i class="fas fa-calendar-alt"></i> Rango
+                                </button>
+                                ${(estado.fechaEspecifica || estado.desde || estado.hasta) ? `
+                                    <button id="btn-limpiar-filtro-fechas" class="btn btn-outline-danger btn-sm" title="Limpiar Filtro de Fechas">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                ` : ''}
+                                ${estado.idIngresoMaterial ? `
+                                    <button id="btn-limpiar-filtro-ingreso" class="btn btn-outline-secondary btn-sm" title="Ver Todos los Pendientes">
+                                        <i class="fas fa-list"></i> Ver Todos
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
                         <div class="card-body p-0" id="contenedor-tabla-paradas">
-                            <div class="text-center p-4"><div class="spinner-border text-warning"></div><p>Cargando pendientes...</p></div>
+                            <div class="text-center p-4"><div class="spinner-border text-warning"></div><p class="mt-2">Cargando pendientes...</p></div>
                         </div>
                     </div>
                 </div>
@@ -110,7 +124,7 @@ const DetalleModulo = (function () {
                 <div class="col-12">
                     <h5 class="text-secondary border-bottom pb-2"><i class="fas fa-check-circle"></i> Últimos Pesajes Registrados en Báscula</h5>
                     <div id="contenedor-tabla-pesadas-realizadas">
-                        <div class="text-center my-3"><div class="spinner-border text-secondary"></div><p>Cargando historial de pesajes...</p></div>
+                        <div class="text-center my-3"><div class="spinner-border text-secondary"></div><p class="mt-2">Cargando historial de pesajes...</p></div>
                     </div>
                 </div>
             </div>
@@ -127,14 +141,26 @@ const DetalleModulo = (function () {
     const enlazarEventos = function () {
         const principal = $('#contenedor-dinamico-trazabilidad');
 
+        // Disparadores de Modales de Fecha
         principal.off('click', '#btn-buscar-fecha-detalle').on('click', '#btn-buscar-fecha-detalle', abrirBuscadorFechaUnica);
         principal.off('click', '#btn-buscar-rango-detalle').on('click', '#btn-buscar-rango-detalle', abrirBuscadorRangoFechas);
 
+        // Limpiar Filtro de Fechas
+        principal.off('click', '#btn-limpiar-filtro-fechas').on('click', '#btn-limpiar-filtro-fechas', function () {
+            estado.fechaEspecifica = '';
+            estado.desde = '';
+            estado.hasta = '';
+            guardarEstadoEnMemoria();
+            obtenerParadasPendientes();
+        });
+
+        // Limpiar Filtro de Ingreso (Ver Todos)
         principal.off('click', '#btn-limpiar-filtro-ingreso').on('click', '#btn-limpiar-filtro-ingreso', function () {
             limpiarMemoria();
             inicializar('contenedor-dinamico-trazabilidad');
         });
 
+        // Selección de parada a pesas
         principal.off('click', '.btn-seleccionar-parada').on('click', '.btn-seleccionar-parada', function (e) {
             e.preventDefault();
             let boton = $(this);
@@ -160,11 +186,19 @@ const DetalleModulo = (function () {
         principal.off('submit', '#form-pesaje-parada').on('submit', '#form-pesaje-parada', registrarPesada);
     };
 
-    // 4. CONSULTAS
-    const obtenerParadasPendientes = function (desde = null, hasta = null) {
+    // 4. CONSULTAS DE BÁSCULA
+    const obtenerParadasPendientes = function () {
         let url = `${URL_DETALLE_INGRESO}/PendientesPesaje`;
-        if (desde && hasta) {
-            url += `?desde=${desde}&hasta=${hasta}`;
+        let parametros = [];
+
+        if (estado.fechaEspecifica) {
+            parametros.push(`desde=${estado.fechaEspecifica}&hasta=${estado.fechaEspecifica}`);
+        } else if (estado.desde && estado.hasta) {
+            parametros.push(`desde=${estado.desde}&hasta=${estado.hasta}`);
+        }
+
+        if (parametros.length > 0) {
+            url += `?${parametros.join('&')}`;
         }
 
         $.ajax({
@@ -180,17 +214,23 @@ const DetalleModulo = (function () {
         });
     };
 
+    // 5. MODALES SWEETALERT2 DE FECHA
     const abrirBuscadorFechaUnica = function () {
         const hoy = obtenerFechaLocalISO();
         Swal.fire({
             title: 'Buscar Pendientes por Fecha',
-            html: `<input id="swal-fecha" type="date" class="form-control" value="${hoy}">`,
+            html: `<input id="swal-fecha" type="date" class="form-control" value="${estado.fechaEspecifica || hoy}">`,
             showCancelButton: true,
             confirmButtonText: 'Buscar',
+            cancelButtonText: 'Cancelar',
             preConfirm: () => document.getElementById('swal-fecha').value
         }).then((result) => {
             if (result.isConfirmed && result.value) {
-                obtenerParadasPendientes(result.value, result.value);
+                estado.fechaEspecifica = result.value;
+                estado.desde = '';
+                estado.hasta = '';
+                guardarEstadoEnMemoria();
+                obtenerParadasPendientes();
             }
         });
     };
@@ -202,12 +242,13 @@ const DetalleModulo = (function () {
             html: `
                 <div class="text-start">
                     <label class="form-label fw-bold">Desde:</label>
-                    <input id="swal-desde" type="date" class="form-control mb-2" value="${hoy}">
+                    <input id="swal-desde" type="date" class="form-control mb-2" value="${estado.desde || hoy}">
                     <label class="form-label fw-bold">Hasta:</label>
-                    <input id="swal-hasta" type="date" class="form-control" value="${hoy}">
+                    <input id="swal-hasta" type="date" class="form-control" value="${estado.hasta || hoy}">
                 </div>`,
             showCancelButton: true,
             confirmButtonText: 'Buscar',
+            cancelButtonText: 'Cancelar',
             preConfirm: () => {
                 return {
                     desde: document.getElementById('swal-desde').value,
@@ -216,7 +257,11 @@ const DetalleModulo = (function () {
             }
         }).then((result) => {
             if (result.isConfirmed && result.value.desde && result.value.hasta) {
-                obtenerParadasPendientes(result.value.desde, result.value.hasta);
+                estado.fechaEspecifica = '';
+                estado.desde = result.value.desde;
+                estado.hasta = result.value.hasta;
+                guardarEstadoEnMemoria();
+                obtenerParadasPendientes();
             }
         });
     };
