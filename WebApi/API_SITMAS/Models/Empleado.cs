@@ -2,284 +2,503 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Configuration;
-
-
 
 namespace API_SITMAS.Models
 {
-    public class Empleado
+
+    public class EmpleadoPersonalDTO
     {
-
-
-        #region Atributos
-
-        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
-        private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
-
-
-        //string conectionString = @"Data Source=DESKTOP-N824T94;Initial Catalog=Gestion_SITMAS; Integrated Security= True ";
-
-        #endregion
-
-        #region Propìedades
-
         public int Id { get; set; }
         public string Apellido { get; set; }
+        public string Nombre { get; set; }
+        public string Cuil { get; set; }
+        public string Calle { get; set; }
+        public string Numero { get; set; }
+        public string Piso { get; set; }
+        public string Dpto { get; set; }
+        public string Telefono { get; set; }
+        public string Email { get; set; }
+    }
 
+    // Solo para devolver datos laborales 
+    public class EmpleadoLaboralDTO
+    {
+        public int Id { get; set; }
+        public string Apellido { get; set; }
+        public string Nombre { get; set; }
+        public string Area { get; set; }
+        public string Cargo { get; set; }
+        public string EstadoEmpleado { get; set; }
+    }
+
+    // Para recibir datos del Frontend (Insertar o Modificar)
+    public class EmpleadoRequestDTO
+    {
+        public int Id { get; set; }
+        public string Apellido { get; set; }
         public string Nombre { get; set; }
         public string Cuil { get; set; }
         public string Telefono { get; set; }
         public string Email { get; set; }
         public DateTime Fecha_Ingreso { get; set; }
+        public int Id_Cargo { get; set; }
+        public int Id_Area { get; set; }
+        public int Id_Barrio { get; set; }
+        public int Id_Estado_Empleado { get; set; }
         public string Calle { get; set; }
         public string Numero { get; set; }
         public string Piso { get; set; }
         public string Dpto { get; set; }
-        public int Id_Cargo { get; set; }
-        public string Cargo { get; set; }
-        public int Id_Area { get; set; }
-        public string Area { get; set; }
-        public int Id_Barrio { get; set; }
-        public string Barrio { get; set; }
-        public int Id_Estado_Empleado { get; set; }
-        public string EstadoEmpleado { get; set; }
+    }
 
 
 
-        #endregion
 
-        #region Metodos
+    public class EmpleadoDatos
+    {
+        private string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
-        public DataTable SelectAll()
+        // 1. LISTAR DATOS PERSONALES
+        public List<EmpleadoPersonalDTO> ListarDatosPersonales()
         {
+            var lista = new List<EmpleadoPersonalDTO>();
 
+            // El bloque "using" asegura que la conexión se cierre y destruya siempre
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ListarEmpleados", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCnn.Open();
 
-            string sqlSentencia = "sp_ListarEmpleados";
-
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-
-
-            sqlCnn.Close();
-
-
-            return ds.Tables[0];
-
+                    // SqlDataReader es la forma más rápida y ligera de leer datos en .NET
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new EmpleadoPersonalDTO
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Nombre = reader["Nombre"].ToString(),
+                                Apellido = reader["Apellido"].ToString(),
+                                Cuil = reader["Cuil"].ToString(),
+                                Calle = reader["Calle"].ToString(),
+                                Numero = reader["Numero"].ToString(),
+                                Piso = reader["Piso"].ToString(),
+                                Dpto = reader["Dpto"].ToString(),
+                                Telefono = reader["Telefono"].ToString(),
+                                Email = reader["Email"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
         }
 
-        public DataTable SelectId()
+        // 2. LISTAR DATOS LABORALES
+        public List<EmpleadoLaboralDTO> ListarDatosLaborales()
         {
+            var lista = new List<EmpleadoLaboralDTO>();
 
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ListarEmpleadosDetallados", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCnn.Open();
 
-            string sqlSentencia = "sp_VerEmpleadoId";
-
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-            sqlCnn.Close();
-
-            return ds.Tables[0];
-
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new EmpleadoLaboralDTO
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Nombre = reader["Nombre"].ToString(),
+                                Apellido = reader["Apellido"].ToString(),
+                                Area = reader["Area"].ToString(),
+                                Cargo = reader["Cargo"].ToString(),
+                                EstadoEmpleado = reader["EstadoEmpleado"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
         }
 
-        public void Insertar()
+        // 3. INSERTAR (Devuelve el ID generado)
+        public int Insertar(EmpleadoRequestDTO empleado)
         {
+            int idGenerado = 0;
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_InsertarEmpleado", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    // Pasamos los parámetros
+                    sqlCom.Parameters.AddWithValue("@Apellido", empleado.Apellido);
+                    sqlCom.Parameters.AddWithValue("@Nombre", empleado.Nombre);
+                    sqlCom.Parameters.AddWithValue("@Cuil", empleado.Cuil);
+                    sqlCom.Parameters.AddWithValue("@Telefono", empleado.Telefono);
+                    sqlCom.Parameters.AddWithValue("@Email", empleado.Email);
+                    sqlCom.Parameters.AddWithValue("@Fecha_Ingreso", empleado.Fecha_Ingreso);
+                    sqlCom.Parameters.AddWithValue("@Id_Cargo", empleado.Id_Cargo);
+                    sqlCom.Parameters.AddWithValue("@Id_Area", empleado.Id_Area);
+                    sqlCom.Parameters.AddWithValue("@Id_Barrio", empleado.Id_Barrio);
+                    sqlCom.Parameters.AddWithValue("@Id_Estado", empleado.Id_Estado_Empleado);
+                    sqlCom.Parameters.AddWithValue("@Calle", empleado.Calle);
+                    sqlCom.Parameters.AddWithValue("@Numero", empleado.Numero);
+                    sqlCom.Parameters.AddWithValue("@Piso", empleado.Piso);
+                    sqlCom.Parameters.AddWithValue("@Dpto", empleado.Dpto);
 
-            string sqlSentencia = "sp_InsertarEmpleado";
-
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            sqlCom.Parameters.Add("@Apellido", SqlDbType.NVarChar).Value = Apellido;
-            sqlCom.Parameters.Add("@Nombre", SqlDbType.NVarChar).Value = Nombre;
-            sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
-            sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
-            sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
-            sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;
-            sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
-            sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
-            sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
-            sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
-            sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
-            sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
-            sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
-            sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
-
-            sqlCnn.Open();
-
-
-            var res = sqlCom.ExecuteNonQuery();
-
-
-            sqlCnn.Close();
-
-
+                    sqlCnn.Open();
+                    // Ejecutamos y leemos el ID que devuelve el SELECT SCOPE_IDENTITY()
+                    idGenerado = Convert.ToInt32(sqlCom.ExecuteScalar());
+                }
+            }
+            return idGenerado;
         }
 
-
-        public void Modificar()
+        // 4. MODIFICAR
+        public void Modificar(int id, EmpleadoRequestDTO empleado)
         {
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ActualizarEmpleado", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@Id", id);
+                    sqlCom.Parameters.AddWithValue("@Apellido", empleado.Apellido);
+                    sqlCom.Parameters.AddWithValue("@Nombre", empleado.Nombre);
+                    sqlCom.Parameters.AddWithValue("@Cuil", empleado.Cuil);
+                    sqlCom.Parameters.AddWithValue("@Telefono", empleado.Telefono);
+                    sqlCom.Parameters.AddWithValue("@Email", empleado.Email);
+                    sqlCom.Parameters.AddWithValue("@Fecha_Ingreso", empleado.Fecha_Ingreso);
+                    sqlCom.Parameters.AddWithValue("@Id_Cargo", empleado.Id_Cargo);
+                    sqlCom.Parameters.AddWithValue("@Id_Area", empleado.Id_Area);
+                    sqlCom.Parameters.AddWithValue("@Id_Barrio", empleado.Id_Barrio);
+                    sqlCom.Parameters.AddWithValue("@Id_Estado", empleado.Id_Estado_Empleado);
+                    sqlCom.Parameters.AddWithValue("@Calle", empleado.Calle);
+                    sqlCom.Parameters.AddWithValue("@Numero", empleado.Numero);
+                    sqlCom.Parameters.AddWithValue("@Piso", empleado.Piso);
+                    sqlCom.Parameters.AddWithValue("@Dpto", empleado.Dpto);
 
-
-            string sqlSentencia = "sp_ActualizarEmpleado";
-
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-
-
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-            sqlCom.Parameters.Add("@Apellido", SqlDbType.NVarChar).Value = Apellido;
-            sqlCom.Parameters.Add("@Nombre", SqlDbType.NVarChar).Value = Nombre;
-            sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
-            sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
-            sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
-            sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;            
-            sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
-            sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
-            sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
-            sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
-            sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
-            sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
-            sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
-            sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
-
-
-            sqlCnn.Open();
-
-
-            var res = sqlCom.ExecuteNonQuery();
-
-
-            sqlCnn.Close();
-
-
+                    sqlCnn.Open();
+                    sqlCom.ExecuteNonQuery();
+                }
+            }
         }
 
-
-        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
-
-        //public void Borrar()
-        //{
-
-        //    string sqlSentencia = "sp_EliminarEmpleado";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-
-        //    sqlCnn.Open();
-
-
-        //    var res = sqlCom.ExecuteNonQuery();
-
-
-        //    sqlCnn.Close();
-
-
-        //}
-
-
-        public DataTable VistalistadoEmpleados()
+        // 5. BORRAR (Borrado Lógico)
+        public void Borrar(int id)
         {
-            string sqlSentencia = "sp_ListarEmpleadosDetallados";
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_EliminarEmpleado", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@Id", id);
 
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-            sqlCnn.Close();
-
-            return ds.Tables[0];
-
+                    sqlCnn.Open();
+                    sqlCom.ExecuteNonQuery();
+                }
+            }
         }
-
-        public DataTable ListadoChoferes()
-        {
-            string sqlSentencia = "sp_ListarCamioneros";
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-            sqlCnn.Close();
-
-            return ds.Tables[0];
-
-        }
-
-
-        #endregion
-
     }
 }
+
+
+
+
+
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Data;
+//using System.Data.SqlClient;
+//using System.Linq;
+//using System.Web;
+//using System.Configuration;
+
+
+
+//namespace API_SITMAS.Models
+//{
+//    public class Empleado
+//    {
+
+
+//        #region Atributos
+
+//        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
+//        private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
+
+
+//        //string conectionString = @"Data Source=DESKTOP-N824T94;Initial Catalog=Gestion_SITMAS; Integrated Security= True ";
+
+//        #endregion
+
+//        #region Propìedades
+
+//        public int Id { get; set; }
+//        public string Apellido { get; set; }
+
+//        public string Nombre { get; set; }
+//        public string Cuil { get; set; }
+//        public string Telefono { get; set; }
+//        public string Email { get; set; }
+//        public DateTime Fecha_Ingreso { get; set; }
+//        public string Calle { get; set; }
+//        public string Numero { get; set; }
+//        public string Piso { get; set; }
+//        public string Dpto { get; set; }
+//        public int Id_Cargo { get; set; }
+//        public string Cargo { get; set; }
+//        public int Id_Area { get; set; }
+//        public string Area { get; set; }
+//        public int Id_Barrio { get; set; }
+//        public string Barrio { get; set; }
+//        public int Id_Estado_Empleado { get; set; }
+//        public string EstadoEmpleado { get; set; }
+
+
+
+//        #endregion
+
+//        #region Metodos
+
+//        public DataTable SelectAll()
+//        {
+
+
+//            string sqlSentencia = "sp_ListarEmpleados";
+
+
+//            SqlConnection sqlCnn = new SqlConnection();
+//            sqlCnn.ConnectionString = conectionString;
+
+
+//            sqlCnn.Open();
+
+//            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//            sqlCom.CommandType = CommandType.StoredProcedure;
+
+//            DataSet ds = new DataSet();
+
+//            SqlDataAdapter da = new SqlDataAdapter();
+//            da.SelectCommand = sqlCom;
+//            da.Fill(ds);
+
+
+
+//            sqlCnn.Close();
+
+
+//            return ds.Tables[0];
+
+//        }
+
+//        public DataTable SelectId()
+//        {
+
+
+//            string sqlSentencia = "sp_VerEmpleadoId";
+
+
+//            SqlConnection sqlCnn = new SqlConnection();
+//            sqlCnn.ConnectionString = conectionString;
+
+
+//            sqlCnn.Open();
+
+//            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//            sqlCom.CommandType = CommandType.StoredProcedure;
+//            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
+
+//            DataSet ds = new DataSet();
+
+//            SqlDataAdapter da = new SqlDataAdapter();
+//            da.SelectCommand = sqlCom;
+//            da.Fill(ds);
+
+//            sqlCnn.Close();
+
+//            return ds.Tables[0];
+
+//        }
+
+//        public void Insertar()
+//        {
+
+//            string sqlSentencia = "sp_InsertarEmpleado";
+
+
+//            SqlConnection sqlCnn = new SqlConnection();
+//            sqlCnn.ConnectionString = conectionString;
+
+
+//            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//            sqlCom.CommandType = CommandType.StoredProcedure;
+
+//            sqlCom.Parameters.Add("@Apellido", SqlDbType.NVarChar).Value = Apellido;
+//            sqlCom.Parameters.Add("@Nombre", SqlDbType.NVarChar).Value = Nombre;
+//            sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
+//            sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
+//            sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
+//            sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;
+//            sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
+//            sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
+//            sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
+//            sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
+//            sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
+//            sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
+//            sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
+//            sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
+
+//            sqlCnn.Open();
+
+
+//            var res = sqlCom.ExecuteNonQuery();
+
+
+//            sqlCnn.Close();
+
+
+//        }
+
+
+//        public void Modificar()
+//        {
+
+
+//            string sqlSentencia = "sp_ActualizarEmpleado";
+
+
+//            SqlConnection sqlCnn = new SqlConnection();
+//            sqlCnn.ConnectionString = conectionString;
+
+
+
+
+//            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//            sqlCom.CommandType = CommandType.StoredProcedure;
+
+//            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
+//            sqlCom.Parameters.Add("@Apellido", SqlDbType.NVarChar).Value = Apellido;
+//            sqlCom.Parameters.Add("@Nombre", SqlDbType.NVarChar).Value = Nombre;
+//            sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
+//            sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
+//            sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
+//            sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;            
+//            sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
+//            sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
+//            sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
+//            sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
+//            sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
+//            sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
+//            sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
+//            sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
+
+
+//            sqlCnn.Open();
+
+
+//            var res = sqlCom.ExecuteNonQuery();
+
+
+//            sqlCnn.Close();
+
+
+//        }
+
+
+//        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
+
+//        //public void Borrar()
+//        //{
+
+//        //    string sqlSentencia = "sp_EliminarEmpleado";
+
+
+//        //    SqlConnection sqlCnn = new SqlConnection();
+//        //    sqlCnn.ConnectionString = conectionString;
+
+
+
+
+//        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//        //    sqlCom.CommandType = CommandType.StoredProcedure;
+
+//        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
+
+
+//        //    sqlCnn.Open();
+
+
+//        //    var res = sqlCom.ExecuteNonQuery();
+
+
+//        //    sqlCnn.Close();
+
+
+//        //}
+
+
+//        public DataTable VistalistadoEmpleados()
+//        {
+//            string sqlSentencia = "sp_ListarEmpleadosDetallados";
+
+//            SqlConnection sqlCnn = new SqlConnection();
+//            sqlCnn.ConnectionString = conectionString;
+
+//            sqlCnn.Open();
+
+//            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//            sqlCom.CommandType = CommandType.StoredProcedure;
+
+//            DataSet ds = new DataSet();
+
+//            SqlDataAdapter da = new SqlDataAdapter();
+//            da.SelectCommand = sqlCom;
+//            da.Fill(ds);
+
+//            sqlCnn.Close();
+
+//            return ds.Tables[0];
+
+//        }
+
+//        public DataTable ListadoChoferes()
+//        {
+//            string sqlSentencia = "sp_ListarCamioneros";
+
+//            SqlConnection sqlCnn = new SqlConnection();
+//            sqlCnn.ConnectionString = conectionString;
+
+//            sqlCnn.Open();
+
+//            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+//            sqlCom.CommandType = CommandType.StoredProcedure;
+
+//            DataSet ds = new DataSet();
+
+//            SqlDataAdapter da = new SqlDataAdapter();
+//            da.SelectCommand = sqlCom;
+//            da.Fill(ds);
+
+//            sqlCnn.Close();
+
+//            return ds.Tables[0];
+
+//        }
+
+
+//        #endregion
+
+//    }
+//}

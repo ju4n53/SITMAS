@@ -11,7 +11,7 @@ const paginaActual = window.location.pathname.split("/").pop();
 
 // Agregamos "Administrador" a todas porque dijimos que él tiene pase libre a todo
 const rutasProtegidas = {
-    "empleado.html": ["R_Humanos", "Administrador"],
+    "personal_gestion.html": ["R_Humanos", "Administrador"],
 
     "traz_material.html": ["Supervisor_Logistica", "Administrador"],
 
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Mapa de qué menúes HTML se encienden según el Rol
         const configuracionMenu = [
-            { idSidebar: 'sidebar-empleados', idItems: ['pageEmpleado'], roles: ["R_Humanos", "Administrador"] },
+            { idSidebar: 'sidebar-personal', idItems: ['pagePersonal'], roles: ["R_Humanos", "Administrador"] },
 
             { idSidebar: 'sidebar-logistica', idItems: ['pageRegistrosLog', 'pageReportesLog'], roles: ["R_Institucionales"] },
 

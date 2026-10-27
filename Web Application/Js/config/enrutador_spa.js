@@ -28,6 +28,42 @@
         });
 
         $('#tab-ingreso-crud').trigger('click');
+
+
+
+
+         $('#RegistroPersonalTabs .nav-link').on('click', function (e) {
+            e.preventDefault();
+
+            // Limpiamos estilos de todas las pestañas
+            $('#RegistroPersonalTabs .nav-link').removeClass('active').addClass('text-secondary');
+            // Activamos la pestaña seleccionada
+            $(this).removeClass('text-secondary').addClass('active');
+
+            const tabId = $(this).attr('id');
+
+            // Enrutador
+            if (tabId === 'tab-empleados-crud') {
+                console.log("Preparando módulo de Ingreso...");
+                EmpleadoModulo.cargarEn("contenedor-dinamico-crud-personal");
+            } else if (tabId === 'tab-usuarios-crud') {
+                console.log("Preparando módulo de Detalle...");
+                //CrudDetalleModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+            } else if (tabId === 'tab-registros-crud') {
+                console.log("Preparando módulo de Clasificación...");
+                //CrudClasificacionModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+            } else if (tabId === 'tab-planillas-crud') {
+                console.log("Preparando módulo de Salida...");
+               // CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+            }
+        });
+
+        $('#tab-empleados-crud').trigger('click');
+
+
+
+
+
     });
 
 

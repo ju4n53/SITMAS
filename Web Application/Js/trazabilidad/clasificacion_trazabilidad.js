@@ -379,7 +379,7 @@ const ClasificacionModulo = (function () {
     const cargarComboSubtipos = function () {
         $.ajax({
             type: "GET",
-            url: `${URL_SUBTIPO}/ListarTodo`,
+            url: `${URL_SUBTIPO}`,
             success: function (data) {
                 let select = $("#select-subtipo-material");
                 select.empty().append('<option value="">Seleccione Subtipo</option>');
@@ -408,7 +408,7 @@ const ClasificacionModulo = (function () {
     const cargarComboDestinos = function () {
         $.ajax({
             type: "GET",
-            url: `${URL_DESTINO}/ListarTodo`,
+            url: `${URL_DESTINO}`,
             success: function (data) {
                 let select = $("#select-destino-material");
                 select.empty();

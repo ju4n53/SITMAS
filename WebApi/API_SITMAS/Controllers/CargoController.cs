@@ -1,98 +1,191 @@
 ﻿using API_SITMAS.Models;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/Cargo")]
     public class CargoController : ApiController
     {
-        // GET: api/Cargo
+        private readonly CargoDatos _datos = new CargoDatos();
+
         [HttpGet]
-        public List<Cargos> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            Cargos oCargo = new Cargos();
-
-            DataTable dt = oCargo.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<Cargos>>(listaJson);
-
-            return Lista;
-
+            try
+            {
+                return Ok(_datos.SelectAll());
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // GET: api/Cargo/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
-
-        // POST: api/Cargo
         [HttpPost]
-        public void Insertar([FromBody] Cargos value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] Cargos value)
         {
-            Cargos oCargo = new Cargos();
-            oCargo.Cargo = value.Cargo;
+            if (value == null || string.IsNullOrWhiteSpace(value.Cargo))
+                return BadRequest("El nombre del cargo es requerido.");
 
-            oCargo.Insertar();
+            try
+            {
+                int id = _datos.Insertar(value);
+                return Ok(new { mensaje = "Cargo registrado correctamente.", id = id });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // PUT: api/Cargo/5
         [HttpPut]
-        public void Modificar(int id, [FromBody] Cargos value)
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] Cargos value)
         {
+            if (value == null) return BadRequest("Datos vacíos.");
 
-            Cargos oCargo = new Cargos();
-            oCargo.Id = id;
-            oCargo.Cargo = value.Cargo;
-
-            oCargo.Modificar();
-
+            try
+            {
+                value.Id = id;
+                _datos.Modificar(value);
+                return Ok(new { mensaje = "Cargo actualizado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // DELETE: api/Cargo/5
         [HttpDelete]
-
-        public void Borrar(int id)
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
         {
-
-            Cargos oCargo = new Cargos();
-            oCargo.Id = id;
-
-            oCargo.Borrar();
-
+            try
+            {
+                _datos.Borrar(id);
+                return Ok(new { mensaje = "Cargo eliminado." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
-
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
-
-        //}
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using API_SITMAS.Models;
+//using Newtonsoft.Json;
+//using System;
+//using System.Collections.Generic;
+//using System.Data;
+//using System.Linq;
+//using System.Net;
+//using System.Net.Http;
+//using System.Web.Http;
+
+//namespace API_SITMAS.Controllers
+//{
+//    public class CargoController : ApiController
+//    {
+//        // GET: api/Cargo
+//        [HttpGet]
+//        public List<Cargos> ListarTodo()
+//        {
+//            Cargos oCargo = new Cargos();
+
+//            DataTable dt = oCargo.SelectAll();
+//            var listaJson = JsonConvert.SerializeObject(dt);
+
+//            var Lista = JsonConvert.DeserializeObject<List<Cargos>>(listaJson);
+
+//            return Lista;
+
+//        }
+
+//        // GET: api/Cargo/5
+//        //[HttpGet]
+
+//        //public Empleado ListarPorId(int id)
+//        //{
+//        //    Empleado oEmpleado = new Empleado();
+//        //    oEmpleado.Id = id;
+
+//        //    DataTable dt = oEmpleado.SelectId();
+
+//        //    var ListaJsom = JsonConvert.SerializeObject(dt);
+
+//        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
+
+//        //    return obj;
+
+//        //}
+
+//        // POST: api/Cargo
+//        [HttpPost]
+//        public void Insertar([FromBody] Cargos value)
+//        {
+//            Cargos oCargo = new Cargos();
+//            oCargo.Cargo = value.Cargo;
+
+//            oCargo.Insertar();
+//        }
+
+//        // PUT: api/Cargo/5
+//        [HttpPut]
+//        public void Modificar(int id, [FromBody] Cargos value)
+//        {
+
+//            Cargos oCargo = new Cargos();
+//            oCargo.Id = id;
+//            oCargo.Cargo = value.Cargo;
+
+//            oCargo.Modificar();
+
+//        }
+
+//        // DELETE: api/Cargo/5
+//        [HttpDelete]
+
+//        public void Borrar(int id)
+//        {
+
+//            Cargos oCargo = new Cargos();
+//            oCargo.Id = id;
+
+//            oCargo.Borrar();
+
+//        }
+
+//        //[HttpGet]
+//        //public List<Empleado> ListarVista()
+//        //{
+//        //    Empleado oEmpleado = new Empleado();
+
+//        //    var dt = oEmpleado.VistalistadoEmpleados();
+
+//        //    var ListaJsom = JsonConvert.SerializeObject(dt);
+
+//        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
+//        //    return Lista;
+
+//        //}
+//    }
+//}

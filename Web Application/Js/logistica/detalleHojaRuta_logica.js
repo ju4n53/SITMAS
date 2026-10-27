@@ -7,7 +7,7 @@ const URL_API_DETALLE = "https://localhost:44325/api/detallehojaruta";
 const URL_API_TIPO_MOV = "https://localhost:44325/api/tipomovimientos";
 const URL_API_RECURSOS = "https://localhost:44325/api/recursosmovilizados";
 const URL_API_ORIGEN = "https://localhost:44325/api/Origen";
-const URL_API_MATERIAL = "https://localhost:44325/api/TP_Material/ListarTodo";
+const URL_API_MATERIAL = "https://localhost:44325/api/TP_Material";
 
 // 📍 Punto Base dinámico cargado en memoria desde la tabla Origen (Base EMEC)
 let coordenadasBaseEMEC = { lat: -31.466122, lng: -64.127283 };

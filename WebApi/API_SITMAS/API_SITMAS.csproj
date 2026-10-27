@@ -238,6 +238,7 @@
     <Compile Include="Controllers\Hoja_RutaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IngresoMaterialController.cs" />
+    <Compile Include="Controllers\LegajoController.cs" />
     <Compile Include="Controllers\LocalidadesCbaController.cs" />
     <Compile Include="Controllers\MarcaVehController.cs" />
     <Compile Include="Controllers\MaterialClasificadoController.cs" />
@@ -274,12 +275,14 @@
     <Compile Include="Models\DetalleHojaRuta.cs" />
     <Compile Include="Models\DetalleIngreso.cs" />
     <Compile Include="Models\Empleado.cs" />
+    <Compile Include="Models\EmpleadoDTOs.cs" />
     <Compile Include="Models\Estado_Empleado.cs" />
     <Compile Include="Models\EST_HDR.cs" />
     <Compile Include="Models\EST_Material.cs" />
     <Compile Include="Models\EST_Usuario.cs" />
     <Compile Include="Models\Hoja_Ruta.cs" />
     <Compile Include="Models\IngresoMaterial.cs" />
+    <Compile Include="Models\Legajo.cs" />
     <Compile Include="Models\LocalidadesCba.cs" />
     <Compile Include="Models\MarcaVeh.cs" />
     <Compile Include="Models\MaterialClasificado.cs" />

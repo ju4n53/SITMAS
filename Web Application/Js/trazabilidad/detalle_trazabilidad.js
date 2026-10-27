@@ -377,7 +377,7 @@ const DetalleModulo = (function () {
     const cargarComboTiposMaterial = function (idPreseleccionado) {
         $.ajax({
             type: "GET",
-            url: `${URL_TIPO_MATERIAL}/ListarTodo`,
+            url: `${URL_TIPO_MATERIAL}`,
             success: function (data) {
                 let select = $("#select-tipo-material");
                 select.empty().append('<option value="">Seleccione Material Pesado *</option>');
