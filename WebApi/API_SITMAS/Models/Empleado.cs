@@ -129,6 +129,40 @@ namespace API_SITMAS.Models
             return lista;
         }
 
+
+        public List<EmpleadoLaboralDTO> ListarChoferes()
+        {
+            var lista = new List<EmpleadoLaboralDTO>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ListarCamioneros", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new EmpleadoLaboralDTO
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Nombre = reader["Nombre"].ToString(),
+                                Apellido = reader["Apellido"].ToString(),
+                                Cargo = reader["Cargo"].ToString(),
+                                EstadoEmpleado = reader["EstadoEmpleado"].ToString(),
+                                Area = "Logística"
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+
+
+
         // 3. INSERTAR (Devuelve el ID generado)
         public int Insertar(EmpleadoRequestDTO empleado)
         {

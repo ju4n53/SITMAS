@@ -36,8 +36,8 @@ const EmpleadoModulo = (function () {
                     <h4 class="text-primary m-0 fw-bold"><i class="fas fa-users-cog"></i> Gestión de Empleados</h4>
                     <small class="text-muted">Administración centralizada del personal de planta SITMAS</small>
                 </div>
-                <button class="btn btn-success" id="btn-nuevo-empleado">
-                    <i class="fas fa-plus-circle"></i> Registrar Nuevo Empleado
+                <button class="btn btn-success btn-lg" id="btn-nuevo-empleado">
+                    <i class="fas fa-plus-circle"></i> Registrar Ingreso
                 </button>
             </div>
 
@@ -219,7 +219,7 @@ const EmpleadoModulo = (function () {
                                 <i class="fas fa-arrow-left me-1"></i> Volver
                             </button>
                             <button type="button" class="btn btn-success" id="btn-guardar-empleado">
-                                <i class="fas fa-save me-1"></i> Guardar Registro
+                                <i class="fas fa-save me-1"></i> Registrar Ingreso
                             </button>
                         </div>
                     </div>

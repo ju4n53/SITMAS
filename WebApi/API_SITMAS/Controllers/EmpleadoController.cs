@@ -43,6 +43,24 @@ namespace API_SITMAS.Controllers
             }
         }
 
+
+        // GET: api/Empleado/ListarChoferes
+        [HttpGet]
+        [Route("ListarChoferes")]
+        public IHttpActionResult ListarChoferes()
+        {
+            try
+            {
+                var lista = _empleadoDatos.ListarChoferes();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
         // POST: api/Empleado
         [HttpPost]
         [Route("")]
