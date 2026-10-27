@@ -64,7 +64,7 @@ const ClasificacionModulo = (function () {
             <div class="row fade-in">
                 <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
                     <div>
-                        <h4 class="text-em-violeta d-inline me-3"><i class="fas fa-recycle"></i> Clasificación de Materiales</h4>
+                        <h4 class="text-success d-inline me-3"><i class="fas fa-recycle"></i> Clasificación de Materiales</h4>
                         <span class="badge bg-success fs-6">${textoBadge}</span>
                     </div>
                 </div>
@@ -74,20 +74,20 @@ const ClasificacionModulo = (function () {
                 <!-- Columna Izquierda: Pesadas pendientes -->
                 <div class="col-md-5">
                     <div class="card border-warning shadow-sm mb-4">
-                        <div class="card-header bg-em-violeta text-white fw-bold d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-boxes"></i> Pendientes (TOP 7 FIFO)</span>
                             
                             <!-- 🔘 BOTONERA DE FILTROS ESTILO DETALLE -->
                             <div class="btn-group" role="group">
-                                <button id="btn-buscar-fecha-clasif" class="btn btn-outline-light btn-sm" title="Fecha Específica">
+                                <button id="btn-buscar-fecha-clasif" class="btn btn-outline-dark btn-sm" title="Fecha Específica">
                                     <i class="fas fa-calendar-day"></i> Fecha
                                 </button>
-                                <button id="btn-buscar-rango-clasif" class="btn btn-outline-light btn-sm" title="Buscar Rango">
+                                <button id="btn-buscar-rango-clasif" class="btn btn-outline-dark btn-sm" title="Buscar Rango">
                                     <i class="fas fa-calendar-alt"></i> Rango
                                 </button>
                                 ${(estado.fechaEspecifica || estado.desde || estado.hasta) ? `
-                                    <button id="btn-limpiar-filtro-fechas" class="btn btn-outline-light btn-sm" title="Limpiar Filtro de Fechas">
-                                        <i class="fas fa-window-close"></i>
+                                    <button id="btn-limpiar-filtro-fechas" class="btn btn-outline-danger btn-sm" title="Limpiar Filtro de Fechas">
+                                        <i class="fas fa-times-circle"></i>
                                     </button>
                                 ` : ''}
                                 ${estado.idIngresoMaterial ? `

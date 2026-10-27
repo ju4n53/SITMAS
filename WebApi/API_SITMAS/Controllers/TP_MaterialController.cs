@@ -3,85 +3,92 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/TP_Material")]
     public class TP_MaterialController : ApiController
     {
         // GET: api/TP_Material
         [HttpGet]
-        public List<Tipo_Material> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            Tipo_Material oTipoMaterial = new Tipo_Material();
+            try
+            {
+                Tipo_Material oTipoMaterial = new Tipo_Material();
+                DataTable dt = oTipoMaterial.SelectAll();
+                var listaJson = JsonConvert.SerializeObject(dt);
+                var lista = JsonConvert.DeserializeObject<List<Tipo_Material>>(listaJson);
 
-            DataTable dt = oTipoMaterial.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<Tipo_Material>>(listaJson);
-
-            return Lista;
-
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
-
-        // GET: api/Area/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
 
         // POST: api/TP_Material
         [HttpPost]
-        public void Insertar([FromBody] Tipo_Material value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] Tipo_Material value)
         {
-            Tipo_Material oTipoMaterial = new Tipo_Material();
-            oTipoMaterial.TipoMaterial = value.TipoMaterial;
-
-            oTipoMaterial.Insertar();
+            if (value == null) return BadRequest("Datos inválidos.");
+            try
+            {
+                Tipo_Material oTipoMaterial = new Tipo_Material
+                {
+                    TipoMaterial = value.TipoMaterial
+                };
+                oTipoMaterial.Insertar();
+                return Ok("Tipo de material registrado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         // PUT: api/TP_Material/5
-        [HttpPost]
-        public void Modificar(int id, [FromBody] Tipo_Material value)
+        [HttpPut]
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] Tipo_Material value)
         {
-
-            Tipo_Material oTipoMaterial = new Tipo_Material();
-            oTipoMaterial.IdTipoMaterial = id;
-            oTipoMaterial.TipoMaterial = value.TipoMaterial;
-
-            oTipoMaterial.Modificar();
-
+            if (value == null) return BadRequest("Datos inválidos.");
+            try
+            {
+                Tipo_Material oTipoMaterial = new Tipo_Material
+                {
+                    IdTipoMaterial = id,
+                    TipoMaterial = value.TipoMaterial
+                };
+                oTipoMaterial.Modificar();
+                return Ok("Tipo de material actualizado.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         // DELETE: api/TP_Material/5
-        [HttpPost]
-
-        public void Borrar(int id)
+        [HttpDelete]
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
         {
-
-            Tipo_Material oTipoMaterial = new Tipo_Material();
-            oTipoMaterial.IdTipoMaterial = id;
-
-            oTipoMaterial.Borrar();
-
+            try
+            {
+                Tipo_Material oTipoMaterial = new Tipo_Material { IdTipoMaterial = id };
+                oTipoMaterial.Borrar();
+                return Ok("Tipo de material eliminado.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
-
-       
-
     }
 }

@@ -3,87 +3,84 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/SbTp_Material")]
     public class SbTp_MaterialController : ApiController
     {
         // GET: api/SbTp_Material
         [HttpGet]
-        public List<SubtipoMaterial> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            SubtipoMaterial oSubtipoMaterial = new SubtipoMaterial();
+            try
+            {
+                SubtipoMaterial oSubtipoMaterial = new SubtipoMaterial();
+                DataTable dt = oSubtipoMaterial.SelectAll();
+                var listaJson = JsonConvert.SerializeObject(dt);
+                var lista = JsonConvert.DeserializeObject<List<SubtipoMaterial>>(listaJson);
 
-            DataTable dt = oSubtipoMaterial.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<SubtipoMaterial>>(listaJson);
-
-            return Lista;
-
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
-
-        // GET: api/Area/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
 
         // POST: api/SbTp_Material
         [HttpPost]
-        public void Insertar([FromBody] SubtipoMaterial value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] SubtipoMaterial value)
         {
-            SubtipoMaterial oSubtipoMaterial = new SubtipoMaterial();
-            oSubtipoMaterial.Id_Tipo_Material = value.Id_Tipo_Material;
-            oSubtipoMaterial.Subtipo = value.Subtipo;
-
-            oSubtipoMaterial.Insertar();
+            if (value == null) return BadRequest("Los datos no pueden ser nulos.");
+            try
+            {
+                value.Insertar();
+                return Ok(new { mensaje = "Subtipo registrado con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         // PUT: api/SbTp_Material/5
-        [HttpPost]
-        public void Modificar(int id, [FromBody] SubtipoMaterial value)
+        [HttpPut]
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] SubtipoMaterial value)
         {
-
-            SubtipoMaterial oSubtipoMaterial = new SubtipoMaterial();
-            oSubtipoMaterial.IdSubtipoM = id;
-            oSubtipoMaterial.Id_Tipo_Material = value.Id_Tipo_Material;
-            oSubtipoMaterial.Subtipo = value.Subtipo;
-
-            oSubtipoMaterial.Modificar();
-
+            if (value == null) return BadRequest("Los datos no pueden ser nulos.");
+            try
+            {
+                value.IdSubtipoM = id;
+                value.Modificar();
+                return Ok(new { mensaje = "Subtipo modificado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         // DELETE: api/SbTp_Material/5
-        [HttpPost]
-
-        public void Borrar(int id)
+        [HttpDelete]
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
         {
-
-            SubtipoMaterial oSubtipoMaterial = new SubtipoMaterial();
-            oSubtipoMaterial.IdSubtipoM = id;
-
-            oSubtipoMaterial.Borrar();
-
+            try
+            {
+                SubtipoMaterial oSubtipoMaterial = new SubtipoMaterial { IdSubtipoM = id };
+                oSubtipoMaterial.Borrar();
+                return Ok(new { mensaje = "Subtipo eliminado con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
-
-        
-
     }
 }

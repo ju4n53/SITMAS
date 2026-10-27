@@ -23,6 +23,10 @@ const rutasProtegidas = {
 
     "traz_reportes.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
 
+    "registros_trazabilidad.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
+
+    "gestion_trazabilidad.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
+
     "log_vehiculo.html": ["Mantenimiento_Vehicular", "Administrador"],
 
     "HojaRuta.html": ["Coordinador", "Supervisor_Logistica", "Administrador"],
@@ -76,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageRegistrosLog', 'pageReportesLog'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"] },
 
-            { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageSalida', 'pageReportes', 'pageClasificacion'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
+            { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageRegistrosCrud', 'pageReportes', 'pageClasificacion'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
 
             { idSidebar: 'sidebar-configuracion', idItems: ['pageConfigEstructura', 'pageConfigAcceso'], roles: ["Administrador"] }
             // Nota: Agrupé algunos para el ejemplo, debes ajustar los idItems exactos según tu HTML
