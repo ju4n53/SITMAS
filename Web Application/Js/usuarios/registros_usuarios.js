@@ -24,8 +24,8 @@ const RegistrosUsuariosModulo = (function () {
         let htmlEstructura = `
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
-                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-users-cog"></i> Padron de Usuarios y Roles</h4>
-                    <small class="text-muted">Consulta integral, búsqueda interactiva y edición de credenciales SITMAS</small>
+                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-users-cog"></i>Usuarios registrados</h4>
+                    <small class="text-muted">Listado total de usuarios registrados</small>
                 </div>
             </div>
 
@@ -36,7 +36,7 @@ const RegistrosUsuariosModulo = (function () {
                         <div class="col-md-8">
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-primary"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" id="input-buscar-usuario" placeholder="Filtrar por usuario, nombre del empleado, rol o estado...">
+                                <input type="text" class="form-control border-start-0 ps-0" id="input-buscar-usuario" placeholder="Buscar por usuario, nombre, rol o estado...">
                             </div>
                         </div>
                         <div class="col-md-4 text-end text-muted mt-2 mt-md-0">
@@ -75,7 +75,7 @@ const RegistrosUsuariosModulo = (function () {
                     <div class="modal-content">
                         <div class="modal-header bg-dark text-white">
                             <h5 class="modal-title" id="titulo-modal-edit">
-                                <i class="fas fa-user-edit me-2"></i> Modificar Credenciales
+                                <i class="fas fa-user-edit me-2"></i> Modificar Usuario
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -96,7 +96,7 @@ const RegistrosUsuariosModulo = (function () {
                                         <small class="text-info"><i class="fas fa-info-circle me-1"></i> Complete solo si desea cambiar la clave.</small>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Rol en el Sistema *</label>
+                                        <label class="form-label fw-bold">Rol *</label>
                                         <select class="form-select" id="edit-usr-rol" required>
                                             <option value="">Cargando roles...</option>
                                         </select>
@@ -158,7 +158,7 @@ const RegistrosUsuariosModulo = (function () {
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
-                        <th class="ps-3">ID</th>
+                       <!-- <th class="ps-3">ID</th>-->
                         <th>Usuario (Login)</th>
                         <th>Empleado Vinculado</th>
                         <th>Rol Asignado</th>
@@ -174,7 +174,7 @@ const RegistrosUsuariosModulo = (function () {
 
             html += `
                 <tr>
-                    <td class="ps-3 fw-bold text-muted">#${usr.Id}</td>
+                    <!--<td class="ps-3 fw-bold text-muted">#${usr.Id}</td>-->
                     <td class="fw-bold text-dark"><i class="fas fa-user-circle text-secondary me-2"></i>${usr.Usuario}</td>
                     <td>${usr.NombreEmpleado}</td>
                     <td><span class="badge bg-primary">${usr.NombreRol}</span></td>

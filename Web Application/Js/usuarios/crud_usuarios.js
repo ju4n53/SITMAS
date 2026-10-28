@@ -25,8 +25,8 @@ const UsuarioModulo = (function () {
         let htmlEstructura = `
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
-                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-user-plus"></i> Registrar Nueva Cuenta de Usuario</h4>
-                    <small class="text-muted">Asignación de credenciales y roles validados por el sistema SITMAS</small>
+                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-user-plus"></i> Formulario de registro</h4>
+                    <small class="text-muted">Creación de usuarios y asignación de roles</small>
                 </div>
                 <button class="btn btn-success btn-lg shadow-sm" id="btn-nuevo-usuario">
                     <i class="fas fa-plus-circle me-1"></i> Crear Usuario
@@ -36,7 +36,7 @@ const UsuarioModulo = (function () {
             <!-- CARD DE REGISTROS RECIENTES (ÚLTIMOS 5) -->
             <div class="card shadow-sm border-0 fade-in">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                    <h6 class="m-0 fw-bold"><i class="fas fa-history me-2"></i> ÚLTIMAS 5 CUENTAS CREADAS (RECIENTES)</h6>
+                    <h6 class="m-0 fw-bold"><i class="fas fa-history me-2"></i> ÚLTIMAS 5 CUENTAS CREADAS</h6>
                     <span class="badge bg-primary">Vista Rápida</span>
                 </div>
                 <div class="card-body p-0">
@@ -66,7 +66,7 @@ const UsuarioModulo = (function () {
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="titulo-modal-usuario">
-                                <i class="fas fa-user-lock me-2"></i> Nueva Cuenta de Usuario
+                                <i class="fas fa-user-lock me-2"></i> Crear Usuario
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -80,7 +80,7 @@ const UsuarioModulo = (function () {
                                         </select>
                                     </div>
                                     <div class="col-md-12">
-                                        <label class="form-label fw-bold">Nombre de Usuario (Login) *</label>
+                                        <label class="form-label fw-bold">Nombre de Usuario *</label>
                                         <input type="text" class="form-control" id="usr-nombre" required placeholder="Ej: jperez">
                                     </div>
                                     <div class="col-md-12">
@@ -96,7 +96,7 @@ const UsuarioModulo = (function () {
                                     <div class="col-12"><hr class="text-muted"></div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Rol Legitimado *</label>
+                                        <label class="form-label fw-bold">Rol *</label>
                                         <select class="form-select" id="usr-rol" required>
                                             <option value="">Cargando roles del sistema...</option>
                                         </select>
@@ -114,7 +114,7 @@ const UsuarioModulo = (function () {
                         <div class="modal-footer bg-light">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="button" class="btn btn-success" id="btn-guardar-usuario">
-                                <i class="fas fa-save me-1"></i> Guardar Usuario
+                                <i class="fas fa-save me-1"></i> Crear Usuario
                             </button>
                         </div>
                     </div>
@@ -179,8 +179,8 @@ const UsuarioModulo = (function () {
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-secondary">
                     <tr>
-                        <th class="ps-3">ID</th>
-                        <th>Usuario (Login)</th>
+                        <!--<th class="ps-3">ID</th>-->
+                        <th>Usuario</th>
                         <th>Empleado Vinculado</th>
                         <th>Rol Asignado</th>
                         <th class="text-center">Estado</th>
@@ -193,7 +193,7 @@ const UsuarioModulo = (function () {
             let badgeColor = usr.EstadoUsuario === 'Activo' ? 'bg-success' : 'bg-danger';
             html += `
                 <tr>
-                    <td class="ps-3 fw-bold text-muted">#${usr.Id}</td>
+                    <!--<td class="ps-3 fw-bold text-muted">#${usr.Id}</td>-->
                     <td class="fw-bold text-primary"><i class="fas fa-user-circle me-1"></i> ${usr.Usuario}</td>
                     <td>${usr.NombreEmpleado}</td>
                     <td><span class="badge bg-info text-dark">${usr.NombreRol}</span></td>

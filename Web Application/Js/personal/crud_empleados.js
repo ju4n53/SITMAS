@@ -29,8 +29,8 @@ const EmpleadoModulo = (function () {
         let htmlEstructura = `
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
-                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-user-plus"></i> Registrar Nuevo Ingreso</h4>
-                    <small class="text-muted">Alta de personal y vinculación de legajos</small>
+                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-user-plus"></i> Registrar Ingreso</h4>
+                    <small class="text-muted">Formulario de alta del personal</small>
                 </div>
                 <button class="btn btn-success btn-lg shadow-sm" id="btn-nuevo-empleado">
                     <i class="fas fa-plus-circle me-1"></i> Registrar Ingreso
@@ -40,7 +40,7 @@ const EmpleadoModulo = (function () {
             <!-- CARD DE REGISTROS RECIENTES -->
             <div class="card shadow-sm border-0 fade-in">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                    <h6 class="m-0 fw-bold"><i class="fas fa-history me-2"></i> ÚLTIMOS 5 INGRESOS (RECIENTES)</h6>
+                    <h6 class="m-0 fw-bold"><i class="fas fa-history me-2"></i> ÚLTIMOS 5 INGRESOS</h6>
                     <span class="badge bg-primary">Vista Rápida</span>
                 </div>
                 <div class="card-body p-0">
@@ -124,7 +124,7 @@ const EmpleadoModulo = (function () {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" id="btn-volver-alta"><i class="fas fa-arrow-left me-1"></i> Volver</button>
-                            <button type="button" class="btn btn-success" id="btn-guardar-alta"><i class="fas fa-save me-1"></i> Confirmar Ingreso</button>
+                            <button type="button" class="btn btn-success" id="btn-guardar-alta"><i class="fas fa-save me-1"></i> Registrar Ingreso</button>
                         </div>
                     </div>
                 </div>
@@ -168,11 +168,11 @@ const EmpleadoModulo = (function () {
             $('#tabla-recientes-container').html('<div class="alert alert-info text-center m-3">No hay ingresos recientes.</div>');
             return;
         }
-        let html = `<table class="table table-hover align-middle mb-0"><thead class="table-secondary"><tr><th class="ps-3">ID</th><th>Empleado</th><th>Área</th><th>Cargo</th><th class="text-center">Estado</th></tr></thead><tbody>`;
+        let html = `<table class="table table-hover align-middle mb-0"><thead class="table-secondary"><tr><th class="ps-3">Empleado</th><th>Área</th><th>Cargo</th><th class="text-center">Estado</th></tr></thead><tbody>`;
         lista.forEach(emp => {
             let bColor = emp.EstadoEmpleado === 'Activo' ? 'bg-success' : 'bg-danger';
             html += `<tr>
-                <td class="ps-3 text-muted fw-bold">#${emp.Id}</td>
+                <!--<td class="ps-3 text-muted fw-bold">#${emp.Id}</td>-->
                 <td class="fw-bold">${emp.Apellido}, ${emp.Nombre}</td>
                 <td><span class="badge bg-light text-dark border">${emp.Area || '-'}</span></td>
                 <td>${emp.Cargo || '-'}</td>

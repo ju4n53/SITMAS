@@ -31,7 +31,7 @@ const RegistrosEmpleadosModulo = (function () {
         let htmlEstructura = `
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
-                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-users"></i> Padrón General de Empleados</h4>
+                    <h4 class="text-primary m-0 fw-bold"><i class="fas fa-users"></i> Listado General de Empleados</h4>
                     <small class="text-muted">Búsqueda rápida, actualización de legajos y bajas del personal</small>
                 </div>
             </div>
@@ -179,11 +179,11 @@ const RegistrosEmpleadosModulo = (function () {
             $('#grid-laborales').html('<div class="alert alert-info text-center m-3">Sin resultados.</div>');
             return;
         }
-        let html = `<table class="table table-hover table-bordered align-middle mb-0"><thead class="table-dark"><tr><th class="text-center">ID</th><th>Apellido y Nombre</th><th>Área</th><th>Cargo</th><th class="text-center">Estado</th><th class="text-center">Acciones</th></tr></thead><tbody>`;
+        let html = `<table class="table table-hover table-bordered align-middle mb-0"><thead class="table-dark"><tr><th class="text-center">Apellido y Nombre</th><th>Área</th><th>Cargo</th><th class="text-center">Estado</th><th class="text-center">Acciones</th></tr></thead><tbody>`;
         lista.forEach(emp => {
             let bColor = emp.EstadoEmpleado === 'Activo' ? 'bg-success' : (emp.EstadoEmpleado === 'Inactivo' ? 'bg-danger' : 'bg-warning text-dark');
             html += `<tr>
-                <td class="text-center fw-bold text-secondary">#${emp.Id}</td>
+                <!--<td class="text-center fw-bold text-secondary">#${emp.Id}</td>-->
                 <td class="fw-bold">${emp.Apellido}, ${emp.Nombre}</td>
                 <td><span class="badge bg-light text-dark border">${emp.Area || '-'}</span></td>
                 <td>${emp.Cargo || '-'}</td>
@@ -203,11 +203,11 @@ const RegistrosEmpleadosModulo = (function () {
             $('#grid-personales').html('<div class="alert alert-info text-center m-3">Sin resultados.</div>');
             return;
         }
-        let html = `<table class="table table-hover table-bordered align-middle mb-0"><thead class="table-secondary"><tr><th class="text-center">ID</th><th>Empleado</th><th>CUIL</th><th>Teléfono</th><th>Email</th><th>Domicilio</th></tr></thead><tbody>`;
+        let html = `<table class="table table-hover table-bordered align-middle mb-0"><thead class="table-secondary"><tr><th class="text-center">Empleado</th><th>CUIL</th><th>Teléfono</th><th>Email</th><th>Domicilio</th></tr></thead><tbody>`;
         lista.forEach(emp => {
             let dom = emp.Calle ? `${emp.Calle} ${emp.Numero || ''}` : '-';
             html += `<tr>
-                <td class="text-center fw-bold text-muted">#${emp.Id}</td>
+                <!--<td class="text-center fw-bold text-muted">#${emp.Id}</td>-->
                 <td class="fw-bold">${emp.Apellido}, ${emp.Nombre}</td>
                 <td><code>${emp.Cuil || '-'}</code></td>
                 <td>${emp.Telefono || '-'}</td>
