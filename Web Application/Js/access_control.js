@@ -13,6 +13,8 @@ const paginaActual = window.location.pathname.split("/").pop();
 const rutasProtegidas = {
     "personal_gestion.html": ["R_Humanos", "Administrador"],
 
+    "usuarios_gestion.html": ["R_Humanos", "Administrador"],
+
     "traz_material.html": ["Supervisor_Logistica", "Administrador"],
 
     "traz_empresa.html": ["Supervisor_Logistica", "R_Institucionales", "Administrador"],
@@ -74,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Mapa de qué menúes HTML se encienden según el Rol
         const configuracionMenu = [
-            { idSidebar: 'sidebar-personal', idItems: ['pagePersonal'], roles: ["R_Humanos", "Administrador"] },
+            { idSidebar: 'sidebar-personal', idItems: ['pagePersonal','pageUsuarios'], roles: ["R_Humanos", "Administrador"] },
 
             { idSidebar: 'sidebar-logistica', idItems: ['pageRegistrosLog', 'pageReportesLog'], roles: ["R_Institucionales"] },
 

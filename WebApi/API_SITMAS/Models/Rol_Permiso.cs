@@ -3,164 +3,77 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.Helpers;
 
 namespace API_SITMAS.Models
 {
-    public class Rol_Permiso
+    public class RolPermisoDTO
     {
-        #region Atributos
-
-        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
-        private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
-
-        #endregion
-
-        #region Propìedades
-
         public int Id_Rol { get; set; }
-        public int Id_Permiso { get; set; }
         public string NombreRol { get; set; }
+        public int Id_Permiso { get; set; }
         public string PermisoUsuario { get; set; }
+    }
 
-        #endregion
+    public class RolPermisoDatos
+    {
+        private readonly string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
-        #region Metodos
-
-        public DataTable SelectAll()
+        // Lee directamente la vista respaldada por el SP sp_ListarRol_Permiso
+        public List<RolPermisoDTO> ListarRelaciones()
         {
-
-
-            string sqlSentencia = "sp_ListarRol_Permiso";
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-            sqlCnn.Close();
-
-            return ds.Tables[0];
-
+            var lista = new List<RolPermisoDTO>();
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ListarRol_Permiso", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCnn.Open();
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new RolPermisoDTO
+                            {
+                                Id_Rol = Convert.ToInt32(reader["Id_Rol"]),
+                                NombreRol = reader["NombreRol"].ToString(),
+                                Id_Permiso = Convert.ToInt32(reader["Id_Permiso"]),
+                                PermisoUsuario = reader["PermisoUsuario"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
         }
 
-        //public DataTable SelectId()
-        //{
-
-
-        //    string sqlSentencia = "sp_VerEmpleadoId";
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-        //    sqlCnn.Close();
-
-        //    return ds.Tables[0];
-
-        //}
-
-       
-
-        public void Modificar()
+        public void AsignarPermisoARol(int idRol, int idPermiso)
         {
-
-
-            string sqlSentencia = "sp_ActualizarRol_Permiso";
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            sqlCom.Parameters.Add("@Id_Rol", SqlDbType.Int).Value = Id_Rol;
-            sqlCom.Parameters.Add("@Id_Permiso", SqlDbType.Int).Value = Id_Permiso;
-
-            sqlCnn.Open();
-
-            var res = sqlCom.ExecuteNonQuery();
-
-            sqlCnn.Close();
-
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_AsignarPermiso_Rol", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@Id_Rol", idRol);
+                    sqlCom.Parameters.AddWithValue("@Id_Permiso", idPermiso);
+                    sqlCnn.Open();
+                    sqlCom.ExecuteNonQuery();
+                }
+            }
         }
 
-
-        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
-
-        public void Borrar()
+        public void EliminarPermisoDeRol(int idRol, int idPermiso)
         {
-
-            string sqlSentencia = "sp_EliminarRol_Permiso";
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            sqlCom.Parameters.Add("@Id_Rol", SqlDbType.Int).Value = Id_Rol;
-            sqlCom.Parameters.Add("@Id_Permiso", SqlDbType.Int).Value = Id_Permiso;
-
-            sqlCnn.Open();
-
-            var res = sqlCom.ExecuteNonQuery();
-
-            sqlCnn.Close();
-
-
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_EliminarRol_Permiso", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@Id_Rol", idRol);
+                    sqlCom.Parameters.AddWithValue("@Id_Permiso", idPermiso);
+                    sqlCnn.Open();
+                    sqlCom.ExecuteNonQuery();
+                }
+            }
         }
-
-
-        public DataTable VistaRolesYPermisos()
-        {
-
-            string sqlSentencia = "sp_ListarVistaRol_Permiso";
-
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
-
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-            sqlCnn.Close();
-
-            return ds.Tables[0];
-
-        }
-
-        #endregion
     }
 }

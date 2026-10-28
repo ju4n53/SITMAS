@@ -38,7 +38,7 @@
     <!-- Se añade el contenedor general flex de Bootstrap para asegurar la alineación horizontal fija -->
     <div class="main-layout flex-grow-1">
 
-         <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+          <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
             <ul class="nav flex-column nav-list pt-3">
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
@@ -85,7 +85,9 @@
                     </a>
                     <div id="gp" class="collapse">
                         <a class="nav-link small ps-4 d-none" id="pagePersonal"
-                            href="../Pages/personal_gestion.html">Personal</a>
+                            href="../Pages/personal_gestion.html">Empleados</a>
+                            <a class="nav-link small ps-4 d-none" id="pageUsuarios"
+                            href="../Pages/usuarios_gestion.html">Usuarios</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown d-none" id="sidebar-configuracion">
@@ -109,6 +111,7 @@
 
 
 
+
         <main class="container-fluid p-4">
             <!-- <div id="alertContainer"></div> -->
 
@@ -118,15 +121,11 @@
                         <ul class="nav nav-tabs border-2" id="RegistroPersonalTabs">
                             <li class="nav-item">
                                 <a class="nav-link active" id="tab-empleados-crud" href="#"
-                                    style="cursor: pointer;"></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-secondary" id="tab-usuarios-crud" href="#"
-                                    style="cursor: pointer;"></a>
+                                    style="cursor: pointer;">Ingresos</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-secondary" id="tab-registros-crud" href="#"
-                                    style="cursor: pointer;"></a>
+                                    style="cursor: pointer;">Registros</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-secondary" id="tab-planillas-crud" href="#"
@@ -157,6 +156,7 @@
 
 <!-- Scripts de los Módulos CRUD (Los crearemos uno a uno) -->
 <script src="../Js/personal/crud_empleados.js"></script>
+<script src="../Js/personal/registros_empleados.js"></script>
 
 
 <!-- Script Principal Enrutador -->

@@ -330,7 +330,7 @@ body {
     font-size: 0.9rem;
 }
 
-.table thead th {
+.table {
     background-color: var(--verde-fondo-claro) !important;
     /* Según paleta fondos EMEC[cite: 1] */
     color: var(--verde-inst) !important;
