@@ -1,179 +1,122 @@
- $(document).ready(function () {
+$(document).ready(function () {
 
-        // Controlador central de navegación
-        $('#RegistroTrazabilidadTabs .nav-link').on('click', function (e) {
-            e.preventDefault();
+    // Controlador central de navegación
+    $('#RegistroTrazabilidadTabs .nav-link').on('click', function (e) {
+        e.preventDefault();
 
-            // Limpiamos estilos de todas las pestañas
-            $('#RegistroTrazabilidadTabs .nav-link').removeClass('active').addClass('text-secondary');
-            // Activamos la pestaña seleccionada
-            $(this).removeClass('text-secondary').addClass('active');
+        // Limpiamos estilos de todas las pestañas
+        $('#RegistroTrazabilidadTabs .nav-link').removeClass('active').addClass('text-secondary');
+        // Activamos la pestaña seleccionada
+        $(this).removeClass('text-secondary').addClass('active');
 
-            const tabId = $(this).attr('id');
+        const tabId = $(this).attr('id');
 
-            // Enrutador
-            if (tabId === 'tab-ingreso-crud') {
-                console.log("Preparando módulo de Ingreso...");
-                CrudIngresoModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
-            } else if (tabId === 'tab-detalle-crud') {
-                console.log("Preparando módulo de Detalle...");
-                CrudDetalleModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
-            } else if (tabId === 'tab-clasificacion-crud') {
-                console.log("Preparando módulo de Clasificación...");
-                CrudClasificacionModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
-            } else if (tabId === 'tab-salida-crud') {
-                console.log("Preparando módulo de Salida...");
-                CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
-            }
-        });
-
-        $('#tab-ingreso-crud').trigger('click');
-
-
-
-
-
-
-         $('#RegistroPersonalTabs .nav-link').on('click', function (e) {
-            e.preventDefault();
-
-            // Limpiamos estilos de todas las pestañas
-            $('#RegistroPersonalTabs .nav-link').removeClass('active').addClass('text-secondary');
-            // Activamos la pestaña seleccionada
-            $(this).removeClass('text-secondary').addClass('active');
-
-            const tabId = $(this).attr('id');
-
-            // Enrutador
-            if (tabId === 'tab-empleados-crud') {
-                console.log("Preparando módulo de Ingreso...");
-                EmpleadoModulo.cargarEn("contenedor-dinamico-crud-personal");
-            } else if (tabId === 'tab-registros-crud') {
-                console.log("Preparando módulo de Clasificación...");
-                RegistrosEmpleadosModulo.cargarEn("contenedor-dinamico-crud-personal");
-            } else if (tabId === 'tab-planillas-crud') {
-                console.log("Preparando módulo de Salida...");
-               // CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-personal");
-            }
-        });
-
-        $('#tab-empleados-crud').trigger('click');
-
-
-
-
-
-         $('#RegistroUsuariosTabs .nav-link').on('click', function (e) {
-            e.preventDefault();
-
-            // Limpiamos estilos de todas las pestañas
-            $('#RegistroUsuariosTabs .nav-link').removeClass('active').addClass('text-secondary');
-            // Activamos la pestaña seleccionada
-            $(this).removeClass('text-secondary').addClass('active');
-
-            const tabId = $(this).attr('id');
-
-            // Enrutador
-            if (tabId === 'tab-usuarios-crud') {
-                console.log("Preparando módulo de Ingreso...");
-               UsuarioModulo.cargarEn("contenedor-dinamico-crud-usuarios");
-            } else if (tabId === 'tab-registros-crud') {
-                console.log("Preparando módulo de Clasificación...");
-                RegistrosUsuariosModulo.cargarEn("contenedor-dinamico-crud-usuarios");
-            } else if (tabId === 'tab-planillas-crud') {
-                console.log("Preparando módulo de Salida...");
-               // CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-usuarios");
-            }
-        });
-
-        $('#tab-usuarios-crud').trigger('click');
-
-
-
-
-
+        // Enrutador
+        if (tabId === 'tab-ingreso-crud') {
+            console.log("Preparando módulo de Ingreso...");
+            CrudIngresoModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+        } else if (tabId === 'tab-detalle-crud') {
+            console.log("Preparando módulo de Detalle...");
+            CrudDetalleModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+        } else if (tabId === 'tab-clasificacion-crud') {
+            console.log("Preparando módulo de Clasificación...");
+            CrudClasificacionModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+        } else if (tabId === 'tab-salida-crud') {
+            console.log("Preparando módulo de Salida...");
+            CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-trazabilidad");
+        }
     });
 
+    $('#tab-ingreso-crud').trigger('click');
 
 
 
 
-// /* ========================================================================
-//    SITMAS - Sala de Control (Router SPA)
-//    ======================================================================== */
 
-// $(document).ready(function () {
-//     // 1. Configuración del Contenedor Principal
-//     const ID_CONTENEDOR = 'contenedor-auditoria';
 
-//     // 2. Lógica de Cambio de Pestañas
-//     $('.nav-link').on('click', function (e) {
-//         e.preventDefault();
-        
-//         // Quitar la clase activa de todos y ponérsela al clickeado
-//         $('.nav-link').removeClass('active');
-//         $(this).addClass('active');
+    $('#RegistroPersonalTabs .nav-link').on('click', function (e) {
+        e.preventDefault();
 
-//         // Leer a qué módulo quiere ir
-//         const moduloSeleccionado = $(this).data('modulo');
-//         cargarModulo(moduloSeleccionado);
-//     });
+        // Limpiamos estilos de todas las pestañas
+        $('#RegistroPersonalTabs .nav-link').removeClass('active').addClass('text-secondary');
+        // Activamos la pestaña seleccionada
+        $(this).removeClass('text-secondary').addClass('active');
 
-//     // 3. Función para orquestar la carga del módulo JS correcto
-//     function cargarModulo(modulo) {
-//         // Mostrar un pequeño loader mientras se dibuja
-//         $(`#${ID_CONTENEDOR}`).html(`
-//             <div class="text-center p-5 fade-in">
-//                 <div class="spinner-border text-secondary" role="status"></div>
-//                 <h5 class="mt-3 text-muted">Cargando datos de auditoría...</h5>
-//             </div>
-//         `);
+        const tabId = $(this).attr('id');
 
-//         // Usamos un pequeño delay simulado para que la transición sea suave
-//         setTimeout(() => {
-//             switch (modulo) {
-//                 case 'ingreso':
-//                     if (typeof CrudIngresoModulo !== 'undefined') {
-//                         CrudIngresoModulo.cargarEn(ID_CONTENEDOR);
-//                     } else {
-//                         mostrarErrorModulo('Ingresos Generales');
-//                     }
-//                     break;
-//                 case 'detalle':
-//                     if (typeof CrudDetalleModulo !== 'undefined') {
-//                         CrudDetalleModulo.cargarEn(ID_CONTENEDOR);
-//                     } else {
-//                         mostrarErrorModulo('Báscula (Detalle)');
-//                     }
-//                     break;
-//                 case 'clasificacion':
-//                     if (typeof CrudClasificacionModulo !== 'undefined') {
-//                         CrudClasificacionModulo.cargarEn(ID_CONTENEDOR);
-//                     } else {
-//                         mostrarErrorModulo('Clasificación');
-//                     }
-//                     break;
-//                 case 'salida':
-//                     if (typeof CrudSalidaModulo !== 'undefined') {
-//                         CrudSalidaModulo.cargarEn(ID_CONTENEDOR);
-//                     } else {
-//                         mostrarErrorModulo('Salidas y Stock');
-//                     }
-//                     break;
-//             }
-//         }, 300);
-//     }
+        // Enrutador
+        if (tabId === 'tab-empleados-crud') {
+            console.log("Preparando módulo de Ingreso...");
+            EmpleadoModulo.cargarEn("contenedor-dinamico-crud-personal");
+        } else if (tabId === 'tab-registros-crud') {
+            console.log("Preparando módulo de Clasificación...");
+            RegistrosEmpleadosModulo.cargarEn("contenedor-dinamico-crud-personal");
+        } else if (tabId === 'tab-planillas-crud') {
+            console.log("Preparando módulo de Salida...");
+            // CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-personal");
+        }
+    });
 
-//     function mostrarErrorModulo(nombreModulo) {
-//         $(`#${ID_CONTENEDOR}`).html(`
-//             <div class="alert alert-warning text-center fade-in m-4 p-4">
-//                 <i class="fas fa-tools fa-3x mb-3 text-warning"></i>
-//                 <h5>Módulo "${nombreModulo}" en Construcción</h5>
-//                 <p>El archivo JavaScript de este módulo aún no ha sido implementado o tiene un error de sintaxis.</p>
-//             </div>
-//         `);
-//     }
+    $('#tab-empleados-crud').trigger('click');
 
-//     // 4. Inicializar la primera pestaña por defecto al cargar la página
-//     cargarModulo('ingreso');
-// });
+
+
+
+
+    $('#RegistroUsuariosTabs .nav-link').on('click', function (e) {
+        e.preventDefault();
+
+        // Limpiamos estilos de todas las pestañas
+        $('#RegistroUsuariosTabs .nav-link').removeClass('active').addClass('text-secondary');
+        // Activamos la pestaña seleccionada
+        $(this).removeClass('text-secondary').addClass('active');
+
+        const tabId = $(this).attr('id');
+
+        // Enrutador
+        if (tabId === 'tab-usuarios-crud') {
+            console.log("Preparando módulo de Ingreso...");
+            UsuarioModulo.cargarEn("contenedor-dinamico-crud-usuarios");
+        } else if (tabId === 'tab-registros-crud') {
+            console.log("Preparando módulo de Clasificación...");
+            RegistrosUsuariosModulo.cargarEn("contenedor-dinamico-crud-usuarios");
+        } else if (tabId === 'tab-planillas-crud') {
+            console.log("Preparando módulo de Salida...");
+            // CrudSalidaModulo.cargarEn("contenedor-dinamico-crud-usuarios");
+        }
+    });
+
+    $('#tab-usuarios-crud').trigger('click');
+
+
+
+
+
+});
+
+
+//Renderizado condicional del landing.html
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sesionString = localStorage.getItem("usuarioSesion");
+    if (sesionString) {
+        const sesionActual = JSON.parse(sesionString);
+
+        // Mostramos el contenedor correcto según el rol
+        if (sesionActual.rol === "Operador_Logistica") {
+            document.getElementById("contenedor-rutas").classList.remove("d-none");
+        } else {
+            document.getElementById("panel-graficos").classList.remove("d-none");
+        }
+        if (sesionActual.rol === "R_Institucionales") {
+            document.getElementById("panel-graficos").classList.remove("d-none");
+        }
+
+        if (sesionActual.rol === "Administrador") {
+            document.getElementById("contenedor-rutas").classList.remove("d-none");
+            document.getElementById("panel-graficos").classList.remove("d-none");
+        }
+    }
+});
+
+

@@ -14,7 +14,8 @@ $(document).ready(function () {
         GuardarHojaRuta();
     });
 
-    // 📡 PATRÓN OYENTE (Pub/Sub):
+    
+
     // Cuando el módulo de detalles notifique una asignación por Drag & Drop,
     // volvemos a pedir las cabeceras a la API. Como el SP ya cambió el estado en BD,
     // la tarjeta se renderizará automáticamente como "Asignado".
@@ -99,7 +100,6 @@ function GetAllHojasRuta() {
                                      style="min-height: 120px; max-height: 300px; overflow-y: auto;">
                                 </div>
                                 
-                                <!-- ✨ ESTE ES EL NUEVO BOTÓN DE CONEXIÓN -->
                                 <button class="btn btn-sm btn-outline-primary w-100" onclick="SincronizarConMapa(${item.Id})">
                                     📍 Trazar en Mapa
                                 </button>

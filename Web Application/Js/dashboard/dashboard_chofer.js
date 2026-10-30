@@ -55,6 +55,10 @@ $(document).ready(function () {
     if (choferRolUsuario === "Operador_Logistica" || choferRolUsuario === "Administrador") {
         CargarHojasDeRutaDelDia();
     }
+
+  CargarGoogleMapsSDK(() => {
+        console.log("SITMAS - Google Maps SDK preparado exitosamente en el Dashboard.");
+    });
 });
 
 // $(document).ready(function () {
@@ -257,7 +261,7 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
         localStorage.setItem(`odometro_inicio_${idHojaRuta}`, kilometrajeInicial); // NUEVO
 
         // 4. Tu lógica original para iniciar la Hoja de Ruta
-        const dtoHoja = { IdUsuario: choferIdUsuario }; // idUsuarioReal viene de tu variable global
+        const dtoHoja = { IdUsuario: choferIdUsuario }; // 
         await $.ajax({
             type: "PATCH",
             url: `${URL_API_HOJAS_RUTA}/${idHojaRuta}/iniciar`,
@@ -279,7 +283,15 @@ async function IniciarViaje(idHojaRuta, idVehiculo) {
    ========================================================================== */
 
 function RenderizarVistaMapaActivo(ruta, $contenedor) {
+    if (!ruta || !ruta.Id) {
+        console.warn("SITMAS - Se intentó renderizar el mapa pero no hay una 'ruta' válida en memoria.");
+        return;
+    }
+
+    // Acceso seguro a .Id
     idRutaActivaMapa = ruta.Id;
+    
+    //idRutaActivaMapa = ruta.Id;
 
     const mapaHTML = `
         <div class="col-12" id="panel-viaje-activo">

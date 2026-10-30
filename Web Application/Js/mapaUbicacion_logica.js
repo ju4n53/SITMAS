@@ -25,7 +25,10 @@ let coordenadaTemporalClick = null;
 
 $(document).ready(function () {
     // 1. Inicializar Mapa e Interfaz
-    InicializarMapa();
+    // InicializarMapa();
+    CargarGoogleMapsSDK(() => {
+        InicializarMapa();
+    });
     InicializarModuloMapa();
 
     // 2. Al cambiar de Hoja de Ruta en el combo, actualizar la tabla resumen y el mapa

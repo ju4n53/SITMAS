@@ -168,39 +168,14 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../Js/alerts_config.js"></script>
+    <script src="../Js/config/config_maps.js"></script>
 
-    <script src="../Js/dashboard/dashboard_graficos.js"></script>
+    <!-- <script src="../Js/dashboard/dashboard_graficos.js"></script> -->
     <script src="../Js/dashboard/dashboard_chofer.js"></script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe7Wm5puoI09mbnI6gBOrheoV0yeJVHds&libraries=places"></script>
-
-
+    <script src="../Js/config/enrutador_spa.js"></script>
     <script src="../Js/logout.js"></script>
 
-    <!-- ✨ MAGIA DEL RENDERIZADO CONDICIONAL -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const sesionString = localStorage.getItem("usuarioSesion");
-            if (sesionString) {
-                const sesionActual = JSON.parse(sesionString);
 
-                // Mostramos el contenedor correcto según el rol
-                if (sesionActual.rol === "Operador_Logistica") {
-                    document.getElementById("contenedor-rutas").classList.remove("d-none");
-                } else {
-                    document.getElementById("panel-graficos").classList.remove("d-none");
-                }
-                if (sesionActual.rol === "R_Institucionales") {
-                    document.getElementById("panel-graficos").classList.remove("d-none");
-                }
-
-                if (sesionActual.rol === "Administrador") {
-                    document.getElementById("contenedor-rutas").classList.remove("d-none");
-                    document.getElementById("panel-graficos").classList.remove("d-none");
-                }
-            }
-        });
-    </script>
 </body>
 
 </html>

@@ -330,7 +330,7 @@ body {
     font-size: 0.9rem;
 }
 
-.table {
+.table thead th {
     background-color: var(--verde-fondo-claro) !important;
     /* Según paleta fondos EMEC[cite: 1] */
     color: var(--verde-inst) !important;
@@ -344,11 +344,11 @@ body {
 .table-em-violeta thead th {
     background-color:#daa3ff !important;
     /* Según paleta fondos EMEC[cite: 1] */
-    color:#4b077e !important;
+    color:#662d91 !important;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid var(--emec-violeta) !important;
+    border-bottom: 2px solid var(--verde-bio) !important;
     padding: 12px;
 }
 
