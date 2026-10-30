@@ -1,121 +1,133 @@
 ﻿using API_SITMAS.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+using System.Data.SqlClient;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/MaterialClasificado")]
     public class MaterialClasificadoController : ApiController
     {
         // GET: api/MaterialClasificado
         [HttpGet]
-        public List<Material_Clasificado> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            Material_Clasificado oMaterial = new Material_Clasificado();
-
-            DataTable dt = oMaterial.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<Material_Clasificado>>(listaJson);
-
-            return Lista;
-
+            try
+            {
+                var oMaterial = new Material_Clasificado();
+                List<Material_Clasificado> lista = oMaterial.SelectAll();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
-        // GET: api/MaterialClasificado/5
-        //[HttpGet]
+        // GET: api/MaterialClasificado/ListarVista
+        [HttpGet]
+        [Route("ListarVista")]
+        public IHttpActionResult ListarVista()
+        {
+            try
+            {
+                var oMaterial = new Material_Clasificado();
+                List<Material_Clasificado> lista = oMaterial.SelectVista();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
-        //public Material_Clasificado ListarPorId(int id)
-        //{
-        //    Material_Clasificado oMaterial = new Material_Clasificado();
-        //    oMaterial.Id = id;
-
-        //    DataTable dt = oMaterial.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Material_Clasificado>>(ListaJsom).ToList().FirstOrDefault();
-        //    return obj;
-
-        //}
+        // GET: api/MaterialClasificado/Pendientes
+        [HttpGet]
+        [Route("Pendientes")]
+        public IHttpActionResult ListarPendientes(
+            int? idIngreso = null,
+            DateTime? fechaEspecifica = null,
+            DateTime? desde = null,
+            DateTime? hasta = null)
+        {
+            try
+            {
+                var oMaterial = new Material_Clasificado();
+                List<PendienteClasificacionDTO> pendientes = oMaterial.SelectPendientes(idIngreso, fechaEspecifica, desde, hasta);
+                return Ok(pendientes);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         // POST: api/MaterialClasificado
         [HttpPost]
-
-        public void Insertar([FromBody] Material_Clasificado value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] Material_Clasificado value)
         {
-            Material_Clasificado oMaterial = new Material_Clasificado();
-            oMaterial.Id_Detalle_Ingreso = value.Id_Detalle_Ingreso;
-            oMaterial.PesoTotal = value.PesoTotal;
-            oMaterial.Id_Estado_Material = value.Id_Estado_Material;
-            oMaterial.Id_Destino = value.Id_Destino;
-            oMaterial.Id_Usuario_Clasificador = value.Id_Usuario_Clasificador;
-        
-            oMaterial.Insertar();
+            if (value == null) return BadRequest("Los datos de clasificación no pueden ser nulos.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                int idGenerado = value.Insertar();
+                return Ok(new { id = idGenerado, mensaje = "Clasificación de material y stock registrada con éxito." });
+            }
+            catch (SqlException ex)
+            {
+                // Captura las validaciones de negocio lanzadas por el RAISERROR en el SP
+                return Content(HttpStatusCode.BadRequest, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
-        // PUT: api/Empleado/5
-        //[HttpPut]
+        // PUT: api/MaterialClasificado/5
+        [HttpPut]
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] Material_Clasificado value)
+        {
+            if (value == null) return BadRequest("Los datos a modificar no pueden ser nulos.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        //public void Modificar(int id, [FromBody] Empleado value)
-        //{
+            try
+            {
+                value.Id = id;
+                value.Modificar();
+                return Ok(new { mensaje = "Registro de stock clasificado modificado exitosamente." });
+            }
+            catch (SqlException ex)
+            {
+                return Content(HttpStatusCode.BadRequest, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-        //    oEmpleado.Apellido = value.Apellido;
-        //    oEmpleado.Nombre = value.Nombre;
-        //    oEmpleado.Cuil = value.Cuil;
-        //    oEmpleado.Telefono = value.Telefono;
-        //    oEmpleado.Email = value.Email;
-        //    oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;
-        //    oEmpleado.Id_Cargo = value.Id_Cargo;
-        //    oEmpleado.Id_Area = value.Id_Area;
-        //    oEmpleado.Id_Barrio = value.Id_Barrio;
-        //    oEmpleado.Id_Estado_Empleado = value.Id_Estado_Empleado;
-        //    oEmpleado.Calle = value.Calle;
-        //    oEmpleado.Numero = value.Numero;
-        //    oEmpleado.Piso = value.Piso;
-        //    oEmpleado.Dpto = value.Dpto;
-
-        //    oEmpleado.Modificar();
-
-
-        //}
-
-        // DELETE: api/Empleado/5
-        //[HttpDelete]
-
-        //public void Borrar(int id)
-        //{
-
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    oEmpleado.Borrar();
-
-        //}
-
-
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
-
-
-        //}
-
-
+        // DELETE: api/MaterialClasificado/5
+        [HttpDelete]
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
+        {
+            try
+            {
+                var oMaterial = new Material_Clasificado { Id = id };
+                oMaterial.Borrar();
+                return Ok(new { mensaje = "Clasificación anulada exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

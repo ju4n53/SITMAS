@@ -1,87 +1,78 @@
 ﻿using API_SITMAS.Models;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/Permisos")]
     public class PermisosController : ApiController
     {
-        // GET: api/Permisos
+        private readonly PermisoDatos _datos = new PermisoDatos();
+
         [HttpGet]
-        public List<PermisoUser> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            PermisoUser oPermiso = new PermisoUser();
-
-            DataTable dt = oPermiso.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<PermisoUser>>(listaJson);
-
-            return Lista;
-
+            try
+            {
+                return Ok(_datos.SelectAll());
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // GET: api/Area/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
-
-        // POST: api/Permisos
         [HttpPost]
-        public void Insertar([FromBody] PermisoUser value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] PermisoDTO value)
         {
-            PermisoUser oPermiso = new PermisoUser();
-            oPermiso.PermisoUsuario = value.PermisoUsuario;
+            if (value == null || string.IsNullOrWhiteSpace(value.PermisoUsuario))
+                return BadRequest("El nombre del permiso es requerido.");
 
-            oPermiso.Insertar();
+            try
+            {
+                int idGenerado = _datos.Insertar(value);
+                return Ok(new { mensaje = "Permiso registrado exitosamente.", id = idGenerado });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // PUT: api/Permisos/5
+        // 🌟 CORREGIDO: Ahora usa correctamente [HttpPut]
         [HttpPut]
-        public void Modificar(int id, [FromBody] PermisoUser value)
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] PermisoDTO value)
         {
+            if (value == null) return BadRequest("Datos requeridos.");
 
-            PermisoUser oPermiso = new PermisoUser();
-            oPermiso.Id = id;
-            oPermiso.PermisoUsuario = value.PermisoUsuario;
-
-            oPermiso.Modificar();
-
+            try
+            {
+                value.Id = id;
+                _datos.Modificar(value);
+                return Ok(new { mensaje = "Permiso modificado exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // DELETE: api/Permisos/5
         [HttpDelete]
-
-        public void Borrar(int id)
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
         {
-
-            PermisoUser oPermiso = new PermisoUser();
-            oPermiso.Id = id;
-
-            oPermiso.Borrar();
-
+            try
+            {
+                _datos.Borrar(id);
+                return Ok(new { mensaje = "Permiso eliminado." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
-
-      
-
     }
 }

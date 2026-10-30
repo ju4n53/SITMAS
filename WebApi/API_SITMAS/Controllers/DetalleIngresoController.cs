@@ -1,121 +1,319 @@
 ﻿using API_SITMAS.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/DetalleIngreso")]
     public class DetalleIngresoController : ApiController
     {
         // GET: api/DetalleIngreso
         [HttpGet]
-        public List<Detalle_Ingreso> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
-
-            DataTable dt = oDetalleIngreso.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<Detalle_Ingreso>>(listaJson);
-
-            return Lista;
-
+            try
+            {
+                Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
+                List<Detalle_Ingreso> lista = oDetalleIngreso.SelectAll();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
-        // GET: api/Empleado/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
+        // GET: api/DetalleIngreso/PorCabecera/5
+        [HttpGet]
+        [Route("PorCabecera/{idCabecera}")]
+        public IHttpActionResult PorCabecera(int idCabecera)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<Detalle_Ingreso> lista = oDetalle.SelectPorCabecera(idCabecera);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         // POST: api/DetalleIngreso
         [HttpPost]
-
-        public void Insertar([FromBody] Detalle_Ingreso value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] Detalle_Ingreso value)
         {
-            Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
-            oDetalleIngreso.Id_Ingreso_Material = value.Id_Ingreso_Material;
-            oDetalleIngreso.Id_SubTipo_Material = value.Id_SubTipo_Material;
-            oDetalleIngreso.PesoBruto = value.PesoBruto;
-            oDetalleIngreso.Observaciones = value.Observaciones;
-
-            oDetalleIngreso.Insertar();
+            if (value == null) return BadRequest("Datos inválidos.");
+            try
+            {
+                value.Insertar();
+                return Ok("Pesada de material registrada en el camión.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
-        // PUT: api/Empleado/5
-        //[HttpPut]
+        // PUT: api/DetalleIngreso/5
+        [HttpPut]
+        [Route("{id}")]
+        public IHttpActionResult Modificar(int id, [FromBody] Detalle_Ingreso value)
+        {
+            if (value == null) return BadRequest("Datos inválidos.");
+            try
+            {
+                value.IdDetalleIngreso = id;
+                value.Modificar();
+                return Ok("Pesada de material modificada.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
-        //public void Modificar(int id, [FromBody] Empleado value)
-        //{
+        // DELETE: api/DetalleIngreso/5
+        [HttpDelete]
+        [Route("{id}")]
+        public IHttpActionResult Borrar(int id)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                oDetalle.IdDetalleIngreso = id;
+                oDetalle.Borrar();
+                return Ok("Pesada anulada correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-        //    oEmpleado.Apellido = value.Apellido;
-        //    oEmpleado.Nombre = value.Nombre;
-        //    oEmpleado.Cuil = value.Cuil;
-        //    oEmpleado.Telefono = value.Telefono;
-        //    oEmpleado.Email = value.Email;
-        //    oEmpleado.Fecha_Ingreso = value.Fecha_Ingreso;
-        //    oEmpleado.Id_Cargo = value.Id_Cargo;
-        //    oEmpleado.Id_Area = value.Id_Area;
-        //    oEmpleado.Id_Barrio = value.Id_Barrio;
-        //    oEmpleado.Id_Estado_Empleado = value.Id_Estado_Empleado;
-        //    oEmpleado.Calle = value.Calle;
-        //    oEmpleado.Numero = value.Numero;
-        //    oEmpleado.Piso = value.Piso;
-        //    oEmpleado.Dpto = value.Dpto;
+        // GET: api/DetalleIngreso/PendientesClasificacion/5
+        [HttpGet]
+        [Route("PendientesClasificacion/{idIngreso}")]
+        public IHttpActionResult ListarPendientesClasificacion(int idIngreso)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idIngreso);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
-        //    oEmpleado.Modificar();
+        // GET: api/DetalleIngreso/PendientesPesaje?desde=2026-10-01&hasta=2026-10-25
+        [HttpGet]
+        [Route("PendientesPesaje")]
+        public IHttpActionResult GetPendientesPesaje(DateTime? desde = null, DateTime? hasta = null)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<PendientePesaje> lista = oDetalle.SelectPendientesPesaje(desde, hasta);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
-
-        //}
-
-        // DELETE: api/Empleado/5
-        //[HttpDelete]
-
-        //public void Borrar(int id)
-        //{
-
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    oEmpleado.Borrar();
-
-        //}
-
-
-        //[HttpGet]
-        //public List<Empleado> ListarVista()
-        //{
-        //    Empleado oEmpleado = new Empleado();
-
-        //    var dt = oEmpleado.VistalistadoEmpleados();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var Lista = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom);
-        //    return Lista;
-
-
-        //}
-
-
+        // GET: api/DetalleIngreso/RemitoOrigen
+        // GET: api/DetalleIngreso/RemitoOrigen?idIngreso=5
+        [HttpGet]
+        [Route("RemitoOrigen")]
+        public IHttpActionResult GetRemitoOrigen(int? idIngreso = null)
+        {
+            try
+            {
+                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+                List<RemitoOrigenDTO> lista = oDetalle.SelectRemitoOrigen(idIngreso);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//using API_SITMAS.Models;
+//using System;
+//using System.Collections.Generic;
+//using System.Net;
+//using System.Web.Http;
+//using static API_SITMAS.Models.Detalle_Ingreso;
+
+//namespace API_SITMAS.Controllers
+//{
+//    [RoutePrefix("api/DetalleIngreso")]
+//    public class DetalleIngresoController : ApiController
+//    {
+//        // GET: api/DetalleIngreso
+//        [HttpGet]
+//        [Route("")]
+//        public IHttpActionResult ListarTodo()
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalleIngreso = new Detalle_Ingreso();
+//                List<Detalle_Ingreso> Lista = oDetalleIngreso.SelectAll();
+//                return Ok(Lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        // GET: api/DetalleIngreso/PorCabecera/5
+//        [HttpGet]
+//        [Route("PorCabecera/{idCabecera}")]
+//        public IHttpActionResult PorCabecera(int idCabecera)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<Detalle_Ingreso> Lista = oDetalle.SelectPorCabecera(idCabecera);
+//                return Ok(Lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        // POST: api/DetalleIngreso
+//        [HttpPost]
+//        [Route("")]
+//        public IHttpActionResult Insertar([FromBody] Detalle_Ingreso value)
+//        {
+//            if (value == null) return BadRequest("Datos inválidos.");
+//            try
+//            {
+//                value.Insertar();
+//                return Ok("Pesada de material registrada en el camión.");
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        // PUT: api/DetalleIngreso/5
+//        [HttpPut]
+//        [Route("{id}")]
+//        public IHttpActionResult Modificar(int id, [FromBody] Detalle_Ingreso value)
+//        {
+//            if (value == null) return BadRequest("Datos inválidos.");
+//            try
+//            {
+//                value.IdDetalleIngreso = id;
+//                value.Modificar();
+//                return Ok("Pesada de material modificada.");
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        // DELETE: api/DetalleIngreso/5
+//        [HttpDelete]
+//        [Route("{id}")]
+//        public IHttpActionResult Borrar(int id)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                oDetalle.IdDetalleIngreso = id;
+//                oDetalle.Borrar();
+//                return Ok("Pesada anulada correctamente.");
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//        // GET: api/DetalleIngreso/PendientesClasificacion/5
+//        [HttpGet]
+//        [Route("PendientesClasificacion/{idIngreso}")]
+//        public IHttpActionResult ListarPendientesClasificacion(int idIngreso)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idIngreso);
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+
+
+//        // GET: api/DetalleIngreso/PendientesPesaje?desde=2026-10-01&hasta=2026-10-25
+//        [HttpGet]
+//        [Route("PendientesPesaje")]
+//        public IHttpActionResult GetPendientesPesaje(DateTime? desde = null, DateTime? hasta = null)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<PendientePesaje> lista = oDetalle.SelectPendientesPesaje(desde, hasta);
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+
+//        // GET: api/DetalleIngreso/RemitoOrigen
+//        // GET: api/DetalleIngreso/RemitoOrigen?idIngreso=5
+//        [HttpGet]
+//        [Route("RemitoOrigen")]
+//        public IHttpActionResult GetRemitoOrigen(int? idIngreso = null)
+//        {
+//            try
+//            {
+//                Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+//                List<RemitoOrigenDTO> lista = oDetalle.SelectRemitoOrigen(idIngreso);
+//                return Ok(lista);
+//            }
+//            catch (Exception ex)
+//            {
+//                return Content(HttpStatusCode.InternalServerError, ex.Message);
+//            }
+//        }
+
+//    }
+//}

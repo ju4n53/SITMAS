@@ -1,85 +1,77 @@
 ﻿using API_SITMAS.Models;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
 {
+    [RoutePrefix("api/Roles")]
     public class RolesController : ApiController
     {
-        // GET: api/Roles
+        private readonly RolDatos _datos = new RolDatos();
+
         [HttpGet]
-        public List<RolSistema> ListarTodo()
+        [Route("")]
+        public IHttpActionResult ListarTodo()
         {
-            RolSistema oRol = new RolSistema();
-
-            DataTable dt = oRol.SelectAll();
-            var listaJson = JsonConvert.SerializeObject(dt);
-
-            var Lista = JsonConvert.DeserializeObject<List<RolSistema>>(listaJson);
-
-            return Lista;
-
+            try
+            {
+                return Ok(_datos.SelectAll());
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
-        // GET: api/Area/5
-        //[HttpGet]
-
-        //public Empleado ListarPorId(int id)
-        //{
-        //    Empleado oEmpleado = new Empleado();
-        //    oEmpleado.Id = id;
-
-        //    DataTable dt = oEmpleado.SelectId();
-
-        //    var ListaJsom = JsonConvert.SerializeObject(dt);
-
-        //    var obj = JsonConvert.DeserializeObject<List<Empleado>>(ListaJsom).ToList().FirstOrDefault();
-
-        //    return obj;
-
-        //}
-
-        // POST: api/Roles
         [HttpPost]
-        public void Insertar([FromBody] RolSistema value)
+        [Route("")]
+        public IHttpActionResult Insertar([FromBody] RolDTO value)
         {
-            RolSistema oRol = new RolSistema();
-            oRol.NombreRol = value.NombreRol;
+            if (value == null || string.IsNullOrWhiteSpace(value.NombreRol))
+                return BadRequest("El nombre del rol es requerido.");
 
-            oRol.Insertar();
+            try
+            {
+                int idGenerado = _datos.Insertar(value);
+                return Ok(new { mensaje = "Rol creado exitosamente.", id = idGenerado });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // PUT: api/Roles/5
         [HttpPut]
-        public void Modificar(int id, [FromBody] RolSistema value)
+        [Route("{id:int}")]
+        public IHttpActionResult Modificar(int id, [FromBody] RolDTO value)
         {
+            if (value == null) return BadRequest("Datos inválidos.");
 
-            RolSistema oRol = new RolSistema();
-            oRol.Id = id;
-            oRol.NombreRol = value.NombreRol;
-
-            oRol.Modificar();
-
+            try
+            {
+                value.Id = id;
+                _datos.Modificar(value);
+                return Ok(new { mensaje = "Rol actualizado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // DELETE: api/Roles/5
         [HttpDelete]
-
-        public void Borrar(int id)
+        [Route("{id:int}")]
+        public IHttpActionResult Borrar(int id)
         {
-
-            RolSistema oRol = new RolSistema();
-            oRol.Id = id;
-
-            oRol.Borrar();
-
+            try
+            {
+                _datos.Borrar(id);
+                return Ok(new { mensaje = "Rol eliminado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
-
     }
 }

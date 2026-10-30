@@ -2,242 +2,274 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Configuration;
-
-
 
 namespace API_SITMAS.Models
 {
     public class Ingreso_Material
     {
-
-
-        #region Atributos
-
-        // Ahora le pedimos al ConfigurationManager que busque la cadena por su nombre
         private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
-
-        //string conectionString = @"Data Source=DESKTOP-N824T94;Initial Catalog=Gestion_SITMAS; Integrated Security= True ";
-
-        #endregion
-
-        #region Propìedades
-
+        #region Propiedades
         public int IdIngresoM { get; set; }
-        public int Id_Origen { get; set; }
+        public DateTime? FechaIngreso { get; set; } // 👈 Ahora lo controlamos nosotros
         public int Id_Usuario_Registro { get; set; }
         public int Id_Camionero_Ingreso { get; set; }
         public int Id_Vehiculo_Ingreso { get; set; }
-
-
+        public string EstadoIng { get; set; }
+        public int? Id_HojaRuta { get; set; } // 👈 Flexible para soportar ingresos espontáneos
         #endregion
 
         #region Metodos
-
-        public DataTable SelectAll()
+        public List<Ingreso_Material> SelectAll()
         {
+            List<Ingreso_Material> lista = new List<Ingreso_Material>();
+            string sqlSentencia = "sp_ListarIngreso_Material"; // Asegúrate de tener este SP
 
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+                sqlCnn.Open();
 
-            string sqlSentencia = "sp_ListarIngresoMaterial";
+                using (SqlDataReader reader = sqlCom.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Ingreso_Material obj = new Ingreso_Material();
+                        obj.IdIngresoM = Convert.ToInt32(reader["IdIngresoM"]);
 
+                        // Protección contra nulos
+                        obj.FechaIngreso = reader["FechaIngreso"] != DBNull.Value ? Convert.ToDateTime(reader["FechaIngreso"]) : (DateTime?)null;
 
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
+                        obj.Id_Usuario_Registro = Convert.ToInt32(reader["Id_Usuario_Registro"]);
+                        obj.Id_Camionero_Ingreso = Convert.ToInt32(reader["Id_Camionero_Ingreso"]);
+                        obj.Id_Vehiculo_Ingreso = Convert.ToInt32(reader["Id_Vehiculo_Ingreso"]);
+                        obj.EstadoIng = reader["EstadoIng"].ToString();
 
+                        obj.Id_HojaRuta = reader["Id_HojaRuta"] != DBNull.Value ? Convert.ToInt32(reader["Id_HojaRuta"]) : (int?)null;
 
-            sqlCnn.Open();
-
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
-
-            DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlCom;
-            da.Fill(ds);
-
-
-
-            sqlCnn.Close();
-
-
-            return ds.Tables[0];
-
+                        lista.Add(obj);
+                    }
+                }
+            }
+            return lista;
         }
 
-        //public DataTable SelectId()
-        //{
-
-
-        //    string sqlSentencia = "sp_VerEmpleadoId";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
-
-        //    sqlCnn.Close();
-
-        //    return ds.Tables[0];
-
-        //}
-
-        public void Insertar()
+        public int Insertar()
         {
+            int nuevoId = 0;
+            string sqlSentencia = "sp_InsertarIngreso_Material";
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
 
-            string sqlSentencia = "sp_RegistrarIngresoMaterial";
+                sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
+                sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
+                sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
 
+                // Si desde el front no mandan fecha, ponemos la actual como respaldo
+                sqlCom.Parameters.Add("@FechaIngreso", SqlDbType.DateTime).Value = FechaIngreso ?? DateTime.Now;
 
-            SqlConnection sqlCnn = new SqlConnection();
-            sqlCnn.ConnectionString = conectionString;
+                sqlCom.Parameters.Add("@Id_HojaRuta", SqlDbType.Int).Value = Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value;
 
+                sqlCnn.Open();
+                // Usamos ExecuteScalar porque el SP hace un SELECT SCOPE_IDENTITY()
+                nuevoId = Convert.ToInt32(sqlCom.ExecuteScalar());
+            }
+            return nuevoId;
+        }
 
-            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-            sqlCom.CommandType = CommandType.StoredProcedure;
+        public void Modificar()
+        {
+            string sqlSentencia = "sp_ActualizarIngreso_Material";
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
 
-            sqlCom.Parameters.Add("@IdOrigen", SqlDbType.Int).Value = Id_Origen;
-            sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
-            sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
-            sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
-           
+                sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = IdIngresoM;
+                sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
+                sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
+                sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
+                sqlCom.Parameters.Add("@FechaIngreso", SqlDbType.DateTime).Value = FechaIngreso ?? DateTime.Now;
+                sqlCom.Parameters.Add("@Id_HojaRuta", SqlDbType.Int).Value = Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value;
 
-            sqlCnn.Open();
-
-
-            var res = sqlCom.ExecuteNonQuery();
-
-
-            sqlCnn.Close();
-
-
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+            }
         }
 
 
-        //public void Modificar()
+        //using System;
+        //using System.Collections.Generic;
+        //using System.Data;
+        //using System.Data.SqlClient;
+        //using System.Linq;
+        //using System.Web;
+        //using System.Configuration;
+
+
+
+        //namespace API_SITMAS.Models
         //{
+        //    public class Ingreso_Material
+        //    {
+
+        //        #region Atributos
+
+        //        private string conectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
+
+        //        #endregion
+
+        //        #region Propìedades
+
+        //        public int IdIngresoM { get; set; }
+        //        public DateTime FechaIngreso { get; set; }
+        //        public int Id_Usuario_Registro { get; set; }
+        //        public int Id_Camionero_Ingreso { get; set; }
+        //        public int Id_Vehiculo_Ingreso { get; set; }
+        //        public string EstadoIng { get; set; }
+        //        public string UsuarioRegistro { get; set; }
+        //        public string Camionero { get; set; }
+        //        public string Vehiculo { get; set; }
+        //        public int? Id_HojaRuta { get; set; }
 
 
-        //    string sqlSentencia = "sp_ActualizarEmpleado";
+        //        #endregion
+
+        //        #region Metodos
+
+        //        public DataTable SelectAll()
+        //        {
 
 
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
+        //            string sqlSentencia = "sp_ListarIngreso_Material";
 
 
+        //            SqlConnection sqlCnn = new SqlConnection();
+        //            sqlCnn.ConnectionString = conectionString;
 
 
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
+        //            sqlCnn.Open();
 
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
-        //    sqlCom.Parameters.Add("@Apellido", SqlDbType.NVarChar).Value = Apellido;
-        //    sqlCom.Parameters.Add("@Nombre", SqlDbType.NVarChar).Value = Nombre;
-        //    sqlCom.Parameters.Add("@Cuil", SqlDbType.NVarChar).Value = Cuil;
-        //    sqlCom.Parameters.Add("@Telefono", SqlDbType.NVarChar).Value = Telefono;
-        //    sqlCom.Parameters.Add("@Email", SqlDbType.NVarChar).Value = Email;
-        //    sqlCom.Parameters.Add("@Fecha_Ingreso", SqlDbType.Date).Value = Fecha_Ingreso;
-        //    sqlCom.Parameters.Add("@Id_Cargo", SqlDbType.Int).Value = Id_Cargo;
-        //    sqlCom.Parameters.Add("@Id_Area", SqlDbType.Int).Value = Id_Area;
-        //    sqlCom.Parameters.Add("@Id_Barrio", SqlDbType.Int).Value = Id_Barrio;
-        //    sqlCom.Parameters.Add("@Id_Estado", SqlDbType.Int).Value = Id_Estado_Empleado;
-        //    sqlCom.Parameters.Add("@Calle", SqlDbType.NVarChar).Value = Calle;
-        //    sqlCom.Parameters.Add("@Numero", SqlDbType.NVarChar).Value = Numero;
-        //    sqlCom.Parameters.Add("@Piso", SqlDbType.NVarChar).Value = Piso;
-        //    sqlCom.Parameters.Add("@Dpto", SqlDbType.NVarChar).Value = Dpto;
+        //            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+        //            sqlCom.CommandType = CommandType.StoredProcedure;
 
+        //            DataSet ds = new DataSet();
 
-        //    sqlCnn.Open();
-
-
-        //    var res = sqlCom.ExecuteNonQuery();
-
-
-        //    sqlCnn.Close();
-
-
-        //}
-
-
-        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
-
-        //public void Borrar()
-        //{
-
-        //    string sqlSentencia = "sp_EliminarEmpleado";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
+        //            SqlDataAdapter da = new SqlDataAdapter();
+        //            da.SelectCommand = sqlCom;
+        //            da.Fill(ds);
 
 
 
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
+        //            sqlCnn.Close();
 
 
-        //    sqlCnn.Open();
+        //            return ds.Tables[0];
 
-
-        //    var res = sqlCom.ExecuteNonQuery();
-
-
-        //    sqlCnn.Close();
-
-
-        //}
-
-
-        //public DataTable VistalistadoEmpleados()
-        //{
-
-
-        //    string sqlSentencia = "sp_ListarEmpleadosDetallados";
-
-
-        //    SqlConnection sqlCnn = new SqlConnection();
-        //    sqlCnn.ConnectionString = conectionString;
-
-
-        //    sqlCnn.Open();
-
-        //    SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-        //    sqlCom.CommandType = CommandType.StoredProcedure;
-
-        //    DataSet ds = new DataSet();
-
-        //    SqlDataAdapter da = new SqlDataAdapter();
-        //    da.SelectCommand = sqlCom;
-        //    da.Fill(ds);
+        //        }
 
 
 
-        //    sqlCnn.Close();
+        //        public int Insertar()
+        //        {
+
+        //            string sqlSentencia = "sp_InsertarIngreso_Material";
+
+        //            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+        //            {
+        //                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+        //                sqlCom.CommandType = CommandType.StoredProcedure;
+
+        //                // Mapeamos los parámetros tal como los definimos en el SP
+        //                sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
+        //                sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
+        //                sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
+        //                sqlCom.Parameters.Add("@Id_HojaRuta", SqlDbType.Int).Value = Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value;
+
+        //                sqlCnn.Open();
+        //                // ExecuteScalar ejecuta el SP y captura el SELECT SCOPE_IDENTITY()
+        //                var resultado = sqlCom.ExecuteScalar();
+        //                sqlCnn.Close();
+
+        //                return Convert.ToInt32(resultado);
+        //            }
+
+        //        }
 
 
-        //    return ds.Tables[0];
+        //        public void Modificar()
+        //        {
 
 
+        //            string sqlSentencia = "sp_ActualizarIngreso_Material";
 
-        //}
 
+        //            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+        //            {
+        //                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+        //                sqlCom.CommandType = CommandType.StoredProcedure;
+
+        //                sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = IdIngresoM;
+        //                sqlCom.Parameters.Add("@IdUsuarioRegistro", SqlDbType.Int).Value = Id_Usuario_Registro;
+        //                sqlCom.Parameters.Add("@IdCamioneroIngreso", SqlDbType.Int).Value = Id_Camionero_Ingreso;
+        //                sqlCom.Parameters.Add("@IdVehiculoIngreso", SqlDbType.Int).Value = Id_Vehiculo_Ingreso;
+        //                sqlCom.Parameters.Add("@Id_HojaRuta", SqlDbType.Int).Value = Id_HojaRuta.HasValue ? (object)Id_HojaRuta.Value : DBNull.Value;
+
+
+        //                sqlCnn.Open();
+        //                sqlCom.ExecuteNonQuery();
+        //                sqlCnn.Close();
+        //            }
+
+
+        //        }
+
+
+        public void Borrar()
+        {
+
+            string sqlSentencia = "sp_EliminarIngreso_Material";
+
+
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = IdIngresoM;
+
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+                sqlCnn.Close();
+            }
+
+
+        }
+
+
+        public DataTable VistaIngreso_Material()
+        {
+
+
+            string sqlSentencia = "sp_ListarVistaIngreso_Material";
+
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+                DataSet ds = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(sqlCom);
+
+                sqlCnn.Open();
+                da.Fill(ds);
+                return ds.Tables[0];
+            }
+
+        }
 
         #endregion
 

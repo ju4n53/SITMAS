@@ -59,6 +59,77 @@ namespace API_SITMAS.Models
 
         }
 
+        public void Insertar()
+        {
+
+            string sqlSentencia = "sp_InsertarEST_Empleado";
+
+            SqlConnection sqlCnn = new SqlConnection();
+            sqlCnn.ConnectionString = conectionString;
+
+            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+            sqlCom.CommandType = CommandType.StoredProcedure;
+
+            sqlCom.Parameters.Add("@EstadoEmpleado", SqlDbType.NVarChar).Value = EstadoEmpleado;
+
+            sqlCnn.Open();
+
+            var res = sqlCom.ExecuteNonQuery();
+
+            sqlCnn.Close();
+
+        }
+
+
+        public void Modificar()
+        {
+
+
+            string sqlSentencia = "sp_ActualizarEST_Empleado";
+
+            SqlConnection sqlCnn = new SqlConnection();
+            sqlCnn.ConnectionString = conectionString;
+
+            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+            sqlCom.CommandType = CommandType.StoredProcedure;
+
+            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
+            sqlCom.Parameters.Add("@EstadoEmpleado", SqlDbType.NVarChar).Value = EstadoEmpleado;
+
+            sqlCnn.Open();
+
+            var res = sqlCom.ExecuteNonQuery();
+
+            sqlCnn.Close();
+
+        }
+
+
+        //EL MÉTODO BORRAR EMPLEADO SE ENCUENTRA FUNCIONANDO, PERO ESTÁ DESACTIVADO (COMENTADO)
+
+        public void Borrar()
+        {
+
+            string sqlSentencia = "sp_EliminarEST_Empleado";
+
+            SqlConnection sqlCnn = new SqlConnection();
+            sqlCnn.ConnectionString = conectionString;
+
+
+            SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+            sqlCom.CommandType = CommandType.StoredProcedure;
+
+            sqlCom.Parameters.Add("@Id", SqlDbType.Int).Value = Id;
+
+            sqlCnn.Open();
+
+            var res = sqlCom.ExecuteNonQuery();
+
+            sqlCnn.Close();
+
+
+        }
+
         #endregion
     }
 }

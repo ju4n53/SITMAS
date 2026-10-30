@@ -1,5 +1,11 @@
 # Archivos de configuración de VS
+# Carpetas de compilación de Visual Studio
+[Bb]in/
+[Oo]bj/
 .vs/
+*.user
+*.suo
+*.pdb
 
 # Archivos de configuración de VS Code
 .vscode/

@@ -26,25 +26,40 @@ namespace API_SITMAS.Controllers
 
         }
 
-        // GET: api/EstadoEmpleado/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST: api/EstadoEmpleado
-        public void Post([FromBody]string value)
+        [HttpPost]
+        public void Insertar([FromBody] Estado_Empleado value)
         {
+            Estado_Empleado oEstado_Empleado = new Estado_Empleado();
+            oEstado_Empleado.EstadoEmpleado = value.EstadoEmpleado;
+
+            oEstado_Empleado.Insertar();
         }
 
-        // PUT: api/EstadoEmpleado/5
-        public void Put(int id, [FromBody]string value)
+        // PUT: api/Area/5
+        [HttpPut]
+        public void Modificar(int id, [FromBody] Estado_Empleado value)
         {
+
+            Estado_Empleado oEstado_Empleado = new Estado_Empleado();
+            oEstado_Empleado.Id = id;
+            oEstado_Empleado.EstadoEmpleado = value.EstadoEmpleado;
+
+            oEstado_Empleado.Modificar();
+
         }
 
-        // DELETE: api/EstadoEmpleado/5
-        public void Delete(int id)
+        // DELETE: api/Area/5
+        [HttpDelete]
+
+        public void Borrar(int id)
         {
+
+            Estado_Empleado oEstado_Empleado = new Estado_Empleado();
+            oEstado_Empleado.Id = id;
+
+            oEstado_Empleado.Borrar();
+
         }
     }
 }
