@@ -124,6 +124,10 @@
                                     style="cursor: pointer;">Ingreso</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link active" id="tab-ingreso-particular" href="#"
+                                    style="cursor: pointer;">Ingreso Particular</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-secondary" id="tab-detalle" href="#"
                                     style="cursor: pointer;">Detalle</a>
                             </li>
@@ -159,6 +163,7 @@
 <script src="../Js/alerts_config.js"></script>
 
 <script src="../Js/trazabilidad/ingreso_trazabilidad.js"></script>
+<script src="../Js/trazabilidad/ingresoParticular_trazabilidad.js"></script>
 <script src="../Js/trazabilidad/detalle_trazabilidad.js"></script>
 <script src="../Js/trazabilidad/clasificacion_trazabilidad.js"></script>
 <script src="../Js/trazabilidad/salida_trazabilidad.js"></script>
@@ -182,6 +187,9 @@
             if (tabId === 'tab-ingreso') {
                 console.log("Preparando módulo de Ingreso...");
                 IngresoModulo.cargarEn("contenedor-dinamico-trazabilidad");
+            } else if (tabId === 'tab-ingreso-particular') {
+                console.log("Preparando módulo de Ingreso Particular...");
+                IngresoParticularModule.cargarEn("contenedor-dinamico-trazabilidad");
             } else if (tabId === 'tab-detalle') {
                 console.log("Preparando módulo de Detalle...");
                 DetalleModulo.cargarEn("contenedor-dinamico-trazabilidad");

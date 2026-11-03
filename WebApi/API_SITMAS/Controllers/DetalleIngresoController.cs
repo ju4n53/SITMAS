@@ -26,15 +26,15 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // GET: api/DetalleIngreso/PorCabecera/5
+        //// GET: api/DetalleIngreso/PorCabecera/
         [HttpGet]
-        [Route("PorCabecera/{idCabecera}")]
-        public IHttpActionResult PorCabecera(int idCabecera)
+        [Route("PorCabecera")]
+        public IHttpActionResult PorCabecera(int? idLogistica = null, int? idParticular = null)
         {
             try
             {
                 Detalle_Ingreso oDetalle = new Detalle_Ingreso();
-                List<Detalle_Ingreso> lista = oDetalle.SelectPorCabecera(idCabecera);
+                List<Detalle_Ingreso> lista = oDetalle.SelectPorCabecera(idLogistica, idParticular);
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -42,6 +42,22 @@ namespace API_SITMAS.Controllers
                 return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //// GET: api/DetalleIngreso/PorCabecera/5
+        //[HttpGet]
+        //[Route("PorCabecera/{idCabecera}")]
+        //public IHttpActionResult PorCabecera(int idCabecera)
+        //{
+        //    try
+        //    {
+        //        Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+        //        List<Detalle_Ingreso> lista = oDetalle.SelectPorCabecera(idCabecera);
+        //        return Ok(lista);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Content(HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
 
         // POST: api/DetalleIngreso
         [HttpPost]
@@ -96,15 +112,15 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // GET: api/DetalleIngreso/PendientesClasificacion/5
+        // GET: api/DetalleIngreso/PendientesClasificacion?idLogistica=5&idParticular=null
         [HttpGet]
-        [Route("PendientesClasificacion/{idIngreso}")]
-        public IHttpActionResult ListarPendientesClasificacion(int idIngreso)
+        [Route("PendientesClasificacion")]
+        public IHttpActionResult ListarPendientesClasificacion(int? idLogistica = null, int? idParticular = null)
         {
             try
             {
                 Detalle_Ingreso oDetalle = new Detalle_Ingreso();
-                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idIngreso);
+                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idLogistica, idParticular);
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -112,6 +128,22 @@ namespace API_SITMAS.Controllers
                 return Content(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        // GET: api/DetalleIngreso/PendientesClasificacion/5
+        //[HttpGet]
+        //[Route("PendientesClasificacion/{idIngreso}")]
+        //public IHttpActionResult ListarPendientesClasificacion(int idIngreso)
+        //{
+        //    try
+        //    {
+        //        Detalle_Ingreso oDetalle = new Detalle_Ingreso();
+        //        List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idIngreso);
+        //        return Ok(lista);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Content(HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
 
         // GET: api/DetalleIngreso/PendientesPesaje?desde=2026-10-01&hasta=2026-10-25
         [HttpGet]

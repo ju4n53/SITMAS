@@ -102,6 +102,51 @@ namespace API_SITMAS.Models
         }
 
 
+        public void Borrar()
+        {
+
+            string sqlSentencia = "sp_EliminarIngreso_Material";
+
+
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+
+                sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = IdIngresoM;
+
+                sqlCnn.Open();
+                sqlCom.ExecuteNonQuery();
+                sqlCnn.Close();
+            }
+
+
+        }
+
+
+        public DataTable VistaIngreso_Material()
+        {
+
+
+            string sqlSentencia = "sp_ListarVistaIngreso_Material";
+
+            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
+            {
+                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
+                sqlCom.CommandType = CommandType.StoredProcedure;
+                DataSet ds = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(sqlCom);
+
+                sqlCnn.Open();
+                da.Fill(ds);
+                return ds.Tables[0];
+            }
+
+        }
+
+        #endregion
+
+
         //using System;
         //using System.Collections.Generic;
         //using System.Data;
@@ -229,49 +274,6 @@ namespace API_SITMAS.Models
         //        }
 
 
-        public void Borrar()
-        {
-
-            string sqlSentencia = "sp_EliminarIngreso_Material";
-
-
-            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
-            {
-                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-                sqlCom.CommandType = CommandType.StoredProcedure;
-
-                sqlCom.Parameters.Add("@IdIngresoM", SqlDbType.Int).Value = IdIngresoM;
-
-                sqlCnn.Open();
-                sqlCom.ExecuteNonQuery();
-                sqlCnn.Close();
-            }
-
-
-        }
-
-
-        public DataTable VistaIngreso_Material()
-        {
-
-
-            string sqlSentencia = "sp_ListarVistaIngreso_Material";
-
-            using (SqlConnection sqlCnn = new SqlConnection(conectionString))
-            {
-                SqlCommand sqlCom = new SqlCommand(sqlSentencia, sqlCnn);
-                sqlCom.CommandType = CommandType.StoredProcedure;
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(sqlCom);
-
-                sqlCnn.Open();
-                da.Fill(ds);
-                return ds.Tables[0];
-            }
-
-        }
-
-        #endregion
 
     }
 }
