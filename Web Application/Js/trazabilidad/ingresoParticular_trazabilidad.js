@@ -78,12 +78,12 @@ const IngresoParticularModule = (function () {
                                         <option value="" selected disabled>Seleccione un origen...</option>
                                     </select>
                                 </div>
-                                <div class="mb-3">
+                                <!--<div class="mb-3">
                                     <label for="select-vehiculo-particular" class="form-label">Vehículo / Patente</label>
                                     <select class="form-select" id="select-vehiculo-particular">
                                         <option value="5">Predeterminado (Sin Vehículo específico / Particular)</option>
                                     </select>
-                                </div>
+                                </div>-->
                                 <div class="mb-3">
                                     <label for="textarea-observaciones-ingreso" class="form-label">Observaciones</label>
                                     <textarea class="form-control" id="textarea-observaciones-ingreso" rows="3" placeholder="Detalles adicionales..."></textarea>
