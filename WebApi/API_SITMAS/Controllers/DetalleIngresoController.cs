@@ -113,14 +113,15 @@ namespace API_SITMAS.Controllers
         }
 
         // GET: api/DetalleIngreso/PendientesClasificacion?idLogistica=5&idParticular=null
+        // GET: api/DetalleIngreso/PendientesClasificacion?idLogistica=5
         [HttpGet]
         [Route("PendientesClasificacion")]
-        public IHttpActionResult ListarPendientesClasificacion(int? idLogistica = null, int? idParticular = null)
+        public IHttpActionResult ListarPendientesClasificacion(int? idLogistica = null)
         {
             try
             {
                 Detalle_Ingreso oDetalle = new Detalle_Ingreso();
-                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idLogistica, idParticular);
+                List<Detalle_Ingreso> lista = oDetalle.SelectPendientesClasificacion(idLogistica);
                 return Ok(lista);
             }
             catch (Exception ex)

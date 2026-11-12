@@ -5,6 +5,8 @@ const DetalleModulo = (function () {
 
     let estado = {
         idIngresoMaterial: null,
+        idIngresoParticular: null, // 🟢 Nuevo: para identificar el ingreso particular
+        origenTipo: null,
         idHojaRuta: null,
         idDetalleHdrSeleccionado: null,
         idTipoMaterialSeleccionado: null,
@@ -144,27 +146,56 @@ const DetalleModulo = (function () {
             inicializar('contenedor-dinamico-trazabilidad');
         });
 
-        principal.off('click', '.btn-seleccionar-parada').on('click', '.btn-seleccionar-parada', function (e) {
-            e.preventDefault();
-            let boton = $(this);
 
-            estado.idDetalleHdrSeleccionado = boton.data('iddetalle');
-            estado.idTipoMaterialSeleccionado = boton.data('idtipomaterial');
-            estado.idOrigenSeleccionado = boton.data('idorigen');
+
+     principal.off('click', '.btn-seleccionar-parada').on('click', '.btn-seleccionar-parada', function (e) {
+     e.preventDefault();
+     let boton = $(this);
+ 
+       // datos discriminadores de origen
+     estado.origenTipo = boton.data('origentipo');
+     estado.idIngresoParticular = boton.data('idingresoparticular') ? parseInt(boton.data('idingresoparticular')) : null;
+     estado.idDetalleHdrSeleccionado = boton.data('iddetalle') ? parseInt(boton.data('iddetalle')) : null;
+    
+      estado.idTipoMaterialSeleccionado = boton.data('idtipomaterial');
+     estado.idOrigenSeleccionado = boton.data('idorigen');
+    
+     let idIngresoFila = boton.data('idingreso');
+     if (idIngresoFila) estado.idIngresoMaterial = parseInt(idIngresoFila);
+
+     let origenNombre = boton.data('origennombre');
+
+     renderizarFormularioPesaje(origenNombre);
+
+     $('html, body').animate({
+        scrollTop: $('#contenedor-formulario-pesaje').offset().top - 30
+     }, 400, function () {
+        $('#input-peso-bruto').focus();
+     });
+    
+  });
+
+        // principal.off('click', '.btn-seleccionar-parada').on('click', '.btn-seleccionar-parada', function (e) {
+        //     e.preventDefault();
+        //     let boton = $(this);
+
+        //     estado.idDetalleHdrSeleccionado = boton.data('iddetalle');
+        //     estado.idTipoMaterialSeleccionado = boton.data('idtipomaterial');
+        //     estado.idOrigenSeleccionado = boton.data('idorigen');
             
-            let idIngresoFila = boton.data('idingreso');
-            if (idIngresoFila) estado.idIngresoMaterial = idIngresoFila;
+        //     let idIngresoFila = boton.data('idingreso');
+        //     if (idIngresoFila) estado.idIngresoMaterial = idIngresoFila;
 
-            let origenNombre = boton.data('origennombre');
+        //     let origenNombre = boton.data('origennombre');
 
-            renderizarFormularioPesaje(origenNombre);
+        //     renderizarFormularioPesaje(origenNombre);
 
-            $('html, body').animate({
-                scrollTop: $('#contenedor-formulario-pesaje').offset().top - 30
-            }, 400, function () {
-                $('#input-peso-bruto').focus();
-            });
-        });
+        //     $('html, body').animate({
+        //         scrollTop: $('#contenedor-formulario-pesaje').offset().top - 30
+        //     }, 400, function () {
+        //         $('#input-peso-bruto').focus();
+        //     });
+       // });
 
         principal.off('submit', '#form-pesaje-parada').on('submit', '#form-pesaje-parada', registrarPesada);
     }
@@ -249,57 +280,112 @@ const DetalleModulo = (function () {
         });
     }
 
-    function renderizarTablaPendientes(lista) {
-        const contenedor = $('#contenedor-tabla-paradas');
 
-        if (!lista || lista.length === 0) {
-            contenedor.html('<div class="alert alert-em-naranja text-center m-3"><i class="fas fa-check-circle text-em-naranja"></i> No hay pesajes pendientes para la selección.</div>');
-            return;
-        }
+function renderizarTablaPendientes(lista) {
+    const contenedor = $('#contenedor-tabla-paradas');
 
-        let htmlTabla = `
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-em-naranja text-white">
-                        <tr>
-                            <th>Viaje / Fecha</th>
-                            <th>Origen</th>
-                            <th>Material Esperado</th>
-                            <th class="text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        lista.forEach(item => {
-            let fechaFmt = item.HojaRutaFecha ? new Date(item.HojaRutaFecha).toLocaleDateString('es-AR') : '-';
-
-            htmlTabla += `
-                <tr>
-                    <td>
-                        <strong class="text-em-naranja">#${item.Id_HojaRuta}</strong><br>
-                        <small class="text-muted">${fechaFmt}</small>
-                    </td>
-                    <td class="fw-bold text-dark">${item.Origen || 'Sin Origen'}</td>
-                    <td><span class="badge bg-light text-em-naranja border border-em-naranja">${item.TipoMaterial || 'Varios'}</span></td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-outline-warning text-dark border-em-naranja btn-seleccionar-parada"
-                                data-iddetalle="${item.Id_Detalle_HDR}"
-                                data-idtipomaterial="${item.Id_TipoMaterial || ''}"
-                                data-idorigen="${item.Id_Origen || ''}"
-                                data-materialnombre="${item.TipoMaterial || ''}"
-                                data-origennombre="${item.Origen || ''}"
-                                data-idingreso="${item.Id_Ingreso_Material || ''}">
-                            <i class="fas fa-balance-scale"></i> Pesar
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        htmlTabla += `</tbody></table></div>`;
-        contenedor.html(htmlTabla);
+    if (!lista || lista.length === 0) {
+        contenedor.html('<div class="alert alert-em-naranja text-center m-3"><i class="fas fa-check-circle text-em-naranja"></i> No hay pesajes pendientes para la selección.</div>');
+        return;
     }
+
+    let htmlTabla = `
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-em-naranja text-white">
+                    <tr>
+                        <th>Identificador / Fecha</th>
+                        <th>Origen</th>
+                        <th>Material Esperado</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    lista.forEach(item => {
+    let fechaFmt = item.HojaRutaFecha ? new Date(item.HojaRutaFecha).toLocaleDateString('es-AR') : '-';
+
+    htmlTabla += `
+        <tr>
+            <td>
+                <strong class="text-em-naranja">#${item.Id_HojaRuta}</strong><br>
+                <small class="text-muted">${fechaFmt}</small>
+            </td>
+            <td class="fw-bold text-dark">${item.Origen || 'Sin Origen'}</td>
+            <td><span class="badge bg-light text-em-naranja border border-em-naranja">${item.TipoMaterial || 'Varios'}</span></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-warning text-dark border-em-naranja btn-seleccionar-parada"
+                        data-iddetalle="${item.Id_Detalle_HDR}"
+                        data-idtipomaterial="${item.Id_TipoMaterial || ''}"
+                        data-idorigen="${item.Id_Origen || ''}"
+                        data-materialnombre="${item.TipoMaterial || ''}"
+                        data-origennombre="${item.Origen || ''}"
+                        data-idingreso="${item.Id_Ingreso_Material || ''}">
+                    <i class="fas fa-balance-scale"></i> Pesar
+                </button>
+            </td>
+        </tr>
+    `;
+});
+
+    htmlTabla += `</tbody></table></div>`;
+    contenedor.html(htmlTabla);
+}
+
+
+
+    // function renderizarTablaPendientes(lista) {
+    //     const contenedor = $('#contenedor-tabla-paradas');
+
+    //     if (!lista || lista.length === 0) {
+    //         contenedor.html('<div class="alert alert-em-naranja text-center m-3"><i class="fas fa-check-circle text-em-naranja"></i> No hay pesajes pendientes para la selección.</div>');
+    //         return;
+    //     }
+
+    //     let htmlTabla = `
+    //         <div class="table-responsive">
+    //             <table class="table table-hover align-middle mb-0">
+    //                 <thead class="bg-em-naranja text-white">
+    //                     <tr>
+    //                         <th>Viaje / Fecha</th>
+    //                         <th>Origen</th>
+    //                         <th>Material Esperado</th>
+    //                         <th class="text-center">Acción</th>
+    //                     </tr>
+    //                 </thead>
+    //                 <tbody>
+    //     `;
+
+    //     lista.forEach(item => {
+    //         let fechaFmt = item.HojaRutaFecha ? new Date(item.HojaRutaFecha).toLocaleDateString('es-AR') : '-';
+
+    //         htmlTabla += `
+    //             <tr>
+    //                 <td>
+    //                     <strong class="text-em-naranja">#${item.Id_HojaRuta}</strong><br>
+    //                     <small class="text-muted">${fechaFmt}</small>
+    //                 </td>
+    //                 <td class="fw-bold text-dark">${item.Origen || 'Sin Origen'}</td>
+    //                 <td><span class="badge bg-light text-em-naranja border border-em-naranja">${item.TipoMaterial || 'Varios'}</span></td>
+    //                 <td class="text-center">
+    //                     <button type="button" class="btn btn-sm btn-outline-warning text-dark border-em-naranja btn-seleccionar-parada"
+    //                             data-iddetalle="${item.Id_Detalle_HDR}"
+    //                             data-idtipomaterial="${item.Id_TipoMaterial || ''}"
+    //                             data-idorigen="${item.Id_Origen || ''}"
+    //                             data-materialnombre="${item.TipoMaterial || ''}"
+    //                             data-origennombre="${item.Origen || ''}"
+    //                             data-idingreso="${item.Id_Ingreso_Material || ''}">
+    //                         <i class="fas fa-balance-scale"></i> Pesar
+    //                     </button>
+    //                 </td>
+    //             </tr>
+    //         `;
+    //     });
+
+    //     htmlTabla += `</tbody></table></div>`;
+    //     contenedor.html(htmlTabla);
+    // }
 
     function renderizarFormularioPesaje(origenPlanificado) {
         const contenedor = $('#contenedor-formulario-pesaje');

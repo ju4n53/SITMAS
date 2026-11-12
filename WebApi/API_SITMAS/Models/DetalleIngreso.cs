@@ -158,7 +158,7 @@ namespace API_SITMAS.Models
             return lista;
         }
 
-        public List<Detalle_Ingreso> SelectPendientesClasificacion(int? idLogistica = null, int? idParticular = null)
+        public List<Detalle_Ingreso> SelectPendientesClasificacion(int? idLogistica = null)
         {
             List<Detalle_Ingreso> lista = new List<Detalle_Ingreso>();
             string sqlSentencia = "sp_ListarDetalleIngreso_PendientesClasificacion";
@@ -170,8 +170,9 @@ namespace API_SITMAS.Models
                     CommandType = CommandType.StoredProcedure
                 };
 
-                sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value = idLogistica.HasValue ? (object)idLogistica.Value : DBNull.Value;
-                sqlCom.Parameters.Add("@Id_Ingreso_Particular", SqlDbType.Int).Value = idParticular.HasValue ? (object)idParticular.Value : DBNull.Value;
+                // Solo enviamos el parámetro que corresponde al circuito institucional
+                sqlCom.Parameters.Add("@IdIngresoMaterial", SqlDbType.Int).Value =
+                    idLogistica.HasValue ? (object)idLogistica.Value : DBNull.Value;
 
                 sqlCnn.Open();
 
@@ -183,7 +184,7 @@ namespace API_SITMAS.Models
                         {
                             IdDetalleIngreso = Convert.ToInt32(reader["IdDetalleIngreso"]),
                             Id_Ingreso_Material = reader["Id_Ingreso_Material"] != DBNull.Value ? Convert.ToInt32(reader["Id_Ingreso_Material"]) : (int?)null,
-                            Id_Ingreso_Particular = reader["Id_Ingreso_Particular"] != DBNull.Value ? Convert.ToInt32(reader["Id_Ingreso_Particular"]) : (int?)null,
+                            Id_Detalle_HDR = reader["Id_Detalle_HDR"] != DBNull.Value ? Convert.ToInt32(reader["Id_Detalle_HDR"]) : (int?)null,
                             PesoBruto = Convert.ToDecimal(reader["PesoBruto"]),
                             Observaciones = reader["Observaciones"] != DBNull.Value ? reader["Observaciones"].ToString() : string.Empty,
                             EstadoDtIng = reader["EstadoDtIng"].ToString(),
