@@ -120,3 +120,28 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// ==========================================
+// ENRUTADOR: REPORTES DE LOGÍSTICA
+// ==========================================
+$('#ReportesLogisticaTabs .nav-link').on('click', function (e) {
+    e.preventDefault();
+
+    // Limpiamos estilos de todas las pestañas
+    $('#ReportesLogisticaTabs .nav-link').removeClass('active').addClass('text-secondary');
+    // Activamos la pestaña seleccionada
+    $(this).removeClass('text-secondary').addClass('active');
+
+    const tabId = $(this).attr('id');
+
+    // Enrutador
+    if (tabId === 'tab-uso-vehiculos') {
+        console.log("Preparando módulo Reporte: Uso de Vehículos...");
+        ReporteVehiculosModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+    } else if (tabId === 'tab-consumo-combustible') {
+        console.log("Preparando módulo Reporte: Consumo de Combustible...");
+        // ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+    }
+});
+
+// Disparamos el click inicial para que cargue el primer gráfico por defecto
+$('#tab-uso-vehiculos').trigger('click');

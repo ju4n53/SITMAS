@@ -38,7 +38,7 @@
     <!-- Se añade el contenedor general flex de Bootstrap para asegurar la alineación horizontal fija -->
     <div class="main-layout flex-grow-1">
 
-       <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
+        <aside class="sidebar-vertical sidebar-collapsible d-none d-md-block">
             <ul class="nav flex-column nav-list pt-3">
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center" href="../Pages/landing.html">
@@ -58,8 +58,8 @@
                             Ruta</a>
                         <a class="nav-link small ps-4 d-none" id="pageRegistrosLog"
                             href="../Pages/registros_logistica.html">Registros</a>
-                        <a class="nav-link small ps-4 d-none" id="pageReportesLog"
-                            href="../Pages/reportes_logistica.html">Reportes</a>
+                        <!-- <a class="nav-link small ps-4 d-none" id="pageReportesLog"
+                            href="../Pages/reportes_logistica.html">Reportes</a> -->
                     </div>
                 </li>
 
@@ -73,8 +73,21 @@
                             href="../Pages/gestion_trazabilidad.html">Gestion</a>
                         <a class="nav-link small ps-4 d-none" id="pageRegistrosCrud"
                             href="../Pages/registros_trazabilidad.html">Registros</a>
-                        <a class="nav-link small ps-4 d-none" id="pageReportes"
-                            href="../Pages/reportes_trazabilidad.html">Reportes</a>
+                        <!-- <a class="nav-link small ps-4 d-none" id="pageReportes"
+                            href="../Pages/reportes_trazabilidad.html">Reportes</a> -->
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown d-none" id="sidebar-reportes">
+                    <a data-bs-toggle="collapse" class="nav-link d-flex align-items-center" href="#gRp">
+                        <span class="material-symbols-outlined">table</span>
+                        <span class="menu-text">REPORTES</span>
+                    </a>
+                    <div id="gRp" class="collapse">
+                        <a class="nav-link small ps-4 d-none" id="pageReportesLogis"
+                            href="../Pages/reportes_logistica.html">Reportes Logistica</a>
+                        <a class="nav-link small ps-4 d-none" id="pageReportesTrazab"
+                            href="../Pages/reportes_trazabilidad.html">Reportes Trazabilidad</a>
                     </div>
                 </li>
 
@@ -135,7 +148,8 @@
                             </li>
                         </ul>
 
-                        <div id="contenedor-dinamico-crud-trazabilidad" class="tab-content-wrapper flex-grow-1 mt-4"></div>
+                        <div id="contenedor-dinamico-crud-trazabilidad" class="tab-content-wrapper flex-grow-1 mt-4">
+                        </div>
 
                     </div>
                 </div>
@@ -160,7 +174,7 @@
 <script src="../Js/registros_trazabilidad/crud_ingreso_traz.js"></script>
 <script src="../Js/registros_trazabilidad/crud_detalle_trazabilidad.js"></script>
 <script src="../Js/registros_trazabilidad/crud_clasificacion_trazabilidad.js"></script>
-<script src="../Js/registros_trazabilidad/crud_salida_trazabilidad.js"></script> 
+<script src="../Js/registros_trazabilidad/crud_salida_trazabilidad.js"></script>
 
 <!-- Script Principal Enrutador -->
 <script src="../Js/config/enrutador_spa.js"></script>

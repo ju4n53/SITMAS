@@ -76,13 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Mapa de qué menúes HTML se encienden según el Rol
         const configuracionMenu = [
-            { idSidebar: 'sidebar-personal', idItems: ['pagePersonal','pageUsuarios'], roles: ["R_Humanos", "Administrador"] },
+            { idSidebar: 'sidebar-personal', idItems: ['pagePersonal', 'pageUsuarios'], roles: ["R_Humanos", "Administrador"] },
 
             { idSidebar: 'sidebar-logistica', idItems: ['pageRegistrosLog', 'pageReportesLog'], roles: ["R_Institucionales"] },
 
             { idSidebar: 'sidebar-logistica', idItems: ['pageHojasRuta', 'pageRegistrosLog', 'pageReportesLog'], roles: ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"] },
 
             { idSidebar: 'sidebar-trazabilidad', idItems: ['pageIngresoMaterial', 'pageRegistrosCrud', 'pageReportes', 'pageClasificacion'], roles: ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
+
+            { idSidebar: 'sidebar-reportes', idItems: ['pageReportesLogis', 'pageReportesTrazab'], roles: ["Supervisor_Gestion", "Coordinador", "R_Institucionales", "Administrador"] },
 
             { idSidebar: 'sidebar-configuracion', idItems: ['pageConfigEstructura', 'pageConfigAcceso'], roles: ["Administrador"] }
             // Nota: Agrupé algunos para el ejemplo, debes ajustar los idItems exactos según tu HTML
@@ -103,41 +105,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // =========================================================================
-        // 5. MOTOR DE OCULTAMIENTO POR PERMISOS FRONTEND (Feature Toggling)
-        // =========================================================================
-
         aplicarSeguridadDOM();
-
-        // // Asumimos que al hacer el login, guardaste la lista de permisos en tu sesión. 
-        // // Si lo llamaste de otra forma, ajusta esta variable (ej. sesion.listaPermisos)
-        // const permisosUsuario = sesion.permisos || [];
-
-        // // El "barrendero" busca en TODA la página cualquier elemento que tenga nuestro atributo mágico
-        // const elementosProtegidos = document.querySelectorAll('[data-permiso-requerido]');
-
-        // elementosProtegidos.forEach(elemento => {
-        //     // Leemos qué permiso pide esta vitrina y lo separamos por comas (por si pide más de uno)
-        //     const stringPermisos = elemento.getAttribute('data-permiso-requerido');
-        //     const permisosNecesarios = stringPermisos.split(',');
-
-        //     // Verificamos si el usuario tiene AL MENOS UNO (.some) de los permisos requeridos
-        //     const tienePermiso = permisosNecesarios.some(permisoRequerido => {
-        //         return permisosUsuario.includes(permisoRequerido.trim()); // .trim() limpia espacios extra
-        //     });
-
-        //     // Si no tiene el permiso... ¡Magia! Arrancamos el elemento de raíz.
-        //     if (!tienePermiso) {
-        //         elemento.remove(); // Usamos .remove() en vez de .hide() para que sea imposible inspeccionar el código
-        //     }
-        // });
 
     }
 
 });
 
 // =========================================================================
-// NUEVA FUNCIÓN GLOBAL: El "Walkie-Talkie" del Guardián
+// FUNCIÓN GLOBAL:"Comunicador" de guardia
 // =========================================================================
 window.aplicarSeguridadDOM = function () {
     // Volvemos a leer la sesión por si acaso

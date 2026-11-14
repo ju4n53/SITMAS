@@ -251,6 +251,7 @@
     <Compile Include="Controllers\RecursoMovilizadoController.cs" />
     <Compile Include="Controllers\RegistroOdometroController.cs" />
     <Compile Include="Controllers\ReportesDataController.cs" />
+    <Compile Include="Controllers\ReportesLogisticaController.cs" />
     <Compile Include="Controllers\ReporteTrazabilidadController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\Rol_PermisoController.cs" />
@@ -297,6 +298,7 @@
     <Compile Include="Models\RecursoMovilizado.cs" />
     <Compile Include="Models\RegistroOdometro.cs" />
     <Compile Include="Models\ReportesData.cs" />
+    <Compile Include="Models\ReportesLogistica.cs" />
     <Compile Include="Models\ReporteTrazabilidad.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\Rol_Permiso.cs" />
