@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 
 namespace API_SITMAS.Models
 {
-    
+    // DTO para reporte de uso de vehiculos
     public class DTO_HojaRutaCabecera
     {
         public int Id { get; set; }
@@ -21,7 +21,27 @@ namespace API_SITMAS.Models
         public decimal Distancia_Total_Estimada_Km { get; set; }
     }
 
-    
+
+    //DTO para el Reporte de Odómetro
+    public class DTO_ReporteOdometro
+    {
+        public int IdRegistroOdomet { get; set; }
+        public DateTime FechaRegOdom { get; set; }
+        public string FechaISO { get; set; }
+        public string FechaFormateada { get; set; }
+        public int IdVehiculo { get; set; }
+        public string Vehiculo { get; set; }
+        public decimal InicioOdom { get; set; }
+        public decimal? FinalOdom { get; set; } // Nullable porque puede estar en curso
+        public decimal KmReales { get; set; }
+        public string EstadoOdometro { get; set; }
+        public int? Id_HojaRuta { get; set; }   // Nullable porque puede ser movimiento interno
+        public string TipoMovimiento { get; set; }
+        public decimal KmEstimadosHDR { get; set; }
+        public decimal DesvioKm { get; set; }
+        public string ChoferNombreCompleto { get; set; }
+    }
+
     public class ReportesLogisticaDatos
     {
         private readonly string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
@@ -63,5 +83,57 @@ namespace API_SITMAS.Models
             }
             return lista;
         }
+
+
+        public List<DTO_ReporteOdometro> ObtenerReporteOdometro(DateTime fechaDesde, DateTime fechaHasta)
+        {
+            var lista = new List<DTO_ReporteOdometro>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ReporteOdometro", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@FechaDesde", fechaDesde);
+                    sqlCom.Parameters.AddWithValue("@FechaHasta", fechaHasta);
+
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new DTO_ReporteOdometro
+                            {
+                                IdRegistroOdomet = Convert.ToInt32(reader["IdRegistroOdomet"]),
+                                FechaRegOdom = Convert.ToDateTime(reader["FechaRegOdom"]),
+                                FechaISO = reader["FechaISO"].ToString(),
+                                FechaFormateada = reader["FechaFormateada"].ToString(),
+                                IdVehiculo = Convert.ToInt32(reader["IdVehiculo"]),
+                                Vehiculo = reader["Vehiculo"].ToString(),
+                                InicioOdom = Convert.ToDecimal(reader["InicioOdom"]),
+
+                                // Protegemos las columnas que admiten NULL en SQL
+                                FinalOdom = reader["FinalOdom"] != DBNull.Value ? Convert.ToDecimal(reader["FinalOdom"]) : (decimal?)null,
+                                Id_HojaRuta = reader["Id_HojaRuta"] != DBNull.Value ? Convert.ToInt32(reader["Id_HojaRuta"]) : (int?)null,
+
+                                KmReales = Convert.ToDecimal(reader["KmReales"]),
+                                EstadoOdometro = reader["EstadoOdometro"].ToString(),
+                                TipoMovimiento = reader["TipoMovimiento"].ToString(),
+                                KmEstimadosHDR = Convert.ToDecimal(reader["KmEstimadosHDR"]),
+                                DesvioKm = Convert.ToDecimal(reader["DesvioKm"]),
+                                ChoferNombreCompleto = reader["ChoferNombreCompleto"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+
+
+
+
+
     }
 }

@@ -166,7 +166,7 @@ const ReporteVehiculosModulo = (function () {
 
     const configurarFechasPorDefecto = function () {
         const hoy = new Date();
-        const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const primerDia = new Date(hoy.getFullYear(), 0, 1);
 
         $('#filtro-fecha-hasta').val(hoy.toISOString().split('T')[0]);
         $('#filtro-fecha-desde').val(primerDia.toISOString().split('T')[0]);
