@@ -140,6 +140,9 @@ $('#ReportesLogisticaTabs .nav-link').on('click', function (e) {
     } else if (tabId === 'tab-odometro') {
         console.log("Preparando módulo Reporte: Odómetro...");
         ReporteOdometroModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+    } else if (tabId === 'tab-mantenimiento') {
+        console.log("Preparando módulo Reporte: Mantenimiento Preventivo...");
+        ReporteMantenimientoModulo.cargarEn("contenedor-dinamico-reportes-logistica");
     } else if (tabId === 'tab-consumo-combustible') {
         console.log("Preparando módulo Reporte: Consumo de Combustible...");
         // ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");

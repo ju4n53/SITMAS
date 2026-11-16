@@ -61,6 +61,53 @@ namespace API_SITMAS.Controllers
             }
         }
 
+        // GET: api/ReportesLogistica/MantenimientoPreventivo
+        [HttpGet]
+        [Route("MantenimientoPreventivo")]
+        public IHttpActionResult ObtenerMantenimientoPreventivo()
+        {
+            try
+            {
+                return Ok(_datos.ObtenerMantenimientoPreventivo());
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+        // GET: api/ReportesLogistica/HistorialMantenimiento
+        // GET: api/ReportesLogistica/HistorialMantenimiento?fechaDesde=2026-01-01&fechaHasta=2026-11-15
+        [HttpGet]
+        [Route("HistorialMantenimiento")]
+        public IHttpActionResult ObtenerHistorialMantenimiento(string fechaDesde = null, string fechaHasta = null)
+        {
+            try
+            {
+                DateTime? desde = !string.IsNullOrWhiteSpace(fechaDesde)
+                    ? Convert.ToDateTime(fechaDesde)
+                    : (DateTime?)null;
+
+                DateTime? hasta = !string.IsNullOrWhiteSpace(fechaHasta)
+                    ? Convert.ToDateTime(fechaHasta)
+                    : (DateTime?)null;
+
+                if (desde.HasValue && hasta.HasValue && desde.Value > hasta.Value)
+                    return BadRequest("La fecha 'fechaDesde' no puede ser mayor a 'fechaHasta'.");
+
+                return Ok(_datos.ObtenerHistorialMantenimiento(desde, hasta));
+            }
+            catch (FormatException)
+            {
+                return BadRequest("El formato de fecha enviado no es válido.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
 
     }
 }

@@ -42,6 +42,48 @@ namespace API_SITMAS.Models
         public string ChoferNombreCompleto { get; set; }
     }
 
+
+    // DTO Estado actual de desgaste preventivo
+    public class DTO_ReporteMantenimientoPreventivo
+    {
+        public int IdVehiculo { get; set; }
+        public string Vehiculo { get; set; }
+        public decimal OdometroActual { get; set; }
+        public int OrdenService { get; set; }
+        public string TipoService { get; set; }
+        public int IntervaloKm { get; set; }
+
+        // Nullable por vehículo sin services
+        public int? IdUltimoMantenimiento { get; set; }
+        public string FechaUltimoServiceISO { get; set; }
+
+        public string FechaUltimoServiceFormateada { get; set; }
+        public string MecanicoUltimoService { get; set; }
+        public decimal OdometroUltimoService { get; set; }
+        public decimal KmRecorridos { get; set; }
+        public decimal KmRestantes { get; set; }
+        public decimal PorcentajeDesgaste { get; set; }
+        public string EstadoAlerta { get; set; }
+    }
+
+    // DTO Bitácora intervenciones en taller
+    public class DTO_ReporteHistorialMantenimiento
+    {
+        public int IdMantenimiento_Vehi { get; set; }
+        public DateTime fechaMantenimiento { get; set; }
+        public string FechaISO { get; set; }
+        public string FechaFormateada { get; set; }
+        public int Id_Vehiculo { get; set; }
+        public string Vehiculo { get; set; }
+        public string TipoMantenimiento { get; set; }
+        public string TipoService { get; set; }
+        public int Id_odometro { get; set; }
+        public decimal KmAlMomentoService { get; set; }
+        public int Id_Mecanico { get; set; }
+        public string MecanicoNombreCompleto { get; set; }
+    }
+
+
     public class ReportesLogisticaDatos
     {
         private readonly string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
@@ -131,6 +173,96 @@ namespace API_SITMAS.Models
             return lista;
         }
 
+
+        public List<DTO_ReporteMantenimientoPreventivo> ObtenerMantenimientoPreventivo()
+        {
+            var lista = new List<DTO_ReporteMantenimientoPreventivo>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_Reporte_MantenimientoPreventivo", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new DTO_ReporteMantenimientoPreventivo
+                            {
+                                IdVehiculo = Convert.ToInt32(reader["IdVehiculo"]),
+                                Vehiculo = reader["Vehiculo"].ToString(),
+                                OdometroActual = Convert.ToDecimal(reader["OdometroActual"]),
+                                OrdenService = Convert.ToInt32(reader["OrdenService"]),
+                                TipoService = reader["TipoService"].ToString(),
+                                IntervaloKm = Convert.ToInt32(reader["IntervaloKm"]),
+
+                                // Protegemos columnas que vienen NULL cuando nunca se hizo ese service
+                                IdUltimoMantenimiento = reader["IdUltimoMantenimiento"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["IdUltimoMantenimiento"])
+                                    : (int?)null,
+                                FechaUltimoServiceISO = reader["FechaUltimoServiceISO"] != DBNull.Value
+                                    ? reader["FechaUltimoServiceISO"].ToString()
+                                    : null,
+
+                                FechaUltimoServiceFormateada = reader["FechaUltimoServiceFormateada"].ToString(),
+                                MecanicoUltimoService = reader["MecanicoUltimoService"].ToString(),
+                                OdometroUltimoService = Convert.ToDecimal(reader["OdometroUltimoService"]),
+                                KmRecorridos = Convert.ToDecimal(reader["KmRecorridos"]),
+                                KmRestantes = Convert.ToDecimal(reader["KmRestantes"]),
+                                PorcentajeDesgaste = Convert.ToDecimal(reader["PorcentajeDesgaste"]),
+                                EstadoAlerta = reader["EstadoAlerta"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+
+        public List<DTO_ReporteHistorialMantenimiento> ObtenerHistorialMantenimiento(DateTime? fechaDesde, DateTime? fechaHasta)
+        {
+            var lista = new List<DTO_ReporteHistorialMantenimiento>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_Reporte_HistorialMantenimiento", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+
+                    // Si la fecha viene null desde C#, debemos enviar explícitamente DBNull.Value a SQL Server
+                    sqlCom.Parameters.AddWithValue("@FechaDesde", (object)fechaDesde ?? DBNull.Value);
+                    sqlCom.Parameters.AddWithValue("@FechaHasta", (object)fechaHasta ?? DBNull.Value);
+
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new DTO_ReporteHistorialMantenimiento
+                            {
+                                IdMantenimiento_Vehi = Convert.ToInt32(reader["IdMantenimiento_Vehi"]),
+                                fechaMantenimiento = Convert.ToDateTime(reader["fechaMantenimiento"]),
+                                FechaISO = reader["FechaISO"].ToString(),
+                                FechaFormateada = reader["FechaFormateada"].ToString(),
+                                Id_Vehiculo = Convert.ToInt32(reader["Id_Vehiculo"]),
+                                Vehiculo = reader["Vehiculo"].ToString(),
+                                TipoMantenimiento = reader["TipoMantenimiento"].ToString(),
+                                TipoService = reader["TipoService"].ToString(),
+                                Id_odometro = Convert.ToInt32(reader["Id_odometro"]),
+                                KmAlMomentoService = Convert.ToDecimal(reader["KmAlMomentoService"]),
+                                Id_Mecanico = Convert.ToInt32(reader["Id_Mecanico"]),
+                                MecanicoNombreCompleto = reader["MecanicoNombreCompleto"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
 
 
 
