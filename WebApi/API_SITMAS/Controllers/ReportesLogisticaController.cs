@@ -1,5 +1,6 @@
 ﻿using API_SITMAS.Models;
 using System;
+using System.Globalization;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
@@ -107,6 +108,46 @@ namespace API_SITMAS.Controllers
             }
         }
 
+
+        // GET: api/ReportesLogistica/PertLogistica
+        // GET: api/ReportesLogistica/PertLogistica?fechaDesde=2025-01-01&fechaHasta=2026-12-31
+        [HttpGet]
+        [Route("PertLogistica")]
+        public IHttpActionResult ObtenerPertLogistica(string fechaDesde = null, string fechaHasta = null)
+        {
+            try
+            {
+                DateTime? desde = null;
+                DateTime? hasta = null;
+
+                if (!string.IsNullOrWhiteSpace(fechaDesde))
+                {
+                    DateTime fechaTempDesde;
+                    if (!DateTime.TryParseExact(fechaDesde.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaTempDesde))
+                        return BadRequest("El formato de 'fechaDesde' debe ser YYYY-MM-DD.");
+
+                    desde = fechaTempDesde;
+                }
+
+                if (!string.IsNullOrWhiteSpace(fechaHasta))
+                {
+                    DateTime fechaTempHasta;
+                    if (!DateTime.TryParseExact(fechaHasta.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaTempHasta))
+                        return BadRequest("El formato de 'fechaHasta' debe ser YYYY-MM-DD.");
+
+                    hasta = fechaTempHasta;
+                }
+
+                if (desde.HasValue && hasta.HasValue && desde.Value > hasta.Value)
+                    return BadRequest("La fecha 'fechaDesde' no puede ser mayor a 'fechaHasta'.");
+
+                return Ok(_datos.ObtenerPertLogistica(desde, hasta));
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
 
     }

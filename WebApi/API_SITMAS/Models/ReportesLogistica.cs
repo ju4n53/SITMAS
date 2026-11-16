@@ -83,6 +83,21 @@ namespace API_SITMAS.Models
         public string MecanicoNombreCompleto { get; set; }
     }
 
+    // DTO para el análisis PERT / Ruta Crítica de Logística
+    public class DTO_NodoPertLogistica
+    {
+        public string Id { get; set; }
+        public string Nombre { get; set; }
+        public List<string> Precedencia { get; set; }
+        public decimal To { get; set; }
+        public decimal Tm { get; set; }
+        public decimal Tp { get; set; }
+        public int MuestrasReales { get; set; }
+        public string OrigenDato { get; set; }
+    }
+
+
+
 
     public class ReportesLogisticaDatos
     {
@@ -264,6 +279,58 @@ namespace API_SITMAS.Models
             return lista;
         }
 
+
+        public List<DTO_NodoPertLogistica> ObtenerPertLogistica(DateTime? fechaDesde, DateTime? fechaHasta)
+        {
+            var lista = new List<DTO_NodoPertLogistica>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ObtenerTiemposPertLogistica", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+
+                    // Si las fechas llegan null, el SP aplica por defecto los últimos 90 días
+                    sqlCom.Parameters.AddWithValue("@FechaDesde", (object)fechaDesde ?? DBNull.Value);
+                    sqlCom.Parameters.AddWithValue("@FechaHasta", (object)fechaHasta ?? DBNull.Value);
+
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string precRaw = reader["Precedencia"] != DBNull.Value
+                                ? reader["Precedencia"].ToString()
+                                : string.Empty;
+
+                            var listaPrecedencias = new List<string>();
+                            if (!string.IsNullOrWhiteSpace(precRaw))
+                            {
+                                foreach (string item in precRaw.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    listaPrecedencias.Add(item.Trim());
+                                }
+                            }
+
+                            lista.Add(new DTO_NodoPertLogistica
+                            {
+                                Id = reader["Id"].ToString(),
+                                Nombre = reader["Nombre"].ToString(),
+                                Precedencia = listaPrecedencias,
+                                To = Convert.ToDecimal(reader["To"]),
+                                Tm = Convert.ToDecimal(reader["Tm"]),
+                                Tp = Convert.ToDecimal(reader["Tp"]),
+                                MuestrasReales = Convert.ToInt32(reader["MuestrasReales"]),
+                                OrigenDato = reader["OrigenDato"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
 
 
 
