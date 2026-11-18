@@ -177,5 +177,30 @@ namespace API_SITMAS.Controllers
         }
 
 
+
+        // GET: api/ReportesLogistica/DetalleHojaRutaConsumo?idHojaRuta=1
+        [HttpGet]
+        [Route("DetalleHojaRutaConsumo")]
+        public IHttpActionResult ObtenerDetalleHojaRutaConsumo(int idHojaRuta)
+        {
+            if (idHojaRuta <= 0)
+                return BadRequest("El parámetro 'idHojaRuta' debe ser un número entero mayor a cero.");
+
+            try
+            {
+                var detalle = _datos.ObtenerDetalleHojaRutaConsumo(idHojaRuta);
+
+                if (detalle == null)
+                    return NotFound();
+
+                return Ok(detalle);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
     }
 }

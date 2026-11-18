@@ -121,6 +121,90 @@ namespace API_SITMAS.Models
     }
 
 
+
+    // =========================================================================
+    // DTOs PARA DETALLE DE HOJA DE RUTA Y CONSUMO POR TRAMO
+    // =========================================================================
+    public class DTO_HojaRutaConsumoCabecera
+    {
+        public int Id_HojaRuta { get; set; }
+        public DateTime? HojaRutaFecha { get; set; }
+        public string FechaISO { get; set; }
+        public string FechaFormateada { get; set; }
+        public int? Id_EstadoHDR { get; set; }
+        public string EstadoHDR { get; set; }
+        public int? Id_Vehiculo { get; set; }
+        public string Patente { get; set; }
+        public string ChoferNombreCompleto { get; set; }
+        public int Id_Combustible { get; set; }
+        public string TipoCombustible { get; set; }
+
+        // Datos de odómetro (nullables porque la HDR puede no haber cerrado viaje aún)
+        public int? IdRegistroOdomet { get; set; }
+        public decimal? InicioOdom { get; set; }
+        public decimal? FinalOdom { get; set; }
+
+        // Auditoría de distancias
+        public decimal KmEstimadosHDR { get; set; }
+        public decimal KmSumaTramos { get; set; }
+        public decimal? KmRealesOdometro { get; set; }
+        public decimal DesvioKm { get; set; }
+
+        // Estado financiero (Real vs. Estimado)
+        public bool EsCostoEstimado { get; set; }
+        public string OrigenCalculo { get; set; }
+        public decimal PrecioLitroAplicado { get; set; }
+        public decimal ConsumoTeoricoLtsKm { get; set; }
+        public decimal CostoPorKm { get; set; }
+        public decimal LitrosTotalesViaje { get; set; }
+        public decimal CostoTotalViaje { get; set; }
+        public decimal CostoDesvio { get; set; }
+    }
+
+    public class DTO_TramoConsumo
+    {
+        public int NumeroTramo { get; set; }
+        public int Id_Detalle_HDR { get; set; }
+        public string HoraEstimada { get; set; }
+        public int Id_TipoMovimiento { get; set; }
+        public string TipoMovimiento { get; set; }
+        public string RecursoMovilizado { get; set; }
+        public string TipoMaterial { get; set; }
+        public string EstadoTramo { get; set; }
+        public string PuntoParada { get; set; }
+        public string DireccionCompleta { get; set; }
+        public string UbicacionDescripcion { get; set; }
+
+        // Coordenadas nullables por si alguna parada no tiene geolocalización cargada
+        public decimal? Latitud { get; set; }
+        public decimal? Longitud { get; set; }
+
+        // Métricas analíticas por tramo
+        public decimal KmTramo { get; set; }
+        public decimal KmAcumulados { get; set; }
+        public decimal PorcentajeIncidencia { get; set; }
+        public decimal LitrosTramo_Teorico { get; set; }
+        public decimal LitrosTramo_Prorrateado { get; set; }
+        public decimal CostoTramo_Teorico { get; set; }
+        public decimal CostoTramo_Prorrateado { get; set; }
+        public decimal SobrecostoDesvioTramo { get; set; }
+        public decimal CostoAcumulado_Prorrateado { get; set; }
+    }
+
+    public class DTO_DetalleHojaRutaConsumo
+    {
+        public DTO_HojaRutaConsumoCabecera Cabecera { get; set; }
+        public List<DTO_TramoConsumo> Tramos { get; set; }
+
+        public DTO_DetalleHojaRutaConsumo()
+        {
+            Tramos = new List<DTO_TramoConsumo>();
+        }
+    }
+
+
+
+
     public class ReportesLogisticaDatos
     {
         private readonly string connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
@@ -401,6 +485,102 @@ namespace API_SITMAS.Models
             return lista;
         }
 
+
+        public DTO_DetalleHojaRutaConsumo ObtenerDetalleHojaRutaConsumo(int idHojaRuta)
+        {
+            DTO_DetalleHojaRutaConsumo resultado = null;
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_ReporteDetalle_HojaRuta_Consumo", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@Id_HojaRuta", idHojaRuta);
+
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        // 1. Leemos el Result Set 1: Cabecera ejecutiva de la Hoja de Ruta
+                        if (reader.Read())
+                        {
+                            resultado = new DTO_DetalleHojaRutaConsumo
+                            {
+                                Cabecera = new DTO_HojaRutaConsumoCabecera
+                                {
+                                    Id_HojaRuta = Convert.ToInt32(reader["Id_HojaRuta"]),
+                                    HojaRutaFecha = reader["HojaRutaFecha"] != DBNull.Value ? Convert.ToDateTime(reader["HojaRutaFecha"]) : (DateTime?)null,
+                                    FechaISO = reader["FechaISO"] != DBNull.Value ? reader["FechaISO"].ToString() : null,
+                                    FechaFormateada = reader["FechaFormateada"] != DBNull.Value ? reader["FechaFormateada"].ToString() : "Sin fecha",
+                                    Id_EstadoHDR = reader["Id_EstadoHDR"] != DBNull.Value ? Convert.ToInt32(reader["Id_EstadoHDR"]) : (int?)null,
+                                    EstadoHDR = reader["EstadoHDR"].ToString(),
+                                    Id_Vehiculo = reader["Id_Vehiculo"] != DBNull.Value ? Convert.ToInt32(reader["Id_Vehiculo"]) : (int?)null,
+                                    Patente = reader["Patente"].ToString(),
+                                    ChoferNombreCompleto = reader["ChoferNombreCompleto"].ToString(),
+                                    Id_Combustible = Convert.ToInt32(reader["Id_Combustible"]),
+                                    TipoCombustible = reader["TipoCombustible"].ToString(),
+
+                                    IdRegistroOdomet = reader["IdRegistroOdomet"] != DBNull.Value ? Convert.ToInt32(reader["IdRegistroOdomet"]) : (int?)null,
+                                    InicioOdom = reader["InicioOdom"] != DBNull.Value ? Convert.ToDecimal(reader["InicioOdom"]) : (decimal?)null,
+                                    FinalOdom = reader["FinalOdom"] != DBNull.Value ? Convert.ToDecimal(reader["FinalOdom"]) : (decimal?)null,
+
+                                    KmEstimadosHDR = Convert.ToDecimal(reader["KmEstimadosHDR"]),
+                                    KmSumaTramos = Convert.ToDecimal(reader["KmSumaTramos"]),
+                                    KmRealesOdometro = reader["KmRealesOdometro"] != DBNull.Value ? Convert.ToDecimal(reader["KmRealesOdometro"]) : (decimal?)null,
+                                    DesvioKm = Convert.ToDecimal(reader["DesvioKm"]),
+
+                                    EsCostoEstimado = Convert.ToBoolean(reader["EsCostoEstimado"]),
+                                    OrigenCalculo = reader["OrigenCalculo"].ToString(),
+                                    PrecioLitroAplicado = Convert.ToDecimal(reader["PrecioLitroAplicado"]),
+                                    ConsumoTeoricoLtsKm = Convert.ToDecimal(reader["ConsumoTeoricoLtsKm"]),
+                                    CostoPorKm = Convert.ToDecimal(reader["CostoPorKm"]),
+                                    LitrosTotalesViaje = Convert.ToDecimal(reader["LitrosTotalesViaje"]),
+                                    CostoTotalViaje = Convert.ToDecimal(reader["CostoTotalViaje"]),
+                                    CostoDesvio = Convert.ToDecimal(reader["CostoDesvio"])
+                                }
+                            };
+                        }
+
+                        // 2. Avanzamos al Result Set 2: Desglose analítico por tramo
+                        if (resultado != null && reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.Tramos.Add(new DTO_TramoConsumo
+                                {
+                                    NumeroTramo = Convert.ToInt32(reader["NumeroTramo"]),
+                                    Id_Detalle_HDR = Convert.ToInt32(reader["Id_Detalle_HDR"]),
+                                    HoraEstimada = reader["HoraEstimada"].ToString(),
+                                    Id_TipoMovimiento = Convert.ToInt32(reader["Id_TipoMovimiento"]),
+                                    TipoMovimiento = reader["TipoMovimiento"].ToString(),
+                                    RecursoMovilizado = reader["RecursoMovilizado"].ToString(),
+                                    TipoMaterial = reader["TipoMaterial"].ToString(),
+                                    EstadoTramo = reader["EstadoTramo"].ToString(),
+                                    PuntoParada = reader["PuntoParada"].ToString(),
+                                    DireccionCompleta = reader["DireccionCompleta"].ToString(),
+                                    UbicacionDescripcion = reader["UbicacionDescripcion"].ToString(),
+
+                                    Latitud = reader["Latitud"] != DBNull.Value ? Convert.ToDecimal(reader["Latitud"]) : (decimal?)null,
+                                    Longitud = reader["Longitud"] != DBNull.Value ? Convert.ToDecimal(reader["Longitud"]) : (decimal?)null,
+
+                                    KmTramo = Convert.ToDecimal(reader["KmTramo"]),
+                                    KmAcumulados = Convert.ToDecimal(reader["KmAcumulados"]),
+                                    PorcentajeIncidencia = reader["PorcentajeIncidencia"] != DBNull.Value ? Convert.ToDecimal(reader["PorcentajeIncidencia"]) : 0m,
+                                    LitrosTramo_Teorico = Convert.ToDecimal(reader["LitrosTramo_Teorico"]),
+                                    LitrosTramo_Prorrateado = reader["LitrosTramo_Prorrateado"] != DBNull.Value ? Convert.ToDecimal(reader["LitrosTramo_Prorrateado"]) : 0m,
+                                    CostoTramo_Teorico = Convert.ToDecimal(reader["CostoTramo_Teorico"]),
+                                    CostoTramo_Prorrateado = reader["CostoTramo_Prorrateado"] != DBNull.Value ? Convert.ToDecimal(reader["CostoTramo_Prorrateado"]) : 0m,
+                                    SobrecostoDesvioTramo = reader["SobrecostoDesvioTramo"] != DBNull.Value ? Convert.ToDecimal(reader["SobrecostoDesvioTramo"]) : 0m,
+                                    CostoAcumulado_Prorrateado = reader["CostoAcumulado_Prorrateado"] != DBNull.Value ? Convert.ToDecimal(reader["CostoAcumulado_Prorrateado"]) : 0m
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return resultado;
+        }
 
 
     }
