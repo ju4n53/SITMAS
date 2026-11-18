@@ -18,13 +18,13 @@
 <body class="min-vh-100 d-flex flex-column">
 
     <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
-        <!-- <div>
+        <div>
             <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
-        </div> -->
+        </div>
 
         <div class="info-right d-flex align-items-center gap-3">
             <div class="text-end d-flex flex-column">
-                <span class="d-none">Hola, <span class="data" id="header-user">---</span></span>
+                <span>Hola, <span class="data" id="header-user">---</span></span>
                 <span class="d-none">Eres: <span class="data" id="header-role">---</span></span>
 
                 <a href="#" type="button" class="btn btn-danger btn-sm" onclick="cerrarSesion(event)">
@@ -131,6 +131,7 @@
 
 
             <main class="container-fluid p-4">
+
                 <!-- PANEL ADMINISTRADOR: Gráficos (Oculto por defecto) -->
                 <div class="row g-4 d-none" id="panel-graficos">
                     <!-- <div class="col-12">
@@ -161,10 +162,11 @@
                     </div> -->
                     <!-- </div> -->
                     <!-- <br> -->
-                    <!-- PANEL CHOFER: Rutas del día (Oculto por defecto) -->
-                    <div class="row g-4 d-none" id="contenedor-rutas">
-                        <!-- El JS del chofer inyectará las tarjetas o el mapa aquí -->
-                    </div>
+                </div>
+
+                <!-- PANEL CHOFER: Rutas del día (Oculto por defecto) -->
+                <div class="row g-4 d-none" id="contenedor-rutas">
+                    <!-- El JS del chofer inyectará las tarjetas o el mapa aquí -->
                 </div>
             </main>
 
@@ -183,11 +185,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- <script src="../Js/dashboard/dashboard_ingresoPrincipal.js"></script>  -->
     <script src="../Js/alerts_config.js"></script>
+    <script src="../Js/config/enrutador_spa.js"></script>
     <script src="../Js/config/config_maps.js"></script>
+    <script src="../Js/dashboard/dashboard_chofer.js"></script>
 
     <!-- <script src="../Js/dashboard/dashboard_graficos.js"></script> -->
-    <script src="../Js/dashboard/dashboard_chofer.js"></script>
-    <script src="../Js/config/enrutador_spa.js"></script>
     <script src="../Js/logout.js"></script>
 
 

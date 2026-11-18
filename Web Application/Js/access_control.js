@@ -19,9 +19,9 @@ const rutasProtegidas = {
 
     "traz_empresa.html": ["Supervisor_Logistica", "R_Institucionales", "Administrador"],
 
-    "IngresoYClasificacion.html": ["Supervisor_Gestion", "Operador_Gestion", "Administrador"],
+    //"IngresoYClasificacion.html": ["Supervisor_Gestion", "Operador_Gestion", "Administrador"],
 
-    "SalidasYStock.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
+    //"SalidasYStock.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
 
     "traz_reportes.html": ["Supervisor_Gestion", "Operador_Gestion", "Coordinador", "R_Institucionales", "Administrador"],
 
@@ -37,9 +37,9 @@ const rutasProtegidas = {
 
     "reportes_logistica.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "R_Institucionales", "Administrador"],
 
-    "odometro.html": ["Coordinador", "Supervisor_Logistica", "R_Institucionales", "Administrador"],
+    //"odometro.html": ["Coordinador", "Supervisor_Logistica", "R_Institucionales", "Administrador"],
 
-    "consumoCombustible.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"],
+    //"consumoCombustible.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"],
 
     "config_estructura.html": ["Administrador"],
 

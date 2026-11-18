@@ -27,6 +27,30 @@ namespace API_SITMAS.Controllers
             }
         }
 
+
+        // POST: api/combustible/sincronizar-surtidor
+        [HttpPost]
+        [Route("sincronizar-surtidor")]
+        public async System.Threading.Tasks.Task<IHttpActionResult> SincronizarPrecioSurtidor()
+        {
+            try
+            {
+                Combustible oCombustible = new Combustible();
+                ResultadoSincronizacionCombustible resultado = await oCombustible.SincronizarPrecioShellAsync();
+
+                if (resultado.Combustible == null)
+                    return NotFound();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
+
         // PUT: api/combustible/5
         // Actualiza el precio del combustible indicado por {id}
         [HttpPut]

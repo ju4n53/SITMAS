@@ -97,6 +97,28 @@ namespace API_SITMAS.Models
     }
 
 
+    // DTO para Reporte de Consumo Combustible
+    public class DTO_ReporteConsumoCombustible
+    {
+        public int Id_Consumo { get; set; }
+        public int IdRegistroOdomet { get; set; }
+        public DateTime FechaRegOdom { get; set; }
+        public string FechaISO { get; set; }
+        public string FechaFormateada { get; set; }
+        public int IdVehiculo { get; set; }
+        public string Vehiculo { get; set; }
+        public int? Id_HojaRuta { get; set; }
+        public string TipoMovimiento { get; set; }
+        public string ChoferNombreCompleto { get; set; }
+        public int Id_Combustible { get; set; }
+        public string TipoCombustible { get; set; }
+        public decimal KmReales { get; set; }
+        public decimal ConsumoTeoricoLtsKm { get; set; }
+        public decimal PrecioLitroAplicado { get; set; }
+        public decimal CostoPorKm { get; set; }
+        public decimal LitrosConsumidos { get; set; }
+        public decimal CostoTotalViaje { get; set; }
+    }
 
 
     public class ReportesLogisticaDatos
@@ -271,6 +293,53 @@ namespace API_SITMAS.Models
                                 KmAlMomentoService = Convert.ToDecimal(reader["KmAlMomentoService"]),
                                 Id_Mecanico = Convert.ToInt32(reader["Id_Mecanico"]),
                                 MecanicoNombreCompleto = reader["MecanicoNombreCompleto"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+
+
+        public List<DTO_ReporteConsumoCombustible> ObtenerReporteConsumoCombustible(DateTime fechaDesde, DateTime fechaHasta)
+        {
+            var lista = new List<DTO_ReporteConsumoCombustible>();
+
+            using (SqlConnection sqlCnn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand sqlCom = new SqlCommand("sp_Reporte_ConsumoCombustible", sqlCnn))
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.Parameters.AddWithValue("@FechaDesde", fechaDesde);
+                    sqlCom.Parameters.AddWithValue("@FechaHasta", fechaHasta);
+
+                    sqlCnn.Open();
+
+                    using (SqlDataReader reader = sqlCom.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new DTO_ReporteConsumoCombustible
+                            {
+                                Id_Consumo = Convert.ToInt32(reader["Id_Consumo"]),
+                                IdRegistroOdomet = Convert.ToInt32(reader["IdRegistroOdomet"]),
+                                FechaRegOdom = Convert.ToDateTime(reader["FechaRegOdom"]),
+                                FechaISO = reader["FechaISO"].ToString(),
+                                FechaFormateada = reader["FechaFormateada"].ToString(),
+                                IdVehiculo = Convert.ToInt32(reader["IdVehiculo"]),
+                                Vehiculo = reader["Vehiculo"].ToString(),
+                                Id_HojaRuta = reader["Id_HojaRuta"] != DBNull.Value ? Convert.ToInt32(reader["Id_HojaRuta"]) : (int?)null,
+                                TipoMovimiento = reader["TipoMovimiento"].ToString(),
+                                ChoferNombreCompleto = reader["ChoferNombreCompleto"].ToString(),
+                                Id_Combustible = Convert.ToInt32(reader["Id_Combustible"]),
+                                TipoCombustible = reader["TipoCombustible"].ToString(),
+                                KmReales = Convert.ToDecimal(reader["KmReales"]),
+                                ConsumoTeoricoLtsKm = Convert.ToDecimal(reader["ConsumoTeoricoLtsKm"]),
+                                PrecioLitroAplicado = Convert.ToDecimal(reader["PrecioLitroAplicado"]),
+                                CostoPorKm = Convert.ToDecimal(reader["CostoPorKm"]),
+                                LitrosConsumidos = Convert.ToDecimal(reader["LitrosConsumidos"]),
+                                CostoTotalViaje = Convert.ToDecimal(reader["CostoTotalViaje"])
                             });
                         }
                     }

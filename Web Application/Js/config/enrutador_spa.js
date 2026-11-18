@@ -145,7 +145,7 @@ $('#ReportesLogisticaTabs .nav-link').on('click', function (e) {
         ReporteMantenimientoModulo.cargarEn("contenedor-dinamico-reportes-logistica");
     } else if (tabId === 'tab-consumo-combustible') {
         console.log("Preparando módulo Reporte: Consumo de Combustible...");
-        // ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");
     } else if (tabId === 'tab-pert-logistica') {
         console.log("Preparando módulo Reporte: Pert Logistica...");
         ReportePertLogisticaModulo.cargarEn("contenedor-dinamico-reportes-logistica");
