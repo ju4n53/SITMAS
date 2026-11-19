@@ -1,6 +1,7 @@
 ﻿using API_SITMAS.Models;
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace API_SITMAS.Controllers
@@ -200,6 +201,48 @@ namespace API_SITMAS.Controllers
                 return InternalServerError(ex);
             }
         }
+
+
+        // GET: api/ReportesLogistica/RendimientoChoferes?fechaDesde=2026-01-01&fechaHasta=2026-11-19
+        // GET: api/ReportesLogistica/RendimientoChoferes?fechaDesde=2026-01-01&fechaHasta=2026-11-19&idChofer=5
+        [HttpGet]
+        [Route("RendimientoChoferes")]
+        public async Task<IHttpActionResult> ObtenerRendimientoChoferes(
+            string fechaDesde,
+            string fechaHasta,
+            int? idChofer = null,
+            int? idUsuario = null)
+        {
+            if (string.IsNullOrWhiteSpace(fechaDesde) || string.IsNullOrWhiteSpace(fechaHasta))
+                return BadRequest("Las fechas 'fechaDesde' y 'fechaHasta' son obligatorias.");
+
+            if (idChofer.HasValue && idChofer.Value <= 0)
+                return BadRequest("El parámetro 'idChofer' debe ser un número entero mayor a cero.");
+
+            if (idUsuario.HasValue && idUsuario.Value <= 0)
+                return BadRequest("El parámetro 'idUsuario' debe ser un número entero mayor a cero.");
+
+            try
+            {
+                DateTime desde = Convert.ToDateTime(fechaDesde);
+                DateTime hasta = Convert.ToDateTime(fechaHasta);
+
+                if (desde > hasta)
+                    return BadRequest("La fecha 'fechaDesde' no puede ser mayor a 'fechaHasta'.");
+
+                var resultado = await _datos.ObtenerRendimientoChoferesAsync(desde, hasta, idChofer, idUsuario);
+                return Ok(resultado);
+            }
+            catch (FormatException)
+            {
+                return BadRequest("El formato de fecha enviado no es válido.");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
 
 
     }
