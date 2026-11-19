@@ -279,7 +279,7 @@ function RenderizarVistaEsperaEnriquecida(listaRutas, $contenedor, esChofer) {
     $contenedor.append(`
         <div class="col-12 mb-2">
             <h5 class="text-secondary fw-bold border-bottom pb-2">
-                📅 Rutas programadas para hoy: <span class="text-primary">${fechaFormateada}</span>
+                📅 Rutas programadas para hoy  <!--: <span class="text-primary">${fechaFormateada}</span>-->
             </h5>
         </div>
     `);

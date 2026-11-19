@@ -1,0 +1,147 @@
+/* ========================================================================
+   SITMAS - Estilos de Impresión y Exportación PDF para Reportes (v2)
+   Archivo: Css/print_reportes.css
+   ======================================================================== */
+
+/* En pantalla normal, el membrete exclusivo de papel permanece oculto */
+#encabezado-impresion-sitmas {
+    display: none;
+}
+
+@media print {
+
+    /* 1. Hoja A4 Horizontal (Landscape): ideal para tablas de 9 a 14 columnas */
+    @page {
+        size: A4 landscape;
+        margin: 10mm 10mm;
+    }
+
+    html,
+    body {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 10pt;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* 2. Ocultar navegación, pestañas y controles de filtro */
+    .main-header,
+    .sidebar-vertical,
+    .footer-liston,
+    #ReportesLogisticaTabs,
+    #ReportesTrazabilidadTabs,
+    .no-print,
+    button,
+    input,
+    select,
+    .input-group {
+        display: none !important;
+    }
+
+    /* 3. Mostrar membrete institucional ajustado al 100% del ancho */
+    #encabezado-impresion-sitmas {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        width: 100% !important;
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
+    }
+
+    /* 4. Neutralizar márgenes negativos de Bootstrap (.row) para evitar desbordes */
+    .main-layout,
+    .main-body-content,
+    .container-fluid,
+    .sitmas-card {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .row>* {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+
+    /* 5. Ajuste estricto de tablas para que NUNCA superen el margen derecho */
+    .table-responsive {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    table.table {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: auto !important;
+        border-collapse: collapse !important;
+        font-size: 8pt !important;
+        /* Tamaño óptimo para grillas de 10-14 columnas */
+    }
+
+    table.table th,
+    table.table td {
+        padding: 4px 5px !important;
+        white-space: normal !important;
+        /* Permite salto de línea en títulos largos */
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 0 !important;
+        /* Anula min-width inline de HTML */
+    }
+
+    /* Permitir que los badges de Bootstrap se adapten al ancho de su columna */
+    table.table .badge {
+        white-space: normal !important;
+        text-align: center;
+        line-height: 1.2;
+        font-size: 7.5pt !important;
+    }
+
+    thead {
+        display: table-header-group;
+        /* Repite cabeceras si el listado ocupa varias hojas */
+    }
+
+    tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    /* 6. Protección contra cortes en tarjetas KPI y gráficos */
+    .card,
+    .alert {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .snapshot-grafico-impresion {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 290px;
+        /* Ajustado a la altura útil de A4 horizontal */
+        object-fit: contain;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
