@@ -62,6 +62,9 @@ namespace API_SITMAS.Controllers
             if (fechaDesde.HasValue && fechaHasta.HasValue && fechaDesde.Value.Date > fechaHasta.Value.Date)
                 return BadRequest("La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.");
 
+            if (idTipoMaterial.HasValue && idTipoMaterial.Value <= 0)
+                return BadRequest("El identificador del tipo de material debe ser mayor a cero.");
+
             try
             {
                 var data = await _repo.ObtenerPorOrigenAsync(fechaDesde, fechaHasta, idTipoMaterial);

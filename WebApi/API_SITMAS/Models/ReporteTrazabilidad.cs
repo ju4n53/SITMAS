@@ -106,10 +106,13 @@ namespace API_SITMAS.Models
         public string NombreOrigen { get; set; }
         public string CategoriaOrigen { get; set; }
         public int FrecuenciaEntregas { get; set; }
+        public int CantLotes { get; set; }
         public decimal PesoBrutoTotalKg { get; set; }
         public decimal PromedioKgPorEntrega { get; set; }
         public decimal PesoUtilVerdeKg { get; set; }
+        public decimal PesoRevisionAmarilloKg { get; set; }
         public decimal PesoDescarteRojoKg { get; set; }
+        public decimal PesoClasificadoTotalKg { get; set; }
         public decimal IndiceCalidadOrigenPct { get; set; }
         public DateTime? UltimaEntrega { get; set; }
         public decimal? Latitud { get; set; }
@@ -121,6 +124,7 @@ namespace API_SITMAS.Models
     {
         public string CategoriaOrigen { get; set; }
         public int CantEntregas { get; set; }
+        public int CantLotes { get; set; }
         public decimal PesoBrutoTotalKg { get; set; }
         public decimal PromedioKgEntrega { get; set; }
     }
@@ -384,7 +388,7 @@ namespace API_SITMAS.Models
             var resultado = new TrazabilidadOrigenResponseDTO();
 
             using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_ReporteTrazabilidad_PorOrigen", conn))
+            using (var cmd = new SqlCommand("dbo.sp_ReporteTrazabilidad_PorOrigen", conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 AddParamNullable(cmd, "@FechaDesde", SqlDbType.Date, fechaDesde?.Date);
@@ -403,10 +407,13 @@ namespace API_SITMAS.Models
                             NombreOrigen = GetString(reader, "NombreOrigen"),
                             CategoriaOrigen = GetString(reader, "CategoriaOrigen"),
                             FrecuenciaEntregas = GetInt(reader, "FrecuenciaEntregas"),
+                            CantLotes = GetInt(reader, "CantLotes"),
                             PesoBrutoTotalKg = GetDecimal(reader, "PesoBrutoTotalKg"),
                             PromedioKgPorEntrega = GetDecimal(reader, "PromedioKgPorEntrega"),
                             PesoUtilVerdeKg = GetDecimal(reader, "PesoUtilVerdeKg"),
+                            PesoRevisionAmarilloKg = GetDecimal(reader, "PesoRevisionAmarilloKg"),
                             PesoDescarteRojoKg = GetDecimal(reader, "PesoDescarteRojoKg"),
+                            PesoClasificadoTotalKg = GetDecimal(reader, "PesoClasificadoTotalKg"),
                             IndiceCalidadOrigenPct = GetDecimal(reader, "IndiceCalidadOrigenPct"),
                             UltimaEntrega = GetDateTimeNullable(reader, "UltimaEntrega"),
                             Latitud = GetDecimalNullable(reader, "Latitud"),
@@ -424,6 +431,7 @@ namespace API_SITMAS.Models
                             {
                                 CategoriaOrigen = GetString(reader, "CategoriaOrigen"),
                                 CantEntregas = GetInt(reader, "CantEntregas"),
+                                CantLotes = GetInt(reader, "CantLotes"),
                                 PesoBrutoTotalKg = GetDecimal(reader, "PesoBrutoTotalKg"),
                                 PromedioKgEntrega = GetDecimal(reader, "PromedioKgEntrega")
                             });

@@ -2,7 +2,11 @@
    SITMAS - Módulo de Reportes de Trazabilidad: Orígenes y Donantes
    Consume: GET /api/ReportesTrazabilidad/PorOrigen
    DTO C#: { RankingOrigenes: [...], PorCategoria: [...] }
-   Incluye: 4 KPIs + Heatmap Large (20K Style) + Barras Superpuestas + Tabla
+   Incluye:
+     - 4 KPIs Principales (Estética Pastel)
+     - Gráfico Principal: Parallel AQI (Entregas vs. Lotes vs. Prom. kg/Entrega)
+     - Gráfico Secundario: Bar Chart Horizontal with Negative Value
+     - Tabla Detallada de Auditoría por Origen
    Archivo: Js/reportes_trazabilidad/reporte_traz_origenes.js
    ======================================================================== */
 
@@ -10,9 +14,8 @@ const ReporteTrazOrigenesModulo = (function () {
     // 🔒 ESTADO PRIVADO
     let estado = {
         origenes: [],
-        categorias: [],
-        chartHeatmapOrigenes: null,
-        chartBarrasSuperpuestas: null
+        chartParallelOrigenes: null,
+        chartBarrasNegativas: null
     };
 
     const URL_POR_ORIGEN = "https://localhost:44325/api/ReportesTrazabilidad/PorOrigen";
@@ -27,6 +30,11 @@ const ReporteTrazOrigenesModulo = (function () {
         });
     };
 
+    const formatearEntero = function (valor) {
+        const num = Math.round(parseFloat(valor || 0));
+        return num.toLocaleString('es-AR');
+    };
+
     const formatearPorcentaje = function (valor) {
         const num = parseFloat(valor || 0);
         return num.toLocaleString('es-AR', {
@@ -35,14 +43,26 @@ const ReporteTrazOrigenesModulo = (function () {
         });
     };
 
-    // Limpieza segura de instancias ECharts al cambiar de pestaña en la SPA
+    const formatearFecha = function (fechaIso) {
+        if (!fechaIso) return '—';
+        const fecha = new Date(fechaIso);
+        if (isNaN(fecha.getTime())) return '—';
+        return fecha.toLocaleDateString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
+    // Limpieza segura de instancias ECharts y eventos globales al cambiar de pestaña en la SPA
     const destruirGraficosActivos = function () {
-        ['chartHeatmapOrigenes', 'chartBarrasSuperpuestas'].forEach(key => {
+        ['chartParallelOrigenes', 'chartBarrasNegativas'].forEach(key => {
             if (estado[key] && !estado[key].isDisposed()) {
                 estado[key].dispose();
             }
             estado[key] = null;
         });
+        $(window).off('resize.trazOrigenes');
     };
 
     // Normalizador alineado 1 a 1 con TrazabilidadOrigenRankingDTO de C#
@@ -58,10 +78,13 @@ const ReporteTrazOrigenesModulo = (function () {
         return listaRaw.map(item => {
             const bruto = parseFloat(item.PesoBrutoTotalKg ?? 0);
             const verde = parseFloat(item.PesoUtilVerdeKg ?? 0);
+            const amarillo = parseFloat(item.PesoRevisionAmarilloKg ?? 0);
             const rojo = parseFloat(item.PesoDescarteRojoKg ?? 0);
+            const clasificado = parseFloat(item.PesoClasificadoTotalKg ?? (verde + amarillo + rojo));
             const promedio = parseFloat(item.PromedioKgPorEntrega ?? 0);
             const indiceCalidad = parseFloat(item.IndiceCalidadOrigenPct ?? 0);
             const frecuencia = parseInt(item.FrecuenciaEntregas ?? 0, 10);
+            const cantLotes = parseInt(item.CantLotes ?? 0, 10);
             const pctAporte = totalGlobalBruto > 0 ? (bruto * 100 / totalGlobalBruto) : 0;
 
             return {
@@ -69,10 +92,13 @@ const ReporteTrazOrigenesModulo = (function () {
                 nombreOrigen: item.NombreOrigen || 'Origen No Especificado',
                 categoriaOrigen: item.CategoriaOrigen || 'Sin Categoría',
                 frecuenciaEntregas: frecuencia,
+                cantLotes: cantLotes,
                 pesoBrutoTotalKg: bruto,
                 promedioKgPorEntrega: promedio,
                 pesoUtilVerdeKg: verde,
+                pesoRevisionAmarilloKg: amarillo,
                 pesoDescarteRojoKg: rojo,
+                pesoClasificadoTotalKg: clasificado,
                 indiceCalidadOrigenPct: indiceCalidad,
                 ultimaEntrega: item.UltimaEntrega || null,
                 ubicacionDescripcion: item.UbicacionDescripcion || '',
@@ -94,7 +120,7 @@ const ReporteTrazOrigenesModulo = (function () {
                         <h4 class="text-primary fw-bold mb-0">
                             <i class="fas fa-building me-2"></i>Análisis de Orígenes, Generadores y Calidad de Aporte
                         </h4>
-                        <small class="text-muted">Mapa térmico de alta densidad (Heatmap Large), eficiencia por entrega y auditoría de separación en origen</small>
+                        <small class="text-muted">Cruce multivariable de frecuencia y volumen por entrega, balance positivo/negativo y auditoría por generador</small>
                     </div>
 
                     <div class="d-flex flex-wrap gap-2 align-items-center bg-light p-2 rounded border">
@@ -116,107 +142,124 @@ const ReporteTrazOrigenesModulo = (function () {
                 </div>
             </div>
 
-            <!-- NIVEL 2: 4 TARJETAS KPI -->
+            <!-- NIVEL 2: 4 TARJETAS KPI PRINCIPALES (ESTÉTICA PASTEL) -->
             <div class="row g-3 mb-4 fade-in">
                 <!-- KPI 1: Mayor Peso Bruto Total -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #e0f2fe; border-color: #0284c7 !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Mayor Peso Bruto Total</span>
-                                <span class="badge bg-primary bg-opacity-10 text-primary p-2"><i class="fas fa-weight-hanging fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #0369a1;">Mayor Peso Bruto Total</span>
+                                <span class="badge p-2" style="background-color: rgba(2, 132, 199, 0.16); color: #0369a1;">
+                                    <i class="fas fa-weight-hanging fa-lg"></i>
+                                </span>
                             </div>
-                            <h4 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mayor-bruto">—</h4>
-                            <small class="text-muted" id="kpi-ori-mayor-bruto-sub">0,00 kg brutos ingresados</small>
+                            <h5 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mayor-bruto">—</h5>
+                            <h5 class="fw-bold mb-1" style="color: #0369a1;" id="kpi-ori-mayor-bruto-valor">0,00 kg</h5>
+                            <small class="text-secondary fw-medium" id="kpi-ori-mayor-bruto-sub">0,0% del total ingresado</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- KPI 2: Mejor Calidad Verde (Más kg de PesoUtilVerdeKg) -->
+                <!-- KPI 2: Mayor Aporte Útil (Verde) -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #dcfce7; border-color: #16a34a !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Mejor Calidad Verde</span>
-                                <span class="badge bg-success bg-opacity-10 text-success p-2"><i class="fas fa-leaf fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #15803d;">Mayor Aporte Útil (Verde)</span>
+                                <span class="badge p-2" style="background-color: rgba(22, 163, 74, 0.18); color: #15803d;">
+                                    <i class="fas fa-leaf fa-lg"></i>
+                                </span>
                             </div>
-                            <h4 class="fw-bold text-success mb-1 text-truncate" id="kpi-ori-mejor-verde">—</h4>
-                            <small class="text-muted" id="kpi-ori-mejor-verde-sub">0,00 kg útiles verdes</small>
+                            <h5 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mejor-verde">—</h5>
+                            <h5 class="fw-bold mb-1" style="color: #15803d;" id="kpi-ori-mejor-verde-valor">0,00 kg</h5>
+                            <small class="text-secondary fw-medium" id="kpi-ori-mejor-verde-sub">0,0% índice de calidad</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- KPI 3: Menor Calidad / Mayor Descarte Rojo (PesoDescarteRojoKg) -->
+                <!-- KPI 3: Mayor Descarte (Rojo) -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #fee2e2; border-color: #dc2626 !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Menor Calidad (Descarte Rojo)</span>
-                                <span class="badge bg-danger bg-opacity-10 text-danger p-2"><i class="fas fa-exclamation-triangle fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #b91c1c;">Mayor Descarte (Rojo)</span>
+                                <span class="badge p-2" style="background-color: rgba(220, 38, 38, 0.16); color: #b91c1c;">
+                                    <i class="fas fa-exclamation-triangle fa-lg"></i>
+                                </span>
                             </div>
-                            <h4 class="fw-bold text-danger mb-1 text-truncate" id="kpi-ori-menor-rojo">—</h4>
-                            <small class="text-muted" id="kpi-ori-menor-rojo-sub">0,00 kg de descarte rojo</small>
+                            <h5 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-menor-rojo">—</h5>
+                            <h5 class="fw-bold mb-1" style="color: #b91c1c;" id="kpi-ori-menor-rojo-valor">0,00 kg</h5>
+                            <small class="text-secondary fw-medium" id="kpi-ori-menor-rojo-sub">Sin descarte registrado</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- KPI 4: Mayor Frecuencia de Entregas (FrecuenciaEntregas) -->
+                <!-- KPI 4: Mayor Frecuencia de Entregas -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #cffafe; border-color: #0891b2 !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Mayor Frecuencia Entregas</span>
-                                <span class="badge bg-info bg-opacity-10 text-info p-2"><i class="fas fa-truck-loading fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #0e7490;">Mayor Frecuencia Entregas</span>
+                                <span class="badge p-2" style="background-color: rgba(8, 145, 178, 0.16); color: #0e7490;">
+                                    <i class="fas fa-truck-loading fa-lg"></i>
+                                </span>
                             </div>
-                            <h4 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mayor-frecuencia">—</h4>
-                            <small class="text-muted" id="kpi-ori-mayor-frecuencia-sub">0 entregas registradas</small>
+                            <h5 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mayor-frecuencia">—</h5>
+                            <h5 class="fw-bold mb-1" style="color: #0e7490;" id="kpi-ori-mayor-frecuencia-valor">0 entregas</h5>
+                            <small class="text-secondary fw-medium" id="kpi-ori-mayor-frecuencia-sub">Prom. 0,00 kg / entrega</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- NIVEL 3: GRÁFICO PRINCIPAL - HEATMAP LARGE (20K DATA ENGINE) -->
+            <!-- NIVEL 3: GRÁFICO PRINCIPAL - PARALLEL AQI (ENTREGAS VS LOTES VS PROMEDIO KG/ENTREGA) -->
             <div class="row g-4 mb-4 fade-in">
                 <div class="col-12">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <div>
                                 <h6 class="fw-bold text-dark mb-0">
-                                    <i class="fas fa-fire text-danger me-2"></i>Mapa de Calor de Alta Densidad por Origen (Heatmap Large)
+                                    <i class="fas fa-project-diagram text-primary me-2"></i>Análisis Multivariable por Origen (Parallel AQI)
                                 </h6>
-                                <small class="text-muted">Espectro térmico de masa (kg) combinando todos los orígenes frente a Peso Bruto Total, Útil Verde, Descarte Rojo y Promedio por Entrega</small>
+                                <small class="text-muted">Cruce paralelo de Cantidad de Entregas, Cantidad de Lotes y Promedio de kg por Entrega (clasificado por nivel de calidad en origen)</small>
                             </div>
-                            <span class="badge bg-light text-dark border">
-                                <i class="fas fa-mouse-pointer me-1 text-primary"></i> Rueda del mouse para Zoom / Arrastrar para desplazar
-                            </span>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="badge bg-light text-dark border" title="Arrastrá verticalmente sobre cualquier eje para filtrar rangos">
+                                    <i class="fas fa-sliders-h me-1 text-primary"></i>Arrastrá sobre un eje para filtrar
+                                </span>
+                                <button type="button" id="btn-limpiar-brush-parallel" class="btn btn-outline-secondary btn-sm" title="Quitar selección de ejes">
+                                    <i class="fas fa-undo me-1"></i>Limpiar selección
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <div id="msg-sin-datos-ori-heatmap" class="alert alert-light text-center border my-4 p-4 d-none">
-                                <i class="fas fa-building fa-2x text-muted mb-2"></i>
+                            <div id="msg-sin-datos-ori-parallel" class="alert alert-light text-center border my-4 p-4 d-none">
+                                <i class="fas fa-project-diagram fa-2x text-muted mb-2"></i>
                                 <p class="mb-0 text-muted">No se registraron entregas por origen en el período seleccionado.</p>
                             </div>
-                            <div id="echarts-ori-heatmap" style="width: 100%; height: 470px;"></div>
+                            <div id="echarts-ori-parallel" style="width: 100%; height: 470px;"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- NIVEL 4: GRÁFICO SECUNDARIO - BARRAS SUPERPUESTAS (PROMEDIO KG/ENTREGA VS ÍNDICE CALIDAD %) -->
+            <!-- NIVEL 4: GRÁFICO SECUNDARIO - BAR CHART HORIZONTAL WITH NEGATIVE VALUE -->
             <div class="row g-4 mb-4 fade-in">
                 <div class="col-12">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-white border-bottom py-3">
                             <h6 class="fw-bold text-dark mb-0">
-                                <i class="fas fa-chart-bar text-success me-2"></i>Eficiencia por Entrega vs. Índice de Calidad en Origen
+                                <i class="fas fa-balance-scale text-success me-2"></i>Balance Horizontal por Origen: Recuperación (+) vs. Descarte (-)
                             </h6>
-                            <small class="text-muted">Barras superpuestas: Promedio de kg por entrega (barra exterior azul) frente al Índice de Calidad Verde % (barra interior verde)</small>
+                            <small class="text-muted">Comparativa horizontal contra Peso Bruto de referencia: Útil Verde y Revisión Amarillo hacia la derecha (+), Descarte Rojo hacia la izquierda (-)</small>
                         </div>
                         <div class="card-body">
-                            <div id="msg-sin-datos-ori-superpuestas" class="alert alert-light text-center border my-4 p-4 d-none">
+                            <div id="msg-sin-datos-ori-negativas" class="alert alert-light text-center border my-4 p-4 d-none">
                                 <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
-                                <p class="mb-0 text-muted">Sin datos suficientes para comparar promedios e índice de calidad.</p>
+                                <p class="mb-0 text-muted">Sin datos suficientes para graficar el balance positivo/negativo por origen.</p>
                             </div>
-                            <div id="echarts-ori-superpuestas" style="width: 100%; height: 430px;"></div>
+                            <div id="echarts-ori-negativas" style="width: 100%; height: 480px;"></div>
                         </div>
                     </div>
                 </div>
@@ -231,7 +274,7 @@ const ReporteTrazOrigenesModulo = (function () {
                                 <h6 class="fw-bold text-dark mb-0">
                                     <i class="fas fa-list-ol text-secondary me-2"></i>Detalle Completo de Orígenes y Generadores
                                 </h6>
-                                <small class="text-muted">Frecuencia de entregas, peso bruto acumulado, promedio por viaje e índice de separación en origen</small>
+                                <small class="text-muted">Frecuencia de entregas, lotes ingresados, peso bruto acumulado, semáforo completo e índice de separación en origen</small>
                             </div>
 
                             <div class="input-group input-group-sm" style="max-width: 280px;">
@@ -247,17 +290,19 @@ const ReporteTrazOrigenesModulo = (function () {
                                             <th class="text-center" style="width: 55px;">#</th>
                                             <th>Origen / Generador</th>
                                             <th>Categoría</th>
-                                            <th class="text-center">Entregas</th>
+                                            <th class="text-center">Entregas / Lotes</th>
                                             <th class="text-end">Peso Bruto Total</th>
                                             <th class="text-end text-primary">Prom. / Entrega</th>
                                             <th class="text-end text-success">Útil Verde</th>
+                                            <th class="text-end text-warning">Rev. Amarillo</th>
                                             <th class="text-end text-danger">Descarte Rojo</th>
-                                            <th style="min-width: 160px;">Índice Calidad (%)</th>
+                                            <th class="text-center">Última Entrega</th>
+                                            <th style="min-width: 155px;">Índice Calidad (%)</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-traz-origenes">
                                         <tr>
-                                            <td colspan="9" class="text-center text-muted py-4">Cargando orígenes...</td>
+                                            <td colspan="11" class="text-center text-muted py-4">Cargando orígenes...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -295,6 +340,11 @@ const ReporteTrazOrigenesModulo = (function () {
             consultarPorOrigenApi(desde, hasta, idTipoMaterial);
         });
 
+        // Botón para limpiar la selección (brush) en los ejes paralelos
+        principal.off('click', '#btn-limpiar-brush-parallel').on('click', '#btn-limpiar-brush-parallel', function () {
+            renderizarParallelAqiOrigenes(estado.origenes);
+        });
+
         // Buscador instantáneo en tabla
         principal.off('input', '#buscador-tabla-origenes').on('input', '#buscador-tabla-origenes', function () {
             const termino = $(this).val().toLowerCase().trim();
@@ -310,11 +360,11 @@ const ReporteTrazOrigenesModulo = (function () {
 
         // Responsividad limpia
         $(window).off('resize.trazOrigenes').on('resize.trazOrigenes', function () {
-            if (estado.chartHeatmapOrigenes && !estado.chartHeatmapOrigenes.isDisposed()) {
-                estado.chartHeatmapOrigenes.resize();
+            if (estado.chartParallelOrigenes && !estado.chartParallelOrigenes.isDisposed()) {
+                estado.chartParallelOrigenes.resize();
             }
-            if (estado.chartBarrasSuperpuestas && !estado.chartBarrasSuperpuestas.isDisposed()) {
-                estado.chartBarrasSuperpuestas.resize();
+            if (estado.chartBarrasNegativas && !estado.chartBarrasNegativas.isDisposed()) {
+                estado.chartBarrasNegativas.resize();
             }
         });
     };
@@ -362,12 +412,11 @@ const ReporteTrazOrigenesModulo = (function () {
             success: function (respuesta) {
                 const lista = normalizarOrigenes(respuesta);
                 estado.origenes = lista.sort((a, b) => b.pesoBrutoTotalKg - a.pesoBrutoTotalKg);
-                estado.categorias = respuesta?.PorCategoria || [];
                 $('#buscador-tabla-origenes').val('');
 
                 renderizarKPIs(estado.origenes);
-                renderizarHeatmapLargeOrigenes(estado.origenes);
-                renderizarBarrasSuperpuestas(estado.origenes);
+                renderizarParallelAqiOrigenes(estado.origenes);
+                renderizarBarrasNegativas(estado.origenes);
                 renderizarTablaOrigenes(estado.origenes);
             },
             error: function (err) {
@@ -380,55 +429,76 @@ const ReporteTrazOrigenesModulo = (function () {
         });
     };
 
-    // 4. RENDERIZADO DE LAS 4 TARJETAS KPI
+    // 4. RENDERIZADO DE LAS 4 TARJETAS KPI PRINCIPALES
     const renderizarKPIs = function (lista) {
         if (!lista || lista.length === 0) {
-            $('#kpi-ori-mayor-bruto').text('Sin datos');
-            $('#kpi-ori-mayor-bruto-sub').text('0,00 kg brutos ingresados');
-            $('#kpi-ori-mejor-verde').text('Sin datos');
-            $('#kpi-ori-mejor-verde-sub').text('0,00 kg útiles verdes');
-            $('#kpi-ori-menor-rojo').text('Sin datos');
-            $('#kpi-ori-menor-rojo-sub').text('0,00 kg de descarte rojo');
-            $('#kpi-ori-mayor-frecuencia').text('Sin datos');
-            $('#kpi-ori-mayor-frecuencia-sub').text('0 entregas registradas');
+            $('#kpi-ori-mayor-bruto, #kpi-ori-mejor-verde, #kpi-ori-menor-rojo, #kpi-ori-mayor-frecuencia')
+                .text('Sin datos').removeAttr('title');
+            $('#kpi-ori-mayor-bruto-valor, #kpi-ori-mejor-verde-valor, #kpi-ori-menor-rojo-valor').text('0,00 kg');
+            $('#kpi-ori-mayor-bruto-sub').text('0,0% del total ingresado');
+            $('#kpi-ori-mejor-verde-sub').text('0,0% índice de calidad');
+            $('#kpi-ori-menor-rojo-sub').text('Sin descarte registrado');
+            $('#kpi-ori-mayor-frecuencia-valor').text('0 entregas');
+            $('#kpi-ori-mayor-frecuencia-sub').text('Prom. 0,00 kg / entrega');
             return;
         }
 
         // 1. Mayor Peso Bruto Total
         const topBruto = [...lista].sort((a, b) => b.pesoBrutoTotalKg - a.pesoBrutoTotalKg)[0];
         $('#kpi-ori-mayor-bruto').text(topBruto.nombreOrigen).attr('title', topBruto.nombreOrigen);
+        $('#kpi-ori-mayor-bruto-valor').text(`${formatearKg(topBruto.pesoBrutoTotalKg)} kg`);
         $('#kpi-ori-mayor-bruto-sub').text(
-            `${formatearKg(topBruto.pesoBrutoTotalKg)} kg (${formatearPorcentaje(topBruto.pctAporte)}% del total)`
+            `${formatearPorcentaje(topBruto.pctAporte)}% del total (${formatearEntero(topBruto.frecuenciaEntregas)} entregas)`
         );
 
-        // 2. Mejor Calidad Verde (mayor PesoUtilVerdeKg)
-        const topVerde = [...lista].sort((a, b) => b.pesoUtilVerdeKg - a.pesoUtilVerdeKg)[0];
-        $('#kpi-ori-mejor-verde').text(topVerde.nombreOrigen).attr('title', topVerde.nombreOrigen);
-        $('#kpi-ori-mejor-verde-sub').text(
-            `${formatearKg(topVerde.pesoUtilVerdeKg)} kg verdes (${formatearPorcentaje(topVerde.indiceCalidadOrigenPct)}% calidad)`
-        );
+        // 2. Mayor Aporte Útil Verde
+        const conVerde = [...lista].filter(o => o.pesoUtilVerdeKg > 0);
+        if (conVerde.length > 0) {
+            const topVerde = conVerde.sort((a, b) => b.pesoUtilVerdeKg - a.pesoUtilVerdeKg)[0];
+            $('#kpi-ori-mejor-verde').text(topVerde.nombreOrigen).attr('title', topVerde.nombreOrigen);
+            $('#kpi-ori-mejor-verde-valor').text(`${formatearKg(topVerde.pesoUtilVerdeKg)} kg`);
+            $('#kpi-ori-mejor-verde-sub').text(
+                `${formatearPorcentaje(topVerde.indiceCalidadOrigenPct)}% índice de calidad en origen`
+            );
+        } else {
+            $('#kpi-ori-mejor-verde').text('Sin clasif. verde').removeAttr('title');
+            $('#kpi-ori-mejor-verde-valor').text('0,00 kg');
+            $('#kpi-ori-mejor-verde-sub').text('0,0% índice de calidad');
+        }
 
-        // 3. Menor Calidad / Mayor Descarte Rojo (mayor PesoDescarteRojoKg)
-        const topRojo = [...lista].sort((a, b) => b.pesoDescarteRojoKg - a.pesoDescarteRojoKg)[0];
-        $('#kpi-ori-menor-rojo').text(topRojo.nombreOrigen).attr('title', topRojo.nombreOrigen);
-        $('#kpi-ori-menor-rojo-sub').text(
-            `${formatearKg(topRojo.pesoDescarteRojoKg)} kg de descarte rojo`
-        );
+        // 3. Mayor Descarte Rojo
+        const conRojo = [...lista].filter(o => o.pesoDescarteRojoKg > 0);
+        if (conRojo.length > 0) {
+            const topRojo = conRojo.sort((a, b) => b.pesoDescarteRojoKg - a.pesoDescarteRojoKg)[0];
+            const pctRojo = topRojo.pesoBrutoTotalKg > 0 ? (topRojo.pesoDescarteRojoKg * 100 / topRojo.pesoBrutoTotalKg) : 0;
+            $('#kpi-ori-menor-rojo').text(topRojo.nombreOrigen).attr('title', topRojo.nombreOrigen);
+            $('#kpi-ori-menor-rojo-valor').text(`${formatearKg(topRojo.pesoDescarteRojoKg)} kg`);
+            $('#kpi-ori-menor-rojo-sub').text(
+                `${formatearPorcentaje(pctRojo)}% de descarte sobre su bruto`
+            );
+        } else {
+            $('#kpi-ori-menor-rojo').text('Sin descarte rojo').removeAttr('title');
+            $('#kpi-ori-menor-rojo-valor').text('0,00 kg');
+            $('#kpi-ori-menor-rojo-sub').text('0,0% de descarte registrado');
+        }
 
-        // 4. Mayor Frecuencia de Entregas (mayor FrecuenciaEntregas)
+        // 4. Mayor Frecuencia de Entregas
         const topFrecuencia = [...lista].sort((a, b) => b.frecuenciaEntregas - a.frecuenciaEntregas)[0];
         $('#kpi-ori-mayor-frecuencia').text(topFrecuencia.nombreOrigen).attr('title', topFrecuencia.nombreOrigen);
+        $('#kpi-ori-mayor-frecuencia-valor').text(
+            `${formatearEntero(topFrecuencia.frecuenciaEntregas)} ${topFrecuencia.frecuenciaEntregas === 1 ? 'entrega' : 'entregas'}`
+        );
         $('#kpi-ori-mayor-frecuencia-sub').text(
-            `${topFrecuencia.frecuenciaEntregas} ${topFrecuencia.frecuenciaEntregas === 1 ? 'entrega' : 'entregas'} (prom. ${formatearKg(topFrecuencia.promedioKgPorEntrega)} kg)`
+            `${formatearEntero(topFrecuencia.cantLotes)} lotes | Prom. ${formatearKg(topFrecuencia.promedioKgPorEntrega)} kg`
         );
     };
 
-    // 5. GRÁFICO PRINCIPAL: HEATMAP LARGE (ESTILO ECHARTS 20K DATA)
-    const renderizarHeatmapLargeOrigenes = function (lista) {
+    // 5. GRÁFICO PRINCIPAL: PARALLEL AQI (ENTREGAS VS LOTES VS PROMEDIO KG/ENTREGA)
+    const renderizarParallelAqiOrigenes = function (lista) {
         if (typeof echarts === 'undefined') return;
 
-        const dom = document.getElementById('echarts-ori-heatmap');
-        const msgSinDatos = $('#msg-sin-datos-ori-heatmap');
+        const dom = document.getElementById('echarts-ori-parallel');
+        const msgSinDatos = $('#msg-sin-datos-ori-parallel');
 
         const validos = (lista || []).filter(o => o.pesoBrutoTotalKg > 0);
 
@@ -441,56 +511,47 @@ const ReporteTrazOrigenesModulo = (function () {
         msgSinDatos.addClass('d-none');
         $(dom).removeClass('d-none');
 
-        if (!estado.chartHeatmapOrigenes || estado.chartHeatmapOrigenes.isDisposed()) {
-            estado.chartHeatmapOrigenes = echarts.init(dom);
+        if (!estado.chartParallelOrigenes || estado.chartParallelOrigenes.isDisposed()) {
+            estado.chartParallelOrigenes = echarts.init(dom);
         }
 
-        // Eje X: Todos los orígenes ordenados de mayor a menor peso bruto
-        const nombresX = validos.map(o => o.nombreOrigen);
-
-        // Eje Y: Dimensiones de masa en kg (de abajo hacia arriba para que Peso Bruto Total corone la fila superior)
-        const dimensionesY = [
-            'Descarte Rojo (kg)',
-            'Promedio / Entrega (kg)',
-            'Útil Verde (kg)',
-            'Peso Bruto Total (kg)'
-        ];
-
-        let maxValor = 0;
-        const datosMatriz = [];
-
-        validos.forEach((o, idxX) => {
-            const valoresFila = [
-                Number(o.pesoDescarteRojoKg.toFixed(2)),
+        // Cada línea cruza: [0: Entregas, 1: Lotes, 2: Prom. kg/Entrega, 3: Índice Calidad % (para color AQI)]
+        const datosParallel = validos.map(o => ({
+            name: o.nombreOrigen,
+            value: [
+                o.frecuenciaEntregas,
+                o.cantLotes,
                 Number(o.promedioKgPorEntrega.toFixed(2)),
-                Number(o.pesoUtilVerdeKg.toFixed(2)),
-                Number(o.pesoBrutoTotalKg.toFixed(2))
-            ];
+                Number(o.indiceCalidadOrigenPct.toFixed(2))
+            ],
+            origenData: o
+        }));
 
-            valoresFila.forEach((val, idxY) => {
-                if (val > maxValor) maxValor = val;
-                datosMatriz.push([idxX, idxY, val]);
-            });
-        });
+        const maxEntregas = Math.max(...validos.map(o => o.frecuenciaEntregas), 1);
+        const maxLotes = Math.max(...validos.map(o => o.cantLotes), 9);
+        const maxPromedio = Math.max(...validos.map(o => o.promedioKgPorEntrega), 1);
 
         const option = {
-            animation: false, // Optimización clave de heatmap-large para renderizado instantáneo
             tooltip: {
-                position: 'top',
+                trigger: 'item',
+                backgroundColor: 'rgba(255, 255, 255, 0.96)',
+                borderColor: '#cbd5e1',
+                borderWidth: 1,
+                textStyle: { color: '#1e293b' },
                 formatter: function (params) {
-                    const [idxX, idxY, valor] = params.value;
-                    const o = validos[idxX];
-                    const metrica = dimensionesY[idxY];
+                    const o = params.data?.origenData;
+                    if (!o) return '';
                     return `
                         <strong>${o.nombreOrigen}</strong><br/>
-                        <span class="badge bg-secondary mb-1">${o.categoriaOrigen}</span><br/>
-                        Indicador: <strong>${metrica}</strong><br/>
-                        Valor: <strong class="text-primary">${formatearKg(valor)} kg</strong><br/>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary mb-1">${o.categoriaOrigen}</span><br/>
+                        <hr class="my-1"/>
+                        Cant. Entregas: <strong>${formatearEntero(o.frecuenciaEntregas)}</strong><br/>
+                        Cant. Lotes: <strong>${formatearEntero(o.cantLotes)}</strong><br/>
+                        Prom. kg / Entrega: <strong class="text-primary">${formatearKg(o.promedioKgPorEntrega)} kg</strong><br/>
                         <hr class="my-1"/>
                         <small class="text-muted">
-                            Bruto Total: ${formatearKg(o.pesoBrutoTotalKg)} kg |
-                            Entregas: ${o.frecuenciaEntregas} |
-                            Calidad: ${formatearPorcentaje(o.indiceCalidadOrigenPct)}%
+                            Bruto Total: <strong>${formatearKg(o.pesoBrutoTotalKg)} kg</strong> |
+                            Calidad Verde: <strong>${formatearPorcentaje(o.indiceCalidadOrigenPct)}%</strong>
                         </small>
                     `;
                 }
@@ -499,100 +560,124 @@ const ReporteTrazOrigenesModulo = (function () {
                 show: true,
                 right: 15,
                 feature: {
-                    saveAsImage: { show: true, title: 'Descargar Heatmap HD', pixelRatio: 2 }
+                    saveAsImage: { show: true, title: 'Descargar Parallel AQI HD', pixelRatio: 2 }
                 }
             },
-            grid: {
-                top: 30,
-                bottom: 115,
-                left: '3%',
-                right: '3%',
-                containLabel: true
-            },
-            xAxis: {
-                type: 'category',
-                data: nombresX,
-                axisLine: { lineStyle: { color: '#ced4da' } },
-                axisLabel: {
-                    fontWeight: 'bold',
-                    fontSize: 11,
-                    rotate: 28,
-                    formatter: val => val.length > 20 ? val.substring(0, 18) + '...' : val
+            parallelAxis: [
+                {
+                    dim: 0,
+                    name: 'Cant. Entregas',
+                    min: 0,
+                    max: maxEntregas,
+                    minInterval: 1
+                },
+                {
+                    dim: 1,
+                    name: 'Cant. Lotes',
+                    min: 0,
+                    max: maxLotes,
+                    minInterval: 1
+                },
+                {
+                    dim: 2,
+                    name: 'Prom. kg / Entrega',
+                    min: 0,
+                    max: Math.ceil(maxPromedio),
+                    axisLabel: {
+                        formatter: val => val.toLocaleString('es-AR') + ' kg'
+                    }
                 }
-            },
-            yAxis: {
-                type: 'category',
-                data: dimensionesY,
-                axisLine: { lineStyle: { color: '#ced4da' } },
-                axisLabel: {
-                    fontWeight: 'bold',
-                    fontSize: 12
+            ],
+            parallel: {
+                left: '8%',
+                right: '10%',
+                top: 65,
+                bottom: 65,
+                parallelAxisDefault: {
+                    type: 'value',
+                    nameLocation: 'end',
+                    nameGap: 18,
+                    nameTextStyle: {
+                        color: '#1e293b',
+                        fontWeight: 'bold',
+                        fontSize: 12
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#64748b',
+                            width: 1.5
+                        }
+                    },
+                    axisTick: {
+                        lineStyle: {
+                            color: '#64748b'
+                        }
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        color: '#334155',
+                        fontWeight: '600',
+                        fontSize: 11
+                    },
+                    areaSelectStyle: {
+                        width: 18,
+                        borderWidth: 1,
+                        borderColor: 'rgba(13, 110, 253, 0.85)',
+                        color: 'rgba(13, 110, 253, 0.2)',
+                        opacity: 0.65
+                    }
                 }
             },
             visualMap: {
-                min: 0,
-                max: maxValor > 0 ? maxValor : 100,
-                calculable: true,
-                realtime: false, // Optimización heatmap-large: aplica el filtro de color al soltar el slider
+                type: 'piecewise',
                 orient: 'horizontal',
                 left: 'center',
-                bottom: 42,
-                text: ['Mayor Masa (kg)', 'Menor Masa (kg)'],
-                inRange: {
-                    // Paleta espectral térmica oficial de ECharts heatmap-large
-                    color: [
-                        '#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8',
-                        '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'
-                    ]
+                bottom: 10,
+                dimension: 3,
+                pieces: [
+                    { min: 70, label: 'Calidad Óptima (≥ 70%)', color: '#16a34a' },
+                    { min: 40, max: 69.99, label: 'Calidad Media (40% - 69,9%)', color: '#d97706' },
+                    { max: 39.99, label: 'Baja Calidad (< 40%)', color: '#dc2626' }
+                ],
+                textStyle: {
+                    color: '#334155',
+                    fontWeight: '600',
+                    fontSize: 11
                 }
             },
-            dataZoom: [
-                {
-                    type: 'slider',
-                    xAxisIndex: 0,
-                    bottom: 6,
-                    height: 18,
-                    start: 0,
-                    end: validos.length > 25 ? Math.round((25 / validos.length) * 100) : 100
-                },
-                {
-                    type: 'inside',
-                    xAxisIndex: 0
-                }
-            ],
             series: [
                 {
-                    name: 'Densidad de Aporte (kg)',
-                    type: 'heatmap',
-                    data: datosMatriz,
-                    progressive: 1000,          // Renderiza por lotes de 1000 celdas (motor 20K data)
-                    progressiveThreshold: 500,
-                    label: {
-                        show: false             // Celdas limpias sin superposición de texto
-                    },
-                    itemStyle: {
-                        borderWidth: 0.5,
-                        borderColor: 'rgba(255, 255, 255, 0.25)'
+                    name: 'Orígenes',
+                    type: 'parallel',
+                    smooth: false,
+                    lineStyle: {
+                        width: 2.2,
+                        opacity: 0.72
                     },
                     emphasis: {
-                        itemStyle: {
-                            borderColor: '#212529',
-                            borderWidth: 1.5
+                        lineStyle: {
+                            width: 4.5,
+                            opacity: 1
                         }
-                    }
+                    },
+                    data: datosParallel
                 }
             ]
         };
 
-        estado.chartHeatmapOrigenes.setOption(option, true);
+        estado.chartParallelOrigenes.setOption(option, true);
+        estado.chartParallelOrigenes.resize();
     };
 
-    // 6. GRÁFICO SECUNDARIO: BARRAS SUPERPUESTAS (PROMEDIO KG/ENTREGA + ÍNDICE CALIDAD %)
-    const renderizarBarrasSuperpuestas = function (lista) {
+    // 6. GRÁFICO SECUNDARIO: BAR CHART HORIZONTAL WITH NEGATIVE VALUE
+    // Peso Bruto como referencia base + Verde/Amarillo hacia derecha (+) + Rojo hacia izquierda (-)
+    const renderizarBarrasNegativas = function (lista) {
         if (typeof echarts === 'undefined') return;
 
-        const dom = document.getElementById('echarts-ori-superpuestas');
-        const msgSinDatos = $('#msg-sin-datos-ori-superpuestas');
+        const dom = document.getElementById('echarts-ori-negativas');
+        const msgSinDatos = $('#msg-sin-datos-ori-negativas');
 
         const validos = (lista || []).filter(o => o.pesoBrutoTotalKg > 0);
 
@@ -605,11 +690,14 @@ const ReporteTrazOrigenesModulo = (function () {
         msgSinDatos.addClass('d-none');
         $(dom).removeClass('d-none');
 
-        if (!estado.chartBarrasSuperpuestas || estado.chartBarrasSuperpuestas.isDisposed()) {
-            estado.chartBarrasSuperpuestas = echarts.init(dom);
+        const altoDinamico = Math.max(440, Math.min(validos.length, 15) * 42 + 110);
+        $(dom).css('height', `${altoDinamico}px`);
+
+        if (!estado.chartBarrasNegativas || estado.chartBarrasNegativas.isDisposed()) {
+            estado.chartBarrasNegativas = echarts.init(dom);
         }
 
-        const nombresX = validos.map(o => o.nombreOrigen);
+        const nombresY = validos.map(o => o.nombreOrigen);
         const necesitaZoom = validos.length > 14;
 
         const option = {
@@ -617,124 +705,139 @@ const ReporteTrazOrigenesModulo = (function () {
                 trigger: 'axis',
                 axisPointer: { type: 'shadow' },
                 formatter: function (params) {
-                    const idx = params[0].dataIndex;
-                    const o = validos[idx];
+                    if (!params || params.length === 0) return '';
+                    const o = validos[params[0].dataIndex];
                     return `
                         <strong>${o.nombreOrigen}</strong> <span class="badge bg-light text-dark border">${o.categoriaOrigen}</span><br/>
-                        <span style="color:#0d6efd;">●</span> Promedio por Entrega: <strong>${formatearKg(o.promedioKgPorEntrega)} kg</strong> (${o.frecuenciaEntregas} entregas)<br/>
-                        <span style="color:#198754;">●</span> Índice de Calidad Verde: <strong>${formatearPorcentaje(o.indiceCalidadOrigenPct)}%</strong><br/>
-                        <small class="text-muted">Bruto Total: ${formatearKg(o.pesoBrutoTotalKg)} kg | Útil Verde: ${formatearKg(o.pesoUtilVerdeKg)} kg</small>
+                        <span style="color:#0d6efd;">●</span> Peso Bruto (Ref.): <strong>${formatearKg(o.pesoBrutoTotalKg)} kg</strong><br/>
+                        <hr class="my-1"/>
+                        <span style="color:#198754;">▶</span> Útil (Verde): <strong>+${formatearKg(o.pesoUtilVerdeKg)} kg</strong><br/>
+                        <span style="color:#ffc107;">▶</span> Revisión (Amarillo): <strong>+${formatearKg(o.pesoRevisionAmarilloKg)} kg</strong><br/>
+                        <span style="color:#dc3545;">◀</span> Descarte (Rojo): <strong>-${formatearKg(o.pesoDescarteRojoKg)} kg</strong><br/>
+                        <small class="text-muted">Índice Calidad: <strong>${formatearPorcentaje(o.indiceCalidadOrigenPct)}%</strong></small>
                     `;
                 }
             },
             legend: {
                 top: 0,
-                data: ['Promedio por Entrega (kg)', 'Índice Calidad Origen (%)']
+                data: ['Peso Bruto (Base Ref.)', 'Útil Verde (+)', 'Revisión Amarillo (+)', 'Descarte Rojo (-)']
             },
             toolbox: {
                 show: true,
                 right: 15,
                 feature: {
-                    saveAsImage: { show: true, title: 'Descargar Barras Superpuestas HD', pixelRatio: 2 }
+                    saveAsImage: { show: true, title: 'Descargar Balance +/- HD', pixelRatio: 2 }
                 }
             },
             grid: {
-                top: 50,
-                bottom: necesitaZoom ? 95 : 65,
+                top: 48,
+                bottom: 42,
                 left: '3%',
-                right: '4%',
+                right: necesitaZoom ? 45 : '4%',
                 containLabel: true
             },
             xAxis: {
+                type: 'value',
+                name: 'Kilogramos (kg)',
+                nameLocation: 'middle',
+                nameGap: 26,
+                axisLabel: {
+                    formatter: function (val) {
+                        const signo = val < 0 ? '-' : '';
+                        return signo + Math.abs(val).toLocaleString('es-AR') + ' kg';
+                    }
+                },
+                splitLine: {
+                    lineStyle: { type: 'dashed', color: '#e9ecef' }
+                }
+            },
+            yAxis: {
                 type: 'category',
-                data: nombresX,
+                data: nombresY,
+                inverse: true,
+                axisLine: { onZero: true, lineStyle: { color: '#6c757d', width: 1.5 } },
+                axisTick: { alignWithLabel: true },
                 axisLabel: {
                     fontWeight: 'bold',
                     fontSize: 11,
-                    interval: 0,
-                    rotate: 28,
-                    formatter: val => val.length > 20 ? val.substring(0, 18) + '...' : val
+                    formatter: val => val.length > 26 ? val.substring(0, 24) + '...' : val
                 }
             },
-            yAxis: [
-                {
-                    type: 'value',
-                    name: 'Promedio / Entrega (kg)',
-                    position: 'left',
-                    axisLine: { show: true, lineStyle: { color: '#0d6efd' } },
-                    axisLabel: {
-                        formatter: val => val.toLocaleString('es-AR') + ' kg'
-                    }
-                },
-                {
-                    type: 'value',
-                    name: 'Índice Calidad (%)',
-                    position: 'right',
-                    min: 0,
-                    max: 100,
-                    splitLine: { show: false },
-                    axisLine: { show: true, lineStyle: { color: '#198754' } },
-                    axisLabel: {
-                        formatter: '{value}%'
-                    }
-                }
-            ],
             dataZoom: necesitaZoom ? [
                 {
                     type: 'slider',
-                    xAxisIndex: 0,
+                    yAxisIndex: 0,
                     startValue: 0,
                     endValue: 13,
-                    bottom: 6,
-                    height: 18
+                    right: 8,
+                    width: 16
                 },
                 {
                     type: 'inside',
-                    xAxisIndex: 0
+                    yAxisIndex: 0
                 }
             ] : [],
             series: [
                 {
-                    name: 'Promedio por Entrega (kg)',
+                    name: 'Peso Bruto (Base Ref.)',
                     type: 'bar',
-                    yAxisIndex: 0,
-                    barWidth: 36,
-                    z: 2,
+                    stack: 'referencia',
+                    barMaxWidth: 20,
                     itemStyle: {
-                        color: 'rgba(13, 110, 253, 0.25)',
+                        color: 'rgba(13, 110, 253, 0.28)',
                         borderColor: '#0d6efd',
                         borderWidth: 1.5,
-                        borderRadius: [5, 5, 0, 0]
+                        borderRadius: [0, 4, 4, 0]
                     },
-                    data: validos.map(o => Number(o.promedioKgPorEntrega.toFixed(2)))
+                    data: validos.map(o => Number(o.pesoBrutoTotalKg.toFixed(2)))
                 },
                 {
-                    name: 'Índice Calidad Origen (%)',
+                    name: 'Útil Verde (+)',
                     type: 'bar',
-                    yAxisIndex: 1,
-                    barWidth: 18,
-                    barGap: '-75%',
-                    z: 3,
+                    stack: 'clasificacion',
+                    barMaxWidth: 20,
                     itemStyle: {
-                        color: '#198754',
-                        borderRadius: [4, 4, 0, 0]
+                        color: '#198754'
                     },
-                    data: validos.map(o => Number(o.indiceCalidadOrigenPct.toFixed(2)))
+                    data: validos.map(o => Number(o.pesoUtilVerdeKg.toFixed(2)))
+                },
+                {
+                    name: 'Revisión Amarillo (+)',
+                    type: 'bar',
+                    stack: 'clasificacion',
+                    barMaxWidth: 20,
+                    itemStyle: {
+                        color: '#ffc107',
+                        borderRadius: [0, 4, 4, 0]
+                    },
+                    data: validos.map(o => Number(o.pesoRevisionAmarilloKg.toFixed(2)))
+                },
+                {
+                    name: 'Descarte Rojo (-)',
+                    type: 'bar',
+                    stack: 'clasificacion',
+                    barMaxWidth: 20,
+                    itemStyle: {
+                        color: '#dc3545',
+                        borderRadius: [4, 0, 0, 4]
+                    },
+                    data: validos.map(o => Number((-Math.abs(o.pesoDescarteRojoKg)).toFixed(2)))
                 }
             ]
         };
 
-        estado.chartBarrasSuperpuestas.setOption(option, true);
+        estado.chartBarrasNegativas.setOption(option, true);
+        estado.chartBarrasNegativas.resize();
     };
 
-    // 7. TABLA DE AUDITORÍA COMPLETA POR ORIGEN
+    // 7. TABLA DE AUDITORÍA COMPLETA POR ORIGEN (UN SOLO REFLOW DOM)
     const renderizarTablaOrigenes = function (lista) {
-        const tbody = $('#tbody-traz-origenes').empty();
+        const tbody = $('#tbody-traz-origenes');
 
         if (!lista || lista.length === 0) {
             tbody.html(`
                 <tr>
-                    <td colspan="9" class="text-center text-muted py-4">
+                    <td colspan="11" class="text-center text-muted py-4">
                         <i class="fas fa-folder-open me-2"></i>No se encontraron orígenes que coincidan con el filtro aplicado.
                     </td>
                 </tr>
@@ -742,7 +845,7 @@ const ReporteTrazOrigenesModulo = (function () {
             return;
         }
 
-        lista.forEach((o, index) => {
+        const filasHtml = lista.map((o, index) => {
             const pct = Math.min(100, Math.max(0, o.indiceCalidadOrigenPct));
             const colorBarra = pct >= 70 ? 'bg-success' : (pct >= 40 ? 'bg-warning' : 'bg-danger');
 
@@ -750,16 +853,21 @@ const ReporteTrazOrigenesModulo = (function () {
                 ? '<span class="badge bg-warning text-dark"><i class="fas fa-crown"></i> 1</span>'
                 : `<span class="text-muted fw-bold">${index + 1}</span>`;
 
-            tbody.append(`
+            return `
                 <tr>
                     <td class="text-center">${medalla}</td>
                     <td class="fw-bold text-dark">${o.nombreOrigen}</td>
                     <td><span class="badge bg-light text-dark border">${o.categoriaOrigen}</span></td>
-                    <td class="text-center"><span class="badge bg-info bg-opacity-10 text-info border border-info">${o.frecuenciaEntregas}</span></td>
+                    <td class="text-center">
+                        <span class="badge bg-info bg-opacity-10 text-info border border-info">${formatearEntero(o.frecuenciaEntregas)} ent.</span>
+                        <div class="small text-muted">${formatearEntero(o.cantLotes)} lotes</div>
+                    </td>
                     <td class="text-end fw-semibold">${formatearKg(o.pesoBrutoTotalKg)} kg</td>
                     <td class="text-end text-primary fw-semibold">${formatearKg(o.promedioKgPorEntrega)} kg</td>
                     <td class="text-end text-success fw-semibold">${formatearKg(o.pesoUtilVerdeKg)} kg</td>
+                    <td class="text-end text-warning fw-semibold">${formatearKg(o.pesoRevisionAmarilloKg)} kg</td>
                     <td class="text-end text-danger fw-semibold">${formatearKg(o.pesoDescarteRojoKg)} kg</td>
+                    <td class="text-center small text-muted">${formatearFecha(o.ultimaEntrega)}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <div class="progress flex-grow-1" style="height: 8px;">
@@ -769,8 +877,10 @@ const ReporteTrazOrigenesModulo = (function () {
                         </div>
                     </td>
                 </tr>
-            `);
-        });
+            `;
+        }).join('');
+
+        tbody.html(filasHtml);
     };
 
     // API Pública del Módulo
@@ -778,6 +888,796 @@ const ReporteTrazOrigenesModulo = (function () {
         cargarEn: inicializar
     };
 })();
+
+
+
+
+
+
+
+
+
+
+// /* ========================================================================
+//    SITMAS - Módulo de Reportes de Trazabilidad: Orígenes y Donantes
+//    Consume: GET /api/ReportesTrazabilidad/PorOrigen
+//    DTO C#: { RankingOrigenes: [...], PorCategoria: [...] }
+//    Incluye: 4 KPIs + Heatmap Large (20K Style) + Barras Superpuestas + Tabla
+//    Archivo: Js/reportes_trazabilidad/reporte_traz_origenes.js
+//    ======================================================================== */
+
+// const ReporteTrazOrigenesModulo = (function () {
+//     // 🔒 ESTADO PRIVADO
+//     let estado = {
+//         origenes: [],
+//         categorias: [],
+//         chartHeatmapOrigenes: null,
+//         chartBarrasSuperpuestas: null
+//     };
+
+//     const URL_POR_ORIGEN = "https://localhost:44325/api/ReportesTrazabilidad/PorOrigen";
+//     const URL_POR_MATERIAL = "https://localhost:44325/api/ReportesTrazabilidad/PorMaterial";
+
+//     // Helpers de formateo regional (es-AR)
+//     const formatearKg = function (valor) {
+//         const num = parseFloat(valor || 0);
+//         return num.toLocaleString('es-AR', {
+//             minimumFractionDigits: 2,
+//             maximumFractionDigits: 2
+//         });
+//     };
+
+//     const formatearPorcentaje = function (valor) {
+//         const num = parseFloat(valor || 0);
+//         return num.toLocaleString('es-AR', {
+//             minimumFractionDigits: 1,
+//             maximumFractionDigits: 2
+//         });
+//     };
+
+//     // Limpieza segura de instancias ECharts al cambiar de pestaña en la SPA
+//     const destruirGraficosActivos = function () {
+//         ['chartHeatmapOrigenes', 'chartBarrasSuperpuestas'].forEach(key => {
+//             if (estado[key] && !estado[key].isDisposed()) {
+//                 estado[key].dispose();
+//             }
+//             estado[key] = null;
+//         });
+//     };
+
+//     // Normalizador alineado 1 a 1 con TrazabilidadOrigenRankingDTO de C#
+//     const normalizarOrigenes = function (respuesta) {
+//         const listaRaw = Array.isArray(respuesta)
+//             ? respuesta
+//             : (respuesta?.RankingOrigenes || respuesta?.rankingOrigenes || []);
+
+//         const totalGlobalBruto = listaRaw.reduce((acc, item) => {
+//             return acc + parseFloat(item.PesoBrutoTotalKg ?? 0);
+//         }, 0);
+
+//         return listaRaw.map(item => {
+//             const bruto = parseFloat(item.PesoBrutoTotalKg ?? 0);
+//             const verde = parseFloat(item.PesoUtilVerdeKg ?? 0);
+//             const rojo = parseFloat(item.PesoDescarteRojoKg ?? 0);
+//             const promedio = parseFloat(item.PromedioKgPorEntrega ?? 0);
+//             const indiceCalidad = parseFloat(item.IndiceCalidadOrigenPct ?? 0);
+//             const frecuencia = parseInt(item.FrecuenciaEntregas ?? 0, 10);
+//             const pctAporte = totalGlobalBruto > 0 ? (bruto * 100 / totalGlobalBruto) : 0;
+
+//             return {
+//                 claveOrigen: item.ClaveOrigen || '',
+//                 nombreOrigen: item.NombreOrigen || 'Origen No Especificado',
+//                 categoriaOrigen: item.CategoriaOrigen || 'Sin Categoría',
+//                 frecuenciaEntregas: frecuencia,
+//                 pesoBrutoTotalKg: bruto,
+//                 promedioKgPorEntrega: promedio,
+//                 pesoUtilVerdeKg: verde,
+//                 pesoDescarteRojoKg: rojo,
+//                 indiceCalidadOrigenPct: indiceCalidad,
+//                 ultimaEntrega: item.UltimaEntrega || null,
+//                 ubicacionDescripcion: item.UbicacionDescripcion || '',
+//                 pctAporte: pctAporte
+//             };
+//         });
+//     };
+
+//     // 1. INICIALIZACIÓN DE LA ESTRUCTURA VISUAL (PIRÁMIDE INVERTIDA)
+//     const inicializar = function (contenedorId) {
+//         destruirGraficosActivos();
+//         const contenedor = $(`#${contenedorId}`);
+
+//         const htmlEstructura = `
+//             <!-- NIVEL 1: ENCABEZADO Y FILTROS -->
+//             <div class="row fade-in">
+//                 <div class="col-12 d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+//                     <div>
+//                         <h4 class="text-primary fw-bold mb-0">
+//                             <i class="fas fa-building me-2"></i>Análisis de Orígenes, Generadores y Calidad de Aporte
+//                         </h4>
+//                         <small class="text-muted">Mapa térmico de alta densidad (Heatmap Large), eficiencia por entrega y auditoría de separación en origen</small>
+//                     </div>
+
+//                     <div class="d-flex flex-wrap gap-2 align-items-center bg-light p-2 rounded border">
+//                         <label class="small fw-bold mb-0">Desde:</label>
+//                         <input type="date" id="filtro-traz-ori-desde" class="form-control form-control-sm" style="width: auto;">
+
+//                         <label class="small fw-bold mb-0 ms-1">Hasta:</label>
+//                         <input type="date" id="filtro-traz-ori-hasta" class="form-control form-control-sm" style="width: auto;">
+
+//                         <label class="small fw-bold mb-0 ms-1">Material:</label>
+//                         <select id="filtro-traz-ori-material" class="form-select form-select-sm fw-semibold" style="width: auto; min-width: 170px;">
+//                             <option value="">Todos los Materiales</option>
+//                         </select>
+
+//                         <button id="btn-filtrar-traz-origenes" class="btn btn-primary btn-sm ms-1">
+//                             <i class="fas fa-search"></i> Filtrar
+//                         </button>
+//                     </div>
+//                 </div>
+//             </div>
+
+//             <!-- NIVEL 2: 4 TARJETAS KPI -->
+//             <div class="row g-3 mb-4 fade-in">
+//                 <!-- KPI 1: Mayor Peso Bruto Total -->
+//                 <div class="col-12 col-sm-6 col-xl-3">
+//                     <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+//                         <div class="card-body">
+//                             <div class="d-flex justify-content-between align-items-center mb-2">
+//                                 <span class="text-muted small fw-bold text-uppercase">Mayor Peso Bruto Total</span>
+//                                 <span class="badge bg-primary bg-opacity-10 text-primary p-2"><i class="fas fa-weight-hanging fa-lg"></i></span>
+//                             </div>
+//                             <h4 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mayor-bruto">—</h4>
+//                             <small class="text-muted" id="kpi-ori-mayor-bruto-sub">0,00 kg brutos ingresados</small>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 <!-- KPI 2: Mejor Calidad Verde (Más kg de PesoUtilVerdeKg) -->
+//                 <div class="col-12 col-sm-6 col-xl-3">
+//                     <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+//                         <div class="card-body">
+//                             <div class="d-flex justify-content-between align-items-center mb-2">
+//                                 <span class="text-muted small fw-bold text-uppercase">Mejor Calidad Verde</span>
+//                                 <span class="badge bg-success bg-opacity-10 text-success p-2"><i class="fas fa-leaf fa-lg"></i></span>
+//                             </div>
+//                             <h4 class="fw-bold text-success mb-1 text-truncate" id="kpi-ori-mejor-verde">—</h4>
+//                             <small class="text-muted" id="kpi-ori-mejor-verde-sub">0,00 kg útiles verdes</small>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 <!-- KPI 3: Menor Calidad / Mayor Descarte Rojo (PesoDescarteRojoKg) -->
+//                 <div class="col-12 col-sm-6 col-xl-3">
+//                     <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
+//                         <div class="card-body">
+//                             <div class="d-flex justify-content-between align-items-center mb-2">
+//                                 <span class="text-muted small fw-bold text-uppercase">Menor Calidad (Descarte Rojo)</span>
+//                                 <span class="badge bg-danger bg-opacity-10 text-danger p-2"><i class="fas fa-exclamation-triangle fa-lg"></i></span>
+//                             </div>
+//                             <h4 class="fw-bold text-danger mb-1 text-truncate" id="kpi-ori-menor-rojo">—</h4>
+//                             <small class="text-muted" id="kpi-ori-menor-rojo-sub">0,00 kg de descarte rojo</small>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 <!-- KPI 4: Mayor Frecuencia de Entregas (FrecuenciaEntregas) -->
+//                 <div class="col-12 col-sm-6 col-xl-3">
+//                     <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+//                         <div class="card-body">
+//                             <div class="d-flex justify-content-between align-items-center mb-2">
+//                                 <span class="text-muted small fw-bold text-uppercase">Mayor Frecuencia Entregas</span>
+//                                 <span class="badge bg-info bg-opacity-10 text-info p-2"><i class="fas fa-truck-loading fa-lg"></i></span>
+//                             </div>
+//                             <h4 class="fw-bold text-dark mb-1 text-truncate" id="kpi-ori-mayor-frecuencia">—</h4>
+//                             <small class="text-muted" id="kpi-ori-mayor-frecuencia-sub">0 entregas registradas</small>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+
+//             <!-- NIVEL 3: GRÁFICO PRINCIPAL - HEATMAP LARGE (20K DATA ENGINE) -->
+//             <div class="row g-4 mb-4 fade-in">
+//                 <div class="col-12">
+//                     <div class="card shadow-sm border-0">
+//                         <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+//                             <div>
+//                                 <h6 class="fw-bold text-dark mb-0">
+//                                     <i class="fas fa-fire text-danger me-2"></i>Mapa de Calor de Alta Densidad por Origen (Heatmap Large)
+//                                 </h6>
+//                                 <small class="text-muted">Espectro térmico de masa (kg) combinando todos los orígenes frente a Peso Bruto Total, Útil Verde, Descarte Rojo y Promedio por Entrega</small>
+//                             </div>
+//                             <span class="badge bg-light text-dark border">
+//                                 <i class="fas fa-mouse-pointer me-1 text-primary"></i> Rueda del mouse para Zoom / Arrastrar para desplazar
+//                             </span>
+//                         </div>
+//                         <div class="card-body">
+//                             <div id="msg-sin-datos-ori-heatmap" class="alert alert-light text-center border my-4 p-4 d-none">
+//                                 <i class="fas fa-building fa-2x text-muted mb-2"></i>
+//                                 <p class="mb-0 text-muted">No se registraron entregas por origen en el período seleccionado.</p>
+//                             </div>
+//                             <div id="echarts-ori-heatmap" style="width: 100%; height: 470px;"></div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+
+//             <!-- NIVEL 4: GRÁFICO SECUNDARIO - BARRAS SUPERPUESTAS (PROMEDIO KG/ENTREGA VS ÍNDICE CALIDAD %) -->
+//             <div class="row g-4 mb-4 fade-in">
+//                 <div class="col-12">
+//                     <div class="card shadow-sm border-0">
+//                         <div class="card-header bg-white border-bottom py-3">
+//                             <h6 class="fw-bold text-dark mb-0">
+//                                 <i class="fas fa-chart-bar text-success me-2"></i>Eficiencia por Entrega vs. Índice de Calidad en Origen
+//                             </h6>
+//                             <small class="text-muted">Barras superpuestas: Promedio de kg por entrega (barra exterior azul) frente al Índice de Calidad Verde % (barra interior verde)</small>
+//                         </div>
+//                         <div class="card-body">
+//                             <div id="msg-sin-datos-ori-superpuestas" class="alert alert-light text-center border my-4 p-4 d-none">
+//                                 <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
+//                                 <p class="mb-0 text-muted">Sin datos suficientes para comparar promedios e índice de calidad.</p>
+//                             </div>
+//                             <div id="echarts-ori-superpuestas" style="width: 100%; height: 430px;"></div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+
+//             <!-- NIVEL 5: TABLA DETALLADA DE AUDITORÍA POR ORIGEN -->
+//             <div class="row fade-in">
+//                 <div class="col-12">
+//                     <div class="card shadow-sm border-0">
+//                         <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+//                             <div>
+//                                 <h6 class="fw-bold text-dark mb-0">
+//                                     <i class="fas fa-list-ol text-secondary me-2"></i>Detalle Completo de Orígenes y Generadores
+//                                 </h6>
+//                                 <small class="text-muted">Frecuencia de entregas, peso bruto acumulado, promedio por viaje e índice de separación en origen</small>
+//                             </div>
+
+//                             <div class="input-group input-group-sm" style="max-width: 280px;">
+//                                 <span class="input-group-text bg-light"><i class="fas fa-search text-muted"></i></span>
+//                                 <input type="text" id="buscador-tabla-origenes" class="form-control" placeholder="Buscar origen o categoría...">
+//                             </div>
+//                         </div>
+//                         <div class="card-body">
+//                             <div class="table-responsive">
+//                                 <table class="table table-hover align-middle mb-0">
+//                                     <thead class="table-light">
+//                                         <tr>
+//                                             <th class="text-center" style="width: 55px;">#</th>
+//                                             <th>Origen / Generador</th>
+//                                             <th>Categoría</th>
+//                                             <th class="text-center">Entregas</th>
+//                                             <th class="text-end">Peso Bruto Total</th>
+//                                             <th class="text-end text-primary">Prom. / Entrega</th>
+//                                             <th class="text-end text-success">Útil Verde</th>
+//                                             <th class="text-end text-danger">Descarte Rojo</th>
+//                                             <th style="min-width: 160px;">Índice Calidad (%)</th>
+//                                         </tr>
+//                                     </thead>
+//                                     <tbody id="tbody-traz-origenes">
+//                                         <tr>
+//                                             <td colspan="9" class="text-center text-muted py-4">Cargando orígenes...</td>
+//                                         </tr>
+//                                     </tbody>
+//                                 </table>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//         `;
+
+//         contenedor.html(htmlEstructura);
+//         enlazarEventos();
+//         cargarCatalogoTiposMaterial();
+//         configurarFechasPorDefecto();
+//     };
+
+//     // 2. ENLACE DE EVENTOS DELEGADOS
+//     const enlazarEventos = function () {
+//         const principal = $('#contenedor-dinamico-reportes-trazabilidad');
+
+//         principal.off('click', '#btn-filtrar-traz-origenes').on('click', '#btn-filtrar-traz-origenes', function () {
+//             const desde = $('#filtro-traz-ori-desde').val();
+//             const hasta = $('#filtro-traz-ori-hasta').val();
+//             const idTipoMaterial = $('#filtro-traz-ori-material').val() || null;
+
+//             if (!desde || !hasta) {
+//                 Swal.fire('Fechas requeridas', 'Por favor seleccioná ambas fechas.', 'warning');
+//                 return;
+//             }
+//             if (desde > hasta) {
+//                 Swal.fire('Rango inválido', 'La fecha "Desde" no puede ser mayor a "Hasta".', 'warning');
+//                 return;
+//             }
+
+//             consultarPorOrigenApi(desde, hasta, idTipoMaterial);
+//         });
+
+//         // Buscador instantáneo en tabla
+//         principal.off('input', '#buscador-tabla-origenes').on('input', '#buscador-tabla-origenes', function () {
+//             const termino = $(this).val().toLowerCase().trim();
+//             const filtrados = termino
+//                 ? estado.origenes.filter(o =>
+//                     o.nombreOrigen.toLowerCase().includes(termino) ||
+//                     o.categoriaOrigen.toLowerCase().includes(termino)
+//                 )
+//                 : estado.origenes;
+
+//             renderizarTablaOrigenes(filtrados);
+//         });
+
+//         // Responsividad limpia
+//         $(window).off('resize.trazOrigenes').on('resize.trazOrigenes', function () {
+//             if (estado.chartHeatmapOrigenes && !estado.chartHeatmapOrigenes.isDisposed()) {
+//                 estado.chartHeatmapOrigenes.resize();
+//             }
+//             if (estado.chartBarrasSuperpuestas && !estado.chartBarrasSuperpuestas.isDisposed()) {
+//                 estado.chartBarrasSuperpuestas.resize();
+//             }
+//         });
+//     };
+
+//     const cargarCatalogoTiposMaterial = function () {
+//         $.ajax({
+//             type: "GET",
+//             url: URL_POR_MATERIAL,
+//             data: { fechaDesde: '2020-01-01', fechaHasta: new Date().toISOString().split('T')[0] },
+//             success: function (res) {
+//                 const select = $('#filtro-traz-ori-material');
+//                 const tipos = (res && res.PorTipo) ? res.PorTipo : [];
+//                 tipos
+//                     .filter(t => t.IdTipoMaterial > 0)
+//                     .sort((a, b) => a.TipoMaterial.localeCompare(b.TipoMaterial))
+//                     .forEach(t => {
+//                         select.append(`<option value="${t.IdTipoMaterial}">${t.TipoMaterial}</option>`);
+//                     });
+//             }
+//         });
+//     };
+
+//     const configurarFechasPorDefecto = function () {
+//         const hoy = new Date();
+//         const primerDiaAnio = new Date(hoy.getFullYear(), 0, 1);
+
+//         $('#filtro-traz-ori-hasta').val(hoy.toISOString().split('T')[0]);
+//         $('#filtro-traz-ori-desde').val(primerDiaAnio.toISOString().split('T')[0]);
+
+//         $('#btn-filtrar-traz-origenes').trigger('click');
+//     };
+
+//     // 3. CONSULTA A LA API C#
+//     const consultarPorOrigenApi = function (fechaDesde, fechaHasta, idTipoMaterial) {
+//         const btn = $('#btn-filtrar-traz-origenes');
+//         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Cargando...');
+
+//         const params = { fechaDesde: fechaDesde, fechaHasta: fechaHasta };
+//         if (idTipoMaterial) params.idTipoMaterial = idTipoMaterial;
+
+//         $.ajax({
+//             type: "GET",
+//             url: URL_POR_ORIGEN,
+//             data: params,
+//             success: function (respuesta) {
+//                 const lista = normalizarOrigenes(respuesta);
+//                 estado.origenes = lista.sort((a, b) => b.pesoBrutoTotalKg - a.pesoBrutoTotalKg);
+//                 estado.categorias = respuesta?.PorCategoria || [];
+//                 $('#buscador-tabla-origenes').val('');
+
+//                 renderizarKPIs(estado.origenes);
+//                 renderizarHeatmapLargeOrigenes(estado.origenes);
+//                 renderizarBarrasSuperpuestas(estado.origenes);
+//                 renderizarTablaOrigenes(estado.origenes);
+//             },
+//             error: function (err) {
+//                 console.error("Error al obtener PorOrigen de Trazabilidad:", err);
+//                 Swal.fire('Error de conexión', 'No se pudo obtener el reporte por orígenes desde el servidor.', 'error');
+//             },
+//             complete: function () {
+//                 btn.prop('disabled', false).html('<i class="fas fa-search"></i> Filtrar');
+//             }
+//         });
+//     };
+
+//     // 4. RENDERIZADO DE LAS 4 TARJETAS KPI
+//     const renderizarKPIs = function (lista) {
+//         if (!lista || lista.length === 0) {
+//             $('#kpi-ori-mayor-bruto').text('Sin datos');
+//             $('#kpi-ori-mayor-bruto-sub').text('0,00 kg brutos ingresados');
+//             $('#kpi-ori-mejor-verde').text('Sin datos');
+//             $('#kpi-ori-mejor-verde-sub').text('0,00 kg útiles verdes');
+//             $('#kpi-ori-menor-rojo').text('Sin datos');
+//             $('#kpi-ori-menor-rojo-sub').text('0,00 kg de descarte rojo');
+//             $('#kpi-ori-mayor-frecuencia').text('Sin datos');
+//             $('#kpi-ori-mayor-frecuencia-sub').text('0 entregas registradas');
+//             return;
+//         }
+
+//         // 1. Mayor Peso Bruto Total
+//         const topBruto = [...lista].sort((a, b) => b.pesoBrutoTotalKg - a.pesoBrutoTotalKg)[0];
+//         $('#kpi-ori-mayor-bruto').text(topBruto.nombreOrigen).attr('title', topBruto.nombreOrigen);
+//         $('#kpi-ori-mayor-bruto-sub').text(
+//             `${formatearKg(topBruto.pesoBrutoTotalKg)} kg (${formatearPorcentaje(topBruto.pctAporte)}% del total)`
+//         );
+
+//         // 2. Mejor Calidad Verde (mayor PesoUtilVerdeKg)
+//         const topVerde = [...lista].sort((a, b) => b.pesoUtilVerdeKg - a.pesoUtilVerdeKg)[0];
+//         $('#kpi-ori-mejor-verde').text(topVerde.nombreOrigen).attr('title', topVerde.nombreOrigen);
+//         $('#kpi-ori-mejor-verde-sub').text(
+//             `${formatearKg(topVerde.pesoUtilVerdeKg)} kg verdes (${formatearPorcentaje(topVerde.indiceCalidadOrigenPct)}% calidad)`
+//         );
+
+//         // 3. Menor Calidad / Mayor Descarte Rojo (mayor PesoDescarteRojoKg)
+//         const topRojo = [...lista].sort((a, b) => b.pesoDescarteRojoKg - a.pesoDescarteRojoKg)[0];
+//         $('#kpi-ori-menor-rojo').text(topRojo.nombreOrigen).attr('title', topRojo.nombreOrigen);
+//         $('#kpi-ori-menor-rojo-sub').text(
+//             `${formatearKg(topRojo.pesoDescarteRojoKg)} kg de descarte rojo`
+//         );
+
+//         // 4. Mayor Frecuencia de Entregas (mayor FrecuenciaEntregas)
+//         const topFrecuencia = [...lista].sort((a, b) => b.frecuenciaEntregas - a.frecuenciaEntregas)[0];
+//         $('#kpi-ori-mayor-frecuencia').text(topFrecuencia.nombreOrigen).attr('title', topFrecuencia.nombreOrigen);
+//         $('#kpi-ori-mayor-frecuencia-sub').text(
+//             `${topFrecuencia.frecuenciaEntregas} ${topFrecuencia.frecuenciaEntregas === 1 ? 'entrega' : 'entregas'} (prom. ${formatearKg(topFrecuencia.promedioKgPorEntrega)} kg)`
+//         );
+//     };
+
+//     // 5. GRÁFICO PRINCIPAL: HEATMAP LARGE (ESTILO ECHARTS 20K DATA)
+//     const renderizarHeatmapLargeOrigenes = function (lista) {
+//         if (typeof echarts === 'undefined') return;
+
+//         const dom = document.getElementById('echarts-ori-heatmap');
+//         const msgSinDatos = $('#msg-sin-datos-ori-heatmap');
+
+//         const validos = (lista || []).filter(o => o.pesoBrutoTotalKg > 0);
+
+//         if (validos.length === 0) {
+//             $(dom).addClass('d-none');
+//             msgSinDatos.removeClass('d-none');
+//             return;
+//         }
+
+//         msgSinDatos.addClass('d-none');
+//         $(dom).removeClass('d-none');
+
+//         if (!estado.chartHeatmapOrigenes || estado.chartHeatmapOrigenes.isDisposed()) {
+//             estado.chartHeatmapOrigenes = echarts.init(dom);
+//         }
+
+//         // Eje X: Todos los orígenes ordenados de mayor a menor peso bruto
+//         const nombresX = validos.map(o => o.nombreOrigen);
+
+//         // Eje Y: Dimensiones de masa en kg (de abajo hacia arriba para que Peso Bruto Total corone la fila superior)
+//         const dimensionesY = [
+//             'Descarte Rojo (kg)',
+//             'Promedio / Entrega (kg)',
+//             'Útil Verde (kg)',
+//             'Peso Bruto Total (kg)'
+//         ];
+
+//         let maxValor = 0;
+//         const datosMatriz = [];
+
+//         validos.forEach((o, idxX) => {
+//             const valoresFila = [
+//                 Number(o.pesoDescarteRojoKg.toFixed(2)),
+//                 Number(o.promedioKgPorEntrega.toFixed(2)),
+//                 Number(o.pesoUtilVerdeKg.toFixed(2)),
+//                 Number(o.pesoBrutoTotalKg.toFixed(2))
+//             ];
+
+//             valoresFila.forEach((val, idxY) => {
+//                 if (val > maxValor) maxValor = val;
+//                 datosMatriz.push([idxX, idxY, val]);
+//             });
+//         });
+
+//         const option = {
+//             animation: false, // Optimización clave de heatmap-large para renderizado instantáneo
+//             tooltip: {
+//                 position: 'top',
+//                 formatter: function (params) {
+//                     const [idxX, idxY, valor] = params.value;
+//                     const o = validos[idxX];
+//                     const metrica = dimensionesY[idxY];
+//                     return `
+//                         <strong>${o.nombreOrigen}</strong><br/>
+//                         <span class="badge bg-secondary mb-1">${o.categoriaOrigen}</span><br/>
+//                         Indicador: <strong>${metrica}</strong><br/>
+//                         Valor: <strong class="text-primary">${formatearKg(valor)} kg</strong><br/>
+//                         <hr class="my-1"/>
+//                         <small class="text-muted">
+//                             Bruto Total: ${formatearKg(o.pesoBrutoTotalKg)} kg |
+//                             Entregas: ${o.frecuenciaEntregas} |
+//                             Calidad: ${formatearPorcentaje(o.indiceCalidadOrigenPct)}%
+//                         </small>
+//                     `;
+//                 }
+//             },
+//             toolbox: {
+//                 show: true,
+//                 right: 15,
+//                 feature: {
+//                     saveAsImage: { show: true, title: 'Descargar Heatmap HD', pixelRatio: 2 }
+//                 }
+//             },
+//             grid: {
+//                 top: 30,
+//                 bottom: 115,
+//                 left: '3%',
+//                 right: '3%',
+//                 containLabel: true
+//             },
+//             xAxis: {
+//                 type: 'category',
+//                 data: nombresX,
+//                 axisLine: { lineStyle: { color: '#ced4da' } },
+//                 axisLabel: {
+//                     fontWeight: 'bold',
+//                     fontSize: 11,
+//                     rotate: 28,
+//                     formatter: val => val.length > 20 ? val.substring(0, 18) + '...' : val
+//                 }
+//             },
+//             yAxis: {
+//                 type: 'category',
+//                 data: dimensionesY,
+//                 axisLine: { lineStyle: { color: '#ced4da' } },
+//                 axisLabel: {
+//                     fontWeight: 'bold',
+//                     fontSize: 12
+//                 }
+//             },
+//             visualMap: {
+//                 min: 0,
+//                 max: maxValor > 0 ? maxValor : 100,
+//                 calculable: true,
+//                 realtime: false, // Optimización heatmap-large: aplica el filtro de color al soltar el slider
+//                 orient: 'horizontal',
+//                 left: 'center',
+//                 bottom: 42,
+//                 text: ['Mayor Masa (kg)', 'Menor Masa (kg)'],
+//                 inRange: {
+//                     // Paleta espectral térmica oficial de ECharts heatmap-large
+//                     color: [
+//                         '#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8',
+//                         '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'
+//                     ]
+//                 }
+//             },
+//             dataZoom: [
+//                 {
+//                     type: 'slider',
+//                     xAxisIndex: 0,
+//                     bottom: 6,
+//                     height: 18,
+//                     start: 0,
+//                     end: validos.length > 25 ? Math.round((25 / validos.length) * 100) : 100
+//                 },
+//                 {
+//                     type: 'inside',
+//                     xAxisIndex: 0
+//                 }
+//             ],
+//             series: [
+//                 {
+//                     name: 'Densidad de Aporte (kg)',
+//                     type: 'heatmap',
+//                     data: datosMatriz,
+//                     progressive: 1000,          // Renderiza por lotes de 1000 celdas (motor 20K data)
+//                     progressiveThreshold: 500,
+//                     label: {
+//                         show: false             // Celdas limpias sin superposición de texto
+//                     },
+//                     itemStyle: {
+//                         borderWidth: 0.5,
+//                         borderColor: 'rgba(255, 255, 255, 0.25)'
+//                     },
+//                     emphasis: {
+//                         itemStyle: {
+//                             borderColor: '#212529',
+//                             borderWidth: 1.5
+//                         }
+//                     }
+//                 }
+//             ]
+//         };
+
+//         estado.chartHeatmapOrigenes.setOption(option, true);
+//     };
+
+//     // 6. GRÁFICO SECUNDARIO: BARRAS SUPERPUESTAS (PROMEDIO KG/ENTREGA + ÍNDICE CALIDAD %)
+//     const renderizarBarrasSuperpuestas = function (lista) {
+//         if (typeof echarts === 'undefined') return;
+
+//         const dom = document.getElementById('echarts-ori-superpuestas');
+//         const msgSinDatos = $('#msg-sin-datos-ori-superpuestas');
+
+//         const validos = (lista || []).filter(o => o.pesoBrutoTotalKg > 0);
+
+//         if (validos.length === 0) {
+//             $(dom).addClass('d-none');
+//             msgSinDatos.removeClass('d-none');
+//             return;
+//         }
+
+//         msgSinDatos.addClass('d-none');
+//         $(dom).removeClass('d-none');
+
+//         if (!estado.chartBarrasSuperpuestas || estado.chartBarrasSuperpuestas.isDisposed()) {
+//             estado.chartBarrasSuperpuestas = echarts.init(dom);
+//         }
+
+//         const nombresX = validos.map(o => o.nombreOrigen);
+//         const necesitaZoom = validos.length > 14;
+
+//         const option = {
+//             tooltip: {
+//                 trigger: 'axis',
+//                 axisPointer: { type: 'shadow' },
+//                 formatter: function (params) {
+//                     const idx = params[0].dataIndex;
+//                     const o = validos[idx];
+//                     return `
+//                         <strong>${o.nombreOrigen}</strong> <span class="badge bg-light text-dark border">${o.categoriaOrigen}</span><br/>
+//                         <span style="color:#0d6efd;">●</span> Promedio por Entrega: <strong>${formatearKg(o.promedioKgPorEntrega)} kg</strong> (${o.frecuenciaEntregas} entregas)<br/>
+//                         <span style="color:#198754;">●</span> Índice de Calidad Verde: <strong>${formatearPorcentaje(o.indiceCalidadOrigenPct)}%</strong><br/>
+//                         <small class="text-muted">Bruto Total: ${formatearKg(o.pesoBrutoTotalKg)} kg | Útil Verde: ${formatearKg(o.pesoUtilVerdeKg)} kg</small>
+//                     `;
+//                 }
+//             },
+//             legend: {
+//                 top: 0,
+//                 data: ['Promedio por Entrega (kg)', 'Índice Calidad Origen (%)']
+//             },
+//             toolbox: {
+//                 show: true,
+//                 right: 15,
+//                 feature: {
+//                     saveAsImage: { show: true, title: 'Descargar Barras Superpuestas HD', pixelRatio: 2 }
+//                 }
+//             },
+//             grid: {
+//                 top: 50,
+//                 bottom: necesitaZoom ? 95 : 65,
+//                 left: '3%',
+//                 right: '4%',
+//                 containLabel: true
+//             },
+//             xAxis: {
+//                 type: 'category',
+//                 data: nombresX,
+//                 axisLabel: {
+//                     fontWeight: 'bold',
+//                     fontSize: 11,
+//                     interval: 0,
+//                     rotate: 28,
+//                     formatter: val => val.length > 20 ? val.substring(0, 18) + '...' : val
+//                 }
+//             },
+//             yAxis: [
+//                 {
+//                     type: 'value',
+//                     name: 'Promedio / Entrega (kg)',
+//                     position: 'left',
+//                     axisLine: { show: true, lineStyle: { color: '#0d6efd' } },
+//                     axisLabel: {
+//                         formatter: val => val.toLocaleString('es-AR') + ' kg'
+//                     }
+//                 },
+//                 {
+//                     type: 'value',
+//                     name: 'Índice Calidad (%)',
+//                     position: 'right',
+//                     min: 0,
+//                     max: 100,
+//                     splitLine: { show: false },
+//                     axisLine: { show: true, lineStyle: { color: '#198754' } },
+//                     axisLabel: {
+//                         formatter: '{value}%'
+//                     }
+//                 }
+//             ],
+//             dataZoom: necesitaZoom ? [
+//                 {
+//                     type: 'slider',
+//                     xAxisIndex: 0,
+//                     startValue: 0,
+//                     endValue: 13,
+//                     bottom: 6,
+//                     height: 18
+//                 },
+//                 {
+//                     type: 'inside',
+//                     xAxisIndex: 0
+//                 }
+//             ] : [],
+//             series: [
+//                 {
+//                     name: 'Promedio por Entrega (kg)',
+//                     type: 'bar',
+//                     yAxisIndex: 0,
+//                     barWidth: 36,
+//                     z: 2,
+//                     itemStyle: {
+//                         color: 'rgba(13, 110, 253, 0.25)',
+//                         borderColor: '#0d6efd',
+//                         borderWidth: 1.5,
+//                         borderRadius: [5, 5, 0, 0]
+//                     },
+//                     data: validos.map(o => Number(o.promedioKgPorEntrega.toFixed(2)))
+//                 },
+//                 {
+//                     name: 'Índice Calidad Origen (%)',
+//                     type: 'bar',
+//                     yAxisIndex: 1,
+//                     barWidth: 18,
+//                     barGap: '-75%',
+//                     z: 3,
+//                     itemStyle: {
+//                         color: '#198754',
+//                         borderRadius: [4, 4, 0, 0]
+//                     },
+//                     data: validos.map(o => Number(o.indiceCalidadOrigenPct.toFixed(2)))
+//                 }
+//             ]
+//         };
+
+//         estado.chartBarrasSuperpuestas.setOption(option, true);
+//     };
+
+//     // 7. TABLA DE AUDITORÍA COMPLETA POR ORIGEN
+//     const renderizarTablaOrigenes = function (lista) {
+//         const tbody = $('#tbody-traz-origenes').empty();
+
+//         if (!lista || lista.length === 0) {
+//             tbody.html(`
+//                 <tr>
+//                     <td colspan="9" class="text-center text-muted py-4">
+//                         <i class="fas fa-folder-open me-2"></i>No se encontraron orígenes que coincidan con el filtro aplicado.
+//                     </td>
+//                 </tr>
+//             `);
+//             return;
+//         }
+
+//         lista.forEach((o, index) => {
+//             const pct = Math.min(100, Math.max(0, o.indiceCalidadOrigenPct));
+//             const colorBarra = pct >= 70 ? 'bg-success' : (pct >= 40 ? 'bg-warning' : 'bg-danger');
+
+//             const medalla = index === 0
+//                 ? '<span class="badge bg-warning text-dark"><i class="fas fa-crown"></i> 1</span>'
+//                 : `<span class="text-muted fw-bold">${index + 1}</span>`;
+
+//             tbody.append(`
+//                 <tr>
+//                     <td class="text-center">${medalla}</td>
+//                     <td class="fw-bold text-dark">${o.nombreOrigen}</td>
+//                     <td><span class="badge bg-light text-dark border">${o.categoriaOrigen}</span></td>
+//                     <td class="text-center"><span class="badge bg-info bg-opacity-10 text-info border border-info">${o.frecuenciaEntregas}</span></td>
+//                     <td class="text-end fw-semibold">${formatearKg(o.pesoBrutoTotalKg)} kg</td>
+//                     <td class="text-end text-primary fw-semibold">${formatearKg(o.promedioKgPorEntrega)} kg</td>
+//                     <td class="text-end text-success fw-semibold">${formatearKg(o.pesoUtilVerdeKg)} kg</td>
+//                     <td class="text-end text-danger fw-semibold">${formatearKg(o.pesoDescarteRojoKg)} kg</td>
+//                     <td>
+//                         <div class="d-flex align-items-center gap-2">
+//                             <div class="progress flex-grow-1" style="height: 8px;">
+//                                 <div class="progress-bar ${colorBarra}" role="progressbar" style="width: ${pct}%;"></div>
+//                             </div>
+//                             <span class="small fw-bold" style="min-width: 48px;">${formatearPorcentaje(o.indiceCalidadOrigenPct)}%</span>
+//                         </div>
+//                     </td>
+//                 </tr>
+//             `);
+//         });
+//     };
+
+//     // API Pública del Módulo
+//     return {
+//         cargarEn: inicializar
+//     };
+// })();
 
 
 
