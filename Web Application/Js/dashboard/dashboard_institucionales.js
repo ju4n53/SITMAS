@@ -107,15 +107,14 @@ const DashboardInstitucionalesModulo = (function () {
                 <div class="bg-white p-3 p-md-4 rounded shadow-sm border-start border-4 border-success">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 pb-2 border-bottom">
                         <div>
-                            <h4 class="fw text-dark mb-1">
-                                <i class="fas fa-building text-success me-2"></i>Panel de Trazabilidad Institucional
+                            <div>
+                            <h4 class="fw-bold text-dark mb-1">
+                                👋 ¡Hola, ${nombreUsuario}!
                             </h4>
-                              <h7 class="fw-bold text-dark mb-1">
-                              👋 ¡Hola, <strong>${nombreUsuario}</strong> • ${fechaHoyTexto}
-                              </h7>
-                              
-                            <!--<small class="text-muted">
-                            </small>-->
+                            <small class="text-muted">
+                                Panel de Trazabilidad Institucional • ${fechaHoyTexto}
+                            </small>
+                        </div>
                         </div>
                         <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2" id="inst-badge-estado">
                             <i class="fas fa-circle-notch fa-spin me-1"></i>Cargando métricas...

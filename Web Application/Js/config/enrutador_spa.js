@@ -87,6 +87,12 @@ $(document).ready(function () {
                 DashboardInstitucionalesModulo.cargarEn("panel-graficos");
             }
         }
+        else if (rol === "Mantenimiento_Vehicular") {
+            $("#panel-graficos").removeClass("d-none");
+            if (typeof DashboardMantenimientoModulo !== "undefined") {
+                DashboardMantenimientoModulo.cargarEn("panel-graficos");
+            }
+        }
         else if (rol === "Administrador") {
             $("#contenedor-rutas").removeClass("d-none");
             $("#panel-graficos").removeClass("d-none");

@@ -86,13 +86,98 @@ namespace API_SITMAS.Models
         public decimal TasaRecuperacionPct { get; set; }
     }
 
+
     // =========================================================================
-    // 2. CLASE DE ACCESO A DATOS (ADO.NET)
+    // 2. DTOs DEL DASHBOARD DE MANTENIMIENTO VEHICULAR (5 Result Sets)
     // =========================================================================
+
+    public class DashboardMantenimientoResponse
+    {
+        public KpisMantenimientoDto Kpis { get; set; }
+        public List<EvolucionMensualMantenimientoDto> EvolucionMensual { get; set; }
+        public List<DistribucionTipoServiceDto> DistribucionServicios { get; set; }
+        public List<SaludPreventivaVehiculoDto> SaludPreventivaFlota { get; set; }
+        public List<AuditoriaMantenimientoDto> PlanillaAuditoria { get; set; }
+
+        public DashboardMantenimientoResponse()
+        {
+            Kpis = new KpisMantenimientoDto();
+            EvolucionMensual = new List<EvolucionMensualMantenimientoDto>();
+            DistribucionServicios = new List<DistribucionTipoServiceDto>();
+            SaludPreventivaFlota = new List<SaludPreventivaVehiculoDto>();
+            PlanillaAuditoria = new List<AuditoriaMantenimientoDto>();
+        }
+    }
+
+    public class KpisMantenimientoDto
+    {
+        public int TotalServicios { get; set; }
+        public int TotalPreventivos { get; set; }
+        public int TotalReparaciones { get; set; }
+        public int TotalUrgentes { get; set; }
+        public decimal PorcentajePreventivo { get; set; }
+        public int AlertasVencidas { get; set; }
+        public int AlertasProximas { get; set; }
+        public int VehiculosAtendidos { get; set; }
+        public int TotalFlotaActiva { get; set; }
+    }
+
+    public class EvolucionMensualMantenimientoDto
+    {
+        public string PeriodoISO { get; set; }
+        public string PeriodoEtiqueta { get; set; }
+        public int CantidadPreventivo { get; set; }
+        public int CantidadReparacion { get; set; }
+        public int CantidadUrgente { get; set; }
+        public int TotalServicios { get; set; }
+    }
+
+    public class DistribucionTipoServiceDto
+    {
+        public string TipoMantenimiento { get; set; }
+        public string TipoService { get; set; }
+        public int CantidadServicios { get; set; }
+        public decimal PorcentajeDelTotal { get; set; }
+    }
+
+    public class SaludPreventivaVehiculoDto
+    {
+        public int IdVehiculo { get; set; }
+        public string Patente { get; set; }
+        public string MarcaModelo { get; set; }
+        public string TipoVehiculo { get; set; }
+        public decimal OdometroActual { get; set; }
+        public int OrdenService { get; set; }
+        public string TipoService { get; set; }
+        public int IntervaloKm { get; set; }
+        public string FechaUltimoServiceFormateada { get; set; }
+        public decimal OdometroUltimoService { get; set; }
+        public decimal KmRecorridos { get; set; }
+        public decimal KmRestantes { get; set; }
+        public decimal PorcentajeDesgaste { get; set; }
+        public string EstadoAlerta { get; set; }
+    }
+
+    public class AuditoriaMantenimientoDto
+    {
+        public int IdMantenimientoVehi { get; set; }
+        public string FechaISO { get; set; }
+        public string FechaFormateada { get; set; }
+        public int IdVehiculo { get; set; }
+        public string Patente { get; set; }
+        public string MarcaModelo { get; set; }
+        public string TipoVehiculo { get; set; }
+        public string TipoMantenimiento { get; set; }
+        public string TipoService { get; set; }
+        public decimal KmAlMomentoService { get; set; }
+        public int IdMecanico { get; set; }
+        public string MecanicoNombreCompleto { get; set; }
+    }
+
 
     public class DashboardUsuariosRol
     {
-        // IMPORTANTE: Verifica que el nombre coincida con tu Web.config (ej. "Conexion" o "Gestion_SITMAS")
+        
         private readonly string _connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
         public DashboardInstitucionalResponse ObtenerDashboardInstitucionales(DateTime? fechaDesde, DateTime? fechaHasta, int? idOrigen)
@@ -218,6 +303,145 @@ namespace API_SITMAS.Models
 
             return resultado;
         }
+
+
+        public DashboardMantenimientoResponse ObtenerDashboardMantenimiento(
+            DateTime? fechaDesde,
+            DateTime? fechaHasta,
+            int? idVehiculo,
+            string tipoMantenimiento)
+        {
+            var resultado = new DashboardMantenimientoResponse();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("dbo.sp_Dashboard_Mantenimiento", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@FechaDesde", SqlDbType.Date).Value = (object)fechaDesde ?? DBNull.Value;
+                    cmd.Parameters.Add("@FechaHasta", SqlDbType.Date).Value = (object)fechaHasta ?? DBNull.Value;
+                    cmd.Parameters.Add("@IdVehiculo", SqlDbType.Int).Value = (object)idVehiculo ?? DBNull.Value;
+                    cmd.Parameters.Add("@TipoMantenimiento", SqlDbType.VarChar, 50).Value =
+                        string.IsNullOrWhiteSpace(tipoMantenimiento) ? (object)DBNull.Value : tipoMantenimiento.Trim();
+
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        // -----------------------------------------------------
+                        // RESULT SET 1: KPIs Ejecutivos (Fila única)
+                        // -----------------------------------------------------
+                        if (reader.Read())
+                        {
+                            resultado.Kpis = new KpisMantenimientoDto
+                            {
+                                TotalServicios = GetIntSafe(reader, "TotalServicios"),
+                                TotalPreventivos = GetIntSafe(reader, "TotalPreventivos"),
+                                TotalReparaciones = GetIntSafe(reader, "TotalReparaciones"),
+                                TotalUrgentes = GetIntSafe(reader, "TotalUrgentes"),
+                                PorcentajePreventivo = GetDecimalSafe(reader, "PorcentajePreventivo"),
+                                AlertasVencidas = GetIntSafe(reader, "AlertasVencidas"),
+                                AlertasProximas = GetIntSafe(reader, "AlertasProximas"),
+                                VehiculosAtendidos = GetIntSafe(reader, "VehiculosAtendidos"),
+                                TotalFlotaActiva = GetIntSafe(reader, "TotalFlotaActiva")
+                            };
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 2: Evolución Mensual por Tipo
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.EvolucionMensual.Add(new EvolucionMensualMantenimientoDto
+                                {
+                                    PeriodoISO = GetStringSafe(reader, "PeriodoISO"),
+                                    PeriodoEtiqueta = GetStringSafe(reader, "PeriodoEtiqueta"),
+                                    CantidadPreventivo = GetIntSafe(reader, "CantidadPreventivo"),
+                                    CantidadReparacion = GetIntSafe(reader, "CantidadReparacion"),
+                                    CantidadUrgente = GetIntSafe(reader, "CantidadUrgente"),
+                                    TotalServicios = GetIntSafe(reader, "TotalServicios")
+                                });
+                            }
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 3: Distribución por Tipo de Service / Tarea
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.DistribucionServicios.Add(new DistribucionTipoServiceDto
+                                {
+                                    TipoMantenimiento = GetStringSafe(reader, "TipoMantenimiento"),
+                                    TipoService = GetStringSafe(reader, "TipoService"),
+                                    CantidadServicios = GetIntSafe(reader, "CantidadServicios"),
+                                    PorcentajeDelTotal = GetDecimalSafe(reader, "PorcentajeDelTotal")
+                                });
+                            }
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 4: Semáforo de Salud Preventiva de Flota
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.SaludPreventivaFlota.Add(new SaludPreventivaVehiculoDto
+                                {
+                                    IdVehiculo = GetIntSafe(reader, "IdVehiculo"),
+                                    Patente = GetStringSafe(reader, "Patente"),
+                                    MarcaModelo = GetStringSafe(reader, "MarcaModelo"),
+                                    TipoVehiculo = GetStringSafe(reader, "TipoVehiculo"),
+                                    OdometroActual = GetDecimalSafe(reader, "OdometroActual"),
+                                    OrdenService = GetIntSafe(reader, "OrdenService"),
+                                    TipoService = GetStringSafe(reader, "TipoService"),
+                                    IntervaloKm = GetIntSafe(reader, "IntervaloKm"),
+                                    FechaUltimoServiceFormateada = GetStringSafe(reader, "FechaUltimoServiceFormateada"),
+                                    OdometroUltimoService = GetDecimalSafe(reader, "OdometroUltimoService"),
+                                    KmRecorridos = GetDecimalSafe(reader, "KmRecorridos"),
+                                    KmRestantes = GetDecimalSafe(reader, "KmRestantes"),
+                                    PorcentajeDesgaste = GetDecimalSafe(reader, "PorcentajeDesgaste"),
+                                    EstadoAlerta = GetStringSafe(reader, "EstadoAlerta")
+                                });
+                            }
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 5: Planilla de Auditoría Detallada
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.PlanillaAuditoria.Add(new AuditoriaMantenimientoDto
+                                {
+                                    IdMantenimientoVehi = GetIntSafe(reader, "IdMantenimientoVehi"),
+                                    FechaISO = GetStringSafe(reader, "FechaISO"),
+                                    FechaFormateada = GetStringSafe(reader, "FechaFormateada"),
+                                    IdVehiculo = GetIntSafe(reader, "IdVehiculo"),
+                                    Patente = GetStringSafe(reader, "Patente"),
+                                    MarcaModelo = GetStringSafe(reader, "MarcaModelo"),
+                                    TipoVehiculo = GetStringSafe(reader, "TipoVehiculo"),
+                                    TipoMantenimiento = GetStringSafe(reader, "TipoMantenimiento"),
+                                    TipoService = GetStringSafe(reader, "TipoService"),
+                                    KmAlMomentoService = GetDecimalSafe(reader, "KmAlMomentoService"),
+                                    IdMecanico = GetIntSafe(reader, "IdMecanico"),
+                                    MecanicoNombreCompleto = GetStringSafe(reader, "MecanicoNombreCompleto")
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return resultado;
+        }
+
 
         // =====================================================================
         // HELPERS DEFENSIVOS DE LECTURA (Evitan excepciones por DBNull)
