@@ -21,7 +21,8 @@
 
     <header class="main-header header-color-emec d-flex justify-content-between align-items-center">
         <div>
-            <img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec" style="height: 65px;">
+            <a href="../Pages/landing.html"><img src="../assets/emec-logo-name-noBG.png" alt="Logo Emec"
+                    style="height: 65px;"></a>
         </div>
 
         <div class="info-right d-flex align-items-center gap-3">
@@ -127,49 +128,18 @@
 
         <div class="main-body-content flex-grow-1 d-flex flex-column">
 
-            <!-- <div class="info-bar border-bottom p-3">
-                <span class="text-uppercase tracking-wider">Panel de inicio</span>
-            </div> -->
-
-
             <main class="container-fluid p-4">
 
-                <!-- PANEL ADMINISTRADOR: Gráficos (Oculto por defecto) -->
-                <div class="row g-4 d-none" id="panel-graficos">
-                    <!-- <div class="col-12">
-                        <div class="sitmas-card">
-                            <h2 class="mb-3 text-success">📦 Stock de Materiales Disponibles en Planta</h2>
-                            <p class="text-muted small">Kilogramos netos listos para su procesamiento o egreso,
-                                calculados post-clasificación (Peso Útil).</p>
-                            <div style="position: relative; height: 350px; width: 100%;">
-                                <canvas id="chartStockActual"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2 class="mb-3">Volumen de Ingresos (Peso Bruto)</h2>
-                            <div style="position: relative; height: 320px; width: 100%;">
-                                <canvas id="chartPesoBruto"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-xl-6">
-                        <div class="sitmas-card h-100">
-                            <h2 class="mb-3">Eficiencia de Clasificación (Bruto vs Útil)</h2>
-                            <div style="position: relative; height: 320px; width: 100%;">
-                                <canvas id="chartRendimiento"></canvas>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- </div> -->
-                    <!-- <br> -->
+                <!-- CONTENEDOR LOGÍSTICA / CHOFER (Oculto por defecto) -->
+                <div class="row g-4 d-none mb-4" id="contenedor-rutas">
+                    <!-- dashboard_chofer.js inyecta aquí tarjetas o mapa en curso -->
                 </div>
 
-                <!-- PANEL CHOFER: Rutas del día (Oculto por defecto) -->
-                <div class="row g-4 d-none" id="contenedor-rutas">
-                    <!-- El JS del chofer inyectará las tarjetas o el mapa aquí -->
+                <!-- CONTENEDOR DASHBOARDS ANALÍTICOS POR ROL (Oculto por defecto) -->
+                <div class="row g-4 d-none" id="panel-graficos">
+                    <!-- DashboardInstitucionalesModulo inyecta aquí el tablero correspondiente -->
                 </div>
+
             </main>
 
 
@@ -182,16 +152,17 @@
         </div>
     </footer>
 
+    <!-- Librerías Base -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
-    <!-- <script src="../Js/dashboard/dashboard_ingresoPrincipal.js"></script>  -->
+
+    <!-- Configuración y Módulos SPA -->
     <script src="../Js/alerts_config.js"></script>
-    <script src="../Js/config/enrutador_spa.js"></script>
     <script src="../Js/config/config_maps.js"></script>
     <script src="../Js/dashboard/dashboard_chofer.js"></script>
-
-    <!-- <script src="../Js/dashboard/dashboard_graficos.js"></script> -->
+    <script src="../Js/dashboard/dashboard_institucionales.js"></script>
+    <script src="../Js/config/enrutador_spa.js"></script>
     <script src="../Js/logout.js"></script>
 
 

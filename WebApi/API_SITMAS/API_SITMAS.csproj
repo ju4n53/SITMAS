@@ -227,6 +227,7 @@
     <Compile Include="Controllers\CombustibleController.cs" />
     <Compile Include="Controllers\ConsumoCombustibleController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\DashboardUsuariosRolController.cs" />
     <Compile Include="Controllers\DestinoController.cs" />
     <Compile Include="Controllers\DetalleHojaRutaController.cs" />
     <Compile Include="Controllers\DetalleIngresoController.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="Models\Combustible.cs" />
     <Compile Include="Models\ConsumoCombustible.cs" />
     <Compile Include="Models\DashboardData.cs" />
+    <Compile Include="Models\DashboardUsuariosRol.cs" />
     <Compile Include="Models\Destino.cs" />
     <Compile Include="Models\DetalleHojaRuta.cs" />
     <Compile Include="Models\DetalleIngreso.cs" />

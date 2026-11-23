@@ -37,6 +37,8 @@ const rutasProtegidas = {
 
     "reportes_logistica.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "R_Institucionales", "Administrador"],
 
+     "reportes_trazabilidad.html": ["Coordinador", "Supervisor_Gestion", "Director", "R_Institucionales", "Administrador"],
+
     //"odometro.html": ["Coordinador", "Supervisor_Logistica", "R_Institucionales", "Administrador"],
 
     //"consumoCombustible.html": ["Coordinador", "Supervisor_Logistica", "Mantenimiento_Vehicular", "Administrador"],
