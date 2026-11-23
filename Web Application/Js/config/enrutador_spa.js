@@ -123,44 +123,34 @@ document.addEventListener("DOMContentLoaded", function () {
 // ==========================================
 // ENRUTADOR: REPORTES DE LOGÍSTICA
 // ==========================================
-$('#ReportesLogisticaTabs .nav-link').on('click', function (e) {
-    e.preventDefault();
+if ($('#ReportesLogisticaTabs').length > 0) {
+    $('#ReportesLogisticaTabs .nav-link').off('click').on('click', function (e) {
+        e.preventDefault();
 
-    // Limpiamos estilos de todas las pestañas
-    $('#ReportesLogisticaTabs .nav-link').removeClass('active').addClass('text-secondary');
-    // Activamos la pestaña seleccionada
-    $(this).removeClass('text-secondary').addClass('active');
+        $('#ReportesLogisticaTabs .nav-link').removeClass('active').addClass('text-secondary');
+        $(this).removeClass('text-secondary').addClass('active');
 
-    const tabId = $(this).attr('id');
+        const tabId = $(this).attr('id');
 
-    // Enrutador
-    if (tabId === 'tab-uso-vehiculos') {
-        console.log("Preparando módulo Reporte: Uso de Vehículos...");
-        ReporteVehiculosModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    } else if (tabId === 'tab-odometro') {
-        console.log("Preparando módulo Reporte: Odómetro...");
-        ReporteOdometroModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    } else if (tabId === 'tab-mantenimiento') {
-        console.log("Preparando módulo Reporte: Mantenimiento Preventivo...");
-        ReporteMantenimientoModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    } else if (tabId === 'tab-consumo-combustible') {
-        console.log("Preparando módulo Reporte: Consumo de Combustible...");
-        ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    } else if (tabId === 'tab-rendimiento-viajes') {
-        console.log("Preparando módulo Reporte: Rendimiento de Viajes...");
-        ReporteRendimientoViajesModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    } else if (tabId === 'tab-rendimiento-choferes') {
-        console.log("Preparando módulo Reporte: Métricas de los choferes...");
-        ReporteChoferesModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    } else if (tabId === 'tab-pert-logistica') {
-        console.log("Preparando módulo Reporte: Pert Logistica...");
-        ReportePertLogisticaModulo.cargarEn("contenedor-dinamico-reportes-logistica");
-    }
-});
+        if (tabId === 'tab-uso-vehiculos') {
+            ReporteVehiculosModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        } else if (tabId === 'tab-odometro') {
+            ReporteOdometroModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        } else if (tabId === 'tab-mantenimiento') {
+            ReporteMantenimientoModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        } else if (tabId === 'tab-consumo-combustible') {
+            ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        } else if (tabId === 'tab-rendimiento-viajes') {
+            ReporteRendimientoViajesModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        } else if (tabId === 'tab-rendimiento-choferes') {
+            ReporteChoferesModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        } else if (tabId === 'tab-pert-logistica') {
+            ReportePertLogisticaModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+        }
+    });
 
-// Disparamos el click inicial para que cargue el primer gráfico por defecto
-$('#tab-uso-vehiculos').trigger('click');
-
+    $('#tab-uso-vehiculos').trigger('click');
+}
 
 // ==========================================
 // ENRUTADOR: REPORTES DE TRAZABILIDAD
@@ -169,16 +159,13 @@ if ($('#ReportesTrazabilidadTabs').length > 0) {
     $('#ReportesTrazabilidadTabs .nav-link').off('click').on('click', function (e) {
         e.preventDefault();
 
-        // Limpiamos estilos de todas las pestañas
         $('#ReportesTrazabilidadTabs .nav-link').removeClass('active').addClass('text-secondary');
-        // Activamos la pestaña seleccionada
         $(this).removeClass('text-secondary').addClass('active');
 
         const tabId = $(this).attr('id');
         const contenedor = "contenedor-dinamico-reportes-trazabilidad";
 
         if (tabId === 'tab-traz-resumen') {
-            console.log("Preparando módulo Reporte Trazabilidad: Resumen y Balance...");
             ReporteTrazResumenModulo.cargarEn(contenedor);
         } else if (tabId === 'tab-traz-materiales') {
             if (typeof ReporteTrazMaterialesModulo !== 'undefined') {
@@ -207,6 +194,98 @@ if ($('#ReportesTrazabilidadTabs').length > 0) {
         }
     });
 
-    // Disparamos el click inicial para cargar el primer reporte por defecto
     $('#tab-traz-resumen').trigger('click');
 }
+
+
+
+// // ==========================================
+// // ENRUTADOR: REPORTES DE LOGÍSTICA
+// // ==========================================
+// $('#ReportesLogisticaTabs .nav-link').on('click', function (e) {
+//     e.preventDefault();
+
+//     // Limpiamos estilos de todas las pestañas
+//     $('#ReportesLogisticaTabs .nav-link').removeClass('active').addClass('text-secondary');
+//     // Activamos la pestaña seleccionada
+//     $(this).removeClass('text-secondary').addClass('active');
+
+//     const tabId = $(this).attr('id');
+
+//     // Enrutador
+//     if (tabId === 'tab-uso-vehiculos') {
+//         console.log("Preparando módulo Reporte: Uso de Vehículos...");
+//         ReporteVehiculosModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     } else if (tabId === 'tab-odometro') {
+//         console.log("Preparando módulo Reporte: Odómetro...");
+//         ReporteOdometroModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     } else if (tabId === 'tab-mantenimiento') {
+//         console.log("Preparando módulo Reporte: Mantenimiento Preventivo...");
+//         ReporteMantenimientoModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     } else if (tabId === 'tab-consumo-combustible') {
+//         console.log("Preparando módulo Reporte: Consumo de Combustible...");
+//         ReporteCombustibleModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     } else if (tabId === 'tab-rendimiento-viajes') {
+//         console.log("Preparando módulo Reporte: Rendimiento de Viajes...");
+//         ReporteRendimientoViajesModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     } else if (tabId === 'tab-rendimiento-choferes') {
+//         console.log("Preparando módulo Reporte: Métricas de los choferes...");
+//         ReporteChoferesModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     } else if (tabId === 'tab-pert-logistica') {
+//         console.log("Preparando módulo Reporte: Pert Logistica...");
+//         ReportePertLogisticaModulo.cargarEn("contenedor-dinamico-reportes-logistica");
+//     }
+// });
+
+// // Disparamos el click inicial para que cargue el primer gráfico por defecto
+// $('#tab-uso-vehiculos').trigger('click');
+
+
+// // ==========================================
+// // ENRUTADOR: REPORTES DE TRAZABILIDAD
+// // ==========================================
+// if ($('#ReportesTrazabilidadTabs').length > 0) {
+//     $('#ReportesTrazabilidadTabs .nav-link').off('click').on('click', function (e) {
+//         e.preventDefault();
+
+//         // Limpiamos estilos de todas las pestañas
+//         $('#ReportesTrazabilidadTabs .nav-link').removeClass('active').addClass('text-secondary');
+//         // Activamos la pestaña seleccionada
+//         $(this).removeClass('text-secondary').addClass('active');
+
+//         const tabId = $(this).attr('id');
+//         const contenedor = "contenedor-dinamico-reportes-trazabilidad";
+
+//         if (tabId === 'tab-traz-resumen') {
+//             console.log("Preparando módulo Reporte Trazabilidad: Resumen y Balance...");
+//             ReporteTrazResumenModulo.cargarEn(contenedor);
+//         } else if (tabId === 'tab-traz-materiales') {
+//             if (typeof ReporteTrazMaterialesModulo !== 'undefined') {
+//                 ReporteTrazMaterialesModulo.cargarEn(contenedor);
+//             } else {
+//                 $(`#${contenedor}`).html('<div class="alert alert-info">Módulo <strong>Tipos y Subtipos</strong> en construcción...</div>');
+//             }
+//         } else if (tabId === 'tab-traz-origenes') {
+//             if (typeof ReporteTrazOrigenesModulo !== 'undefined') {
+//                 ReporteTrazOrigenesModulo.cargarEn(contenedor);
+//             } else {
+//                 $(`#${contenedor}`).html('<div class="alert alert-info">Módulo <strong>Orígenes y Donantes</strong> en construcción...</div>');
+//             }
+//         } else if (tabId === 'tab-traz-auditoria') {
+//             if (typeof ReporteTrazAuditoriaModulo !== 'undefined') {
+//                 ReporteTrazAuditoriaModulo.cargarEn(contenedor);
+//             } else {
+//                 $(`#${contenedor}`).html('<div class="alert alert-info">Módulo <strong>Auditoría de Lotes</strong> en construcción...</div>');
+//             }
+//         } else if (tabId === 'tab-traz-planta') {
+//             if (typeof ReporteTrazPlantaModulo !== 'undefined') {
+//                 ReporteTrazPlantaModulo.cargarEn(contenedor);
+//             } else {
+//                 $(`#${contenedor}`).html('<div class="alert alert-info">Módulo <strong>Planta y Salidas</strong> en construcción...</div>');
+//             }
+//         }
+//     });
+
+//     // Disparamos el click inicial para cargar el primer reporte por defecto
+//     $('#tab-traz-resumen').trigger('click');
+// }

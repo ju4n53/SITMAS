@@ -1,26 +1,27 @@
 /* ========================================================================
    SITMAS - Módulo de Reportes de Trazabilidad: Resumen Ejecutivo y Balance
-   Consume: GET /api/ReportesTrazabilidad/ResumenKPIs
-            GET /api/ReportesTrazabilidad/AuditoriaLotes (para Boxplot estadístico)
-   Incluye: 4 KPIs + Evolución Temporal + Dona Balance + Boxplot Semáforo + Tabla
+   Consume exclusivamente: GET /api/ReportesTrazabilidad/ResumenKPIs
+   (Catálogo de filtro: GET /api/ReportesTrazabilidad/PorMaterial)
+   Estructura:
+     - Filtros superiores (Desde, Hasta, Material)
+     - 3 Bandas de KPIs con tonalidades suaves semánticas (11 tarjetas)
+     - Gráfico 1: Share Dataset (Torta superior + Evolución % revisado inferior)
+     - Gráfico 2: Bar Label Rotation (Lotes vs. Bruto y Semáforo en kg)
    Archivo: Js/reportes_trazabilidad/reporte_traz_resumen.js
    ======================================================================== */
 
 const ReporteTrazResumenModulo = (function () {
-    // 🔒 ESTADO PRIVADO
+    // 🔒 ESTADO PRIVADO DEL MÓDULO
     let estado = {
         kpis: null,
         evolucionDiaria: [],
-        clasificacionesIndividuales: [],
         granularidad: 'diaria', // 'diaria' | 'mensual'
-        chartEvolucion: null,
-        chartBalanceDona: null,
-        chartBoxplotSemaforo: null
+        chartShareDataset: null,
+        chartBarRotation: null
     };
 
     const URL_RESUMEN_KPIS = "https://localhost:44325/api/ReportesTrazabilidad/ResumenKPIs";
     const URL_POR_MATERIAL = "https://localhost:44325/api/ReportesTrazabilidad/PorMaterial";
-    const URL_AUDITORIA_LOTES = "https://localhost:44325/api/ReportesTrazabilidad/AuditoriaLotes";
 
     const MESES_CORTOS = [
         "Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -34,6 +35,11 @@ const ReporteTrazResumenModulo = (function () {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
+    };
+
+    const formatearEntero = function (valor) {
+        const num = Math.round(parseFloat(valor || 0));
+        return num.toLocaleString('es-AR');
     };
 
     const formatearPorcentaje = function (valor) {
@@ -63,17 +69,18 @@ const ReporteTrazResumenModulo = (function () {
         return MESES_CORTOS[idx] ? `${MESES_CORTOS[idx]} ${anio}` : mesIso;
     };
 
-    // Limpieza segura de instancias ECharts al cambiar de pestaña en la SPA
+    // Limpieza segura de todas las instancias ECharts y listeners al salir de la vista
     const destruirGraficosActivos = function () {
-        ['chartEvolucion', 'chartBalanceDona', 'chartBoxplotSemaforo'].forEach(key => {
+        ['chartShareDataset', 'chartBarRotation'].forEach(key => {
             if (estado[key] && !estado[key].isDisposed()) {
                 estado[key].dispose();
             }
             estado[key] = null;
         });
+        $(window).off('resize.trazResumen');
     };
 
-    // 1. INICIALIZACIÓN DE LA ESTRUCTURA VISUAL (PIRÁMIDE INVERTIDA)
+    // 1. INICIALIZACIÓN DE LA ESTRUCTURA VISUAL
     const inicializar = function (contenedorId) {
         destruirGraficosActivos();
         const contenedor = $(`#${contenedorId}`);
@@ -86,7 +93,7 @@ const ReporteTrazResumenModulo = (function () {
                         <h4 class="text-primary fw-bold mb-0">
                             <i class="fas fa-balance-scale me-2"></i>Resumen Ejecutivo y Balance de Masa
                         </h4>
-                        <small class="text-muted">Auditoría consolidada de pesaje bruto, clasificación por semáforo de calidad, tiempos y egresos de planta</small>
+                        <small class="text-muted">Indicadores consolidados de recepción bruta, clasificación por semáforo, lotes y flujo de planta</small>
                     </div>
 
                     <div class="d-flex flex-wrap gap-2 align-items-center bg-light p-2 rounded border">
@@ -108,71 +115,203 @@ const ReporteTrazResumenModulo = (function () {
                 </div>
             </div>
 
-            <!-- NIVEL 2: 4 TARJETAS KPI EJECUTIVAS -->
-            <div class="row g-3 mb-4 fade-in">
+            <!-- NIVEL 2 - PARTE 1: BRUTO INGRESADO Y PORCENTAJES DE CLASIFICACIÓN (4 TARJETAS) -->
+            <div class="row g-3 mb-3 fade-in">
+                <!-- 1. Celeste: Peso total bruto ingresado -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #e0f2fe; border-color: #0284c7 !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Total Bruto Ingresado</span>
-                                <span class="badge bg-primary bg-opacity-10 text-primary p-2"><i class="fas fa-weight-hanging fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #0369a1;">Peso Bruto Ingresado</span>
+                                <span class="badge p-2" style="background-color: rgba(2, 132, 199, 0.16); color: #0369a1;">
+                                    <i class="fas fa-weight-hanging fa-lg"></i>
+                                </span>
                             </div>
-                            <h3 class="fw-bold text-dark mb-1" id="kpi-traz-bruto">0,00 kg</h3>
-                            <small class="text-muted" id="kpi-traz-sub-lotes">0 lotes (0 camión / 0 part.)</small>
+                            <h3 class="fw-bold text-dark mb-1" id="kpi-p1-bruto">0,00 kg</h3>
+                            <small class="text-secondary fw-medium" id="kpi-p1-sub-bruto">Sin clasif. / merma: 0,00 kg</small>
                         </div>
                     </div>
                 </div>
 
+                <!-- 2. Verde: % Peso bruto clasificado en verde -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #dcfce7; border-color: #16a34a !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Útil Directo (Verde)</span>
-                                <span class="badge bg-success bg-opacity-10 text-success p-2"><i class="fas fa-recycle fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #15803d;">% Clasificado Verde</span>
+                                <span class="badge p-2" style="background-color: rgba(22, 163, 74, 0.16); color: #15803d;">
+                                    <i class="fas fa-check-circle fa-lg"></i>
+                                </span>
                             </div>
-                            <h3 class="fw-bold text-success mb-1" id="kpi-traz-verde">0,00 kg</h3>
-                            <small class="text-muted" id="kpi-traz-sub-aprov">0,0% directo (0,0% incl. Amarillo)</small>
+                            <h3 class="fw-bold mb-1" style="color: #15803d;" id="kpi-p1-pct-verde">0,0%</h3>
+                            <small class="text-secondary fw-medium" id="kpi-p1-sub-verde">Recuperable total (V+A): 0,0%</small>
                         </div>
                     </div>
                 </div>
 
+                <!-- 3. Amarilla: % Peso bruto clasificado en amarillo -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #fef9c3; border-color: #ca8a04 !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Egresado / Producido</span>
-                                <span class="badge bg-info bg-opacity-10 text-info p-2"><i class="fas fa-dolly-flatbed fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #a16207;">% Clasificado Amarillo</span>
+                                <span class="badge p-2" style="background-color: rgba(202, 138, 4, 0.18); color: #a16207;">
+                                    <i class="fas fa-exclamation-circle fa-lg"></i>
+                                </span>
                             </div>
-                            <h3 class="fw-bold text-dark mb-1" id="kpi-traz-egresado">0,00 kg</h3>
-                            <small class="text-muted" id="kpi-traz-sub-tiempo">Tiempo medio clasif.: 0,0 hs</small>
+                            <h3 class="fw-bold mb-1" style="color: #a16207;" id="kpi-p1-pct-amarillo">0,0%</h3>
+                            <small class="text-secondary fw-medium">Material en revisión / proceso</small>
                         </div>
                     </div>
                 </div>
 
+                <!-- 4. Roja: % Peso bruto clasificado en rojo -->
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #fee2e2; border-color: #dc2626 !important;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted small fw-bold text-uppercase">Sin Clasificar / Merma</span>
-                                <span class="badge bg-warning bg-opacity-10 text-warning p-2"><i class="fas fa-exclamation-triangle fa-lg"></i></span>
+                                <span class="small fw-bold text-uppercase" style="color: #b91c1c;">% Clasificado Rojo</span>
+                                <span class="badge p-2" style="background-color: rgba(220, 38, 38, 0.16); color: #b91c1c;">
+                                    <i class="fas fa-times-circle fa-lg"></i>
+                                </span>
                             </div>
-                            <h3 class="fw-bold text-dark mb-1" id="kpi-traz-sin-clasif">0,00 kg</h3>
-                            <small class="text-muted" id="kpi-traz-sub-semaforo">Rojo: 0,00 kg | Amarillo: 0,00 kg</small>
+                            <h3 class="fw-bold mb-1" style="color: #b91c1c;" id="kpi-p1-pct-rojo">0,0%</h3>
+                            <small class="text-secondary fw-medium">Porcentaje de descarte sobre bruto</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- NIVEL 3: GRÁFICOS ANALÍTICOS INTERACTIVOS (EVOLUCIÓN + DONA) -->
+            <!-- NIVEL 2 - PARTE 2: FLUJO DE PLANTA Y DESCARTE (3 TARJETAS) -->
+            <div class="row g-3 mb-3 fade-in">
+                <!-- 1. Azul claro: Peso total egresado de planta -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #dbeafe; border-color: #2563eb !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" style="color: #1d4ed8;">Total Egresado de Planta</span>
+                                <span class="badge p-2" style="background-color: rgba(37, 99, 235, 0.16); color: #1d4ed8;">
+                                    <i class="fas fa-dolly-flatbed fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold mb-1" style="color: #1d4ed8;" id="kpi-p2-egresado">0,00 kg</h3>
+                            <small class="text-secondary fw-medium">Salidas y despachos registrados en el período</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Verde claro: Peso balance de flujo recuperable -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" id="card-p2-balance" style="background-color: #d1fae5; border-color: #059669 !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" id="lbl-p2-balance" style="color: #047857;">Balance Flujo Recuperable</span>
+                                <span class="badge p-2" id="icon-p2-balance" style="background-color: rgba(5, 150, 105, 0.16); color: #047857;">
+                                    <i class="fas fa-exchange-alt fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold mb-1" style="color: #047857;" id="kpi-p2-balance">0,00 kg</h3>
+                            <small class="text-secondary fw-medium" id="kpi-p2-sub-balance">(Verde + Amarillo) − Egresado de planta</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Rojo claro: Peso total en rojo (descarte) -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #ffe4e6; border-color: #e11d48 !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" style="color: #be123c;">Peso Total en Rojo (Descarte)</span>
+                                <span class="badge p-2" style="background-color: rgba(225, 29, 72, 0.16); color: #be123c;">
+                                    <i class="fas fa-trash-alt fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold mb-1" style="color: #be123c;" id="kpi-p2-rojo-descarte">0,00 kg</h3>
+                            <small class="text-secondary fw-medium">Material no recuperable del período</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NIVEL 2 - PARTE 3: LOTES Y VOLÚMENES FÍSICOS EN KG POR SEMÁFORO (4 TARJETAS) -->
+            <div class="row g-3 mb-4 fade-in">
+                <!-- 1. Celeste suave: Total de lotes ingresados -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #e0f7fa; border-color: #0891b2 !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" style="color: #0e7490;">Total Lotes Ingresados</span>
+                                <span class="badge p-2" style="background-color: rgba(8, 145, 178, 0.16); color: #0e7490;">
+                                    <i class="fas fa-boxes fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold text-dark mb-1" id="kpi-p3-lotes">0</h3>
+                            <small class="text-secondary fw-medium" id="kpi-p3-sub-lotes">0 camión / 0 particulares</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Verde: Total peso verde kg -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #ecfdf5; border-color: #16a34a !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" style="color: #15803d;">Total Peso Verde</span>
+                                <span class="badge p-2" style="background-color: rgba(22, 163, 74, 0.16); color: #15803d;">
+                                    <i class="fas fa-recycle fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold mb-1" style="color: #15803d;" id="kpi-p3-kg-verde">0,00 kg</h3>
+                            <small class="text-secondary fw-medium" id="kpi-p3-sub-tiempo">Tiempo medio clasif.: 0,0 hs</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Amarillo: Total peso amarillo kg -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #fefce8; border-color: #ca8a04 !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" style="color: #a16207;">Total Peso Amarillo</span>
+                                <span class="badge p-2" style="background-color: rgba(202, 138, 4, 0.18); color: #a16207;">
+                                    <i class="fas fa-hourglass-half fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold mb-1" style="color: #a16207;" id="kpi-p3-kg-amarillo">0,00 kg</h3>
+                            <small class="text-secondary fw-medium">Pendiente de reproceso / recuperación</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Rojo: Total peso rojo kg -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 border-start border-4 h-100" style="background-color: #fef2f2; border-color: #dc2626 !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase" style="color: #b91c1c;">Total Peso Rojo</span>
+                                <span class="badge p-2" style="background-color: rgba(220, 38, 38, 0.16); color: #b91c1c;">
+                                    <i class="fas fa-ban fa-lg"></i>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold mb-1" style="color: #b91c1c;" id="kpi-p3-kg-rojo">0,00 kg</h3>
+                            <small class="text-secondary fw-medium">Rechazo clasificado en cinta</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NIVEL 3: GRÁFICO PRINCIPAL SHARE DATASET (TORTA ARRIBA + LÍNEAS ABAJO - SOLO REVISADO) -->
             <div class="row g-4 mb-4 fade-in">
-                <div class="col-12 col-xl-8">
-                    <div class="card shadow-sm border-0 h-100">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
                         <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <div>
                                 <h6 class="fw-bold text-dark mb-0">
-                                    <i class="fas fa-chart-area text-primary me-2"></i>Evolución de Ingresos Brutos vs. Semáforo de Clasificación
+                                    <i class="fas fa-project-diagram text-primary me-2"></i>Distribución Porcentual del Material Revisado (Share Dataset)
                                 </h6>
-                                <small class="text-muted">Comparativa cronológica del flujo de material recibido y recuperado</small>
+                                <small class="text-muted">
+                                    Desliza el cursor sobre cualquier fecha de la curva inferior para actualizar la composición circular superior (Verde, Amarillo y Rojo)
+                                </small>
                             </div>
 
                             <div class="btn-group btn-group-sm" role="group" aria-label="Granularidad temporal">
@@ -185,95 +324,39 @@ const ReporteTrazResumenModulo = (function () {
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="msg-sin-datos-traz-evolucion" class="alert alert-light text-center border my-4 p-4 d-none">
+                            <div id="msg-sin-datos-traz-share" class="alert alert-light text-center border my-4 p-4 d-none">
                                 <i class="fas fa-chart-line fa-2x text-muted mb-2"></i>
-                                <p class="mb-0 text-muted">No se registraron ingresos de material en el rango de fechas seleccionado.</p>
+                                <p class="mb-0 text-muted">No se registraron materiales clasificados en el rango de fechas seleccionado.</p>
                             </div>
-                            <div id="echarts-traz-evolucion" style="width: 100%; height: 390px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-xl-4">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-header bg-white border-bottom py-3">
-                            <h6 class="fw-bold text-dark mb-0">
-                                <i class="fas fa-chart-pie text-success me-2"></i>Balance de Masa del Período
-                            </h6>
-                            <small class="text-muted">Distribución porcentual sobre el peso bruto ingresado</small>
-                        </div>
-                        <div class="card-body">
-                            <div id="msg-sin-datos-traz-dona" class="alert alert-light text-center border my-4 p-4 d-none">
-                                <i class="fas fa-pie-chart fa-2x text-muted mb-2"></i>
-                                <p class="mb-0 text-muted">Sin masa ingresada para distribuir.</p>
-                            </div>
-                            <div id="echarts-traz-balance-dona" style="width: 100%; height: 390px;"></div>
+                            <div id="echarts-traz-share-dataset" style="width: 100%; height: 640px;"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- NIVEL 3.5: DIAGRAMA DE CAJA Y BIGOTES (BOXPLOT) POR ESTADO DEL SEMÁFORO -->
-            <div class="row g-4 mb-4 fade-in">
+            <!-- NIVEL 4: GRÁFICO SECUNDARIO BAR LABEL ROTATION (CRUCE DE LOTES Y CLASIFICACIÓN RS2) -->
+            <div class="row g-4 fade-in">
                 <div class="col-12">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <div>
                                 <h6 class="fw-bold text-dark mb-0">
-                                    <i class="fas fa-sliders-h text-success me-2"></i>Distribución Estadística de Pesajes por Estado (Diagrama de Caja / Boxplot)
+                                    <i class="fas fa-chart-bar text-info me-2"></i>Comparativa de Lotes Recibidos vs. Recepción y Clasificación en Planta (Bar Label Rotation)
                                 </h6>
-                                <small class="text-muted" id="subtitulo-boxplot-semaforo">
-                                    Analiza la mediana, rango intercuartílico (50% central de pesajes) y detección automática de valores atípicos
+                                <small class="text-muted">
+                                    Cruce cronológico de cantidad de lotes ingresados (eje derecho) frente a kilogramos brutos y clasificados por semáforo (eje izquierdo)
                                 </small>
                             </div>
                             <span class="badge bg-light text-secondary border">
-                                <i class="fas fa-info-circle text-primary me-1"></i>Caja: Q1–Q3 | Línea: Mediana | Puntos: Atípicos
+                                <i class="fas fa-mouse-pointer text-primary me-1"></i>Clic en la leyenda para aislar series
                             </span>
                         </div>
-
                         <div class="card-body">
-                            <div id="msg-sin-datos-traz-boxplot" class="alert alert-light text-center border my-4 p-4 d-none">
-                                <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
-                                <p class="mb-0 text-muted">No hay pesajes clasificados en Verde, Amarillo o Rojo para calcular cuartiles en este período.</p>
+                            <div id="msg-sin-datos-traz-barras" class="alert alert-light text-center border my-4 p-4 d-none">
+                                <i class="fas fa-boxes fa-2x text-muted mb-2"></i>
+                                <p class="mb-0 text-muted">No se registraron lotes ingresados en el rango seleccionado.</p>
                             </div>
-                            <div id="echarts-traz-boxplot" style="width: 100%; height: 390px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NIVEL 4: TABLA DETALLADA DE AUDITORÍA DIARIA -->
-            <div class="row fade-in">
-                <div class="col-12">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-white border-bottom py-3">
-                            <h6 class="fw-bold text-dark mb-0">
-                                <i class="fas fa-table text-secondary me-2"></i>Detalle Cronológico de Recepción y Clasificación
-                            </h6>
-                            <small class="text-muted">Consolidado diario de lotes recibidos, pesos clasificados por bandera y tasa de aprovechamiento</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Fecha</th>
-                                            <th class="text-center">Lotes</th>
-                                            <th class="text-end">Peso Bruto (kg)</th>
-                                            <th class="text-end text-success">Útil Verde (kg)</th>
-                                            <th class="text-end text-warning">Revisión Amarillo (kg)</th>
-                                            <th class="text-end text-danger">Descarte Rojo (kg)</th>
-                                            <th class="text-end">Sin Clasif. / Merma</th>
-                                            <th class="text-center">% Aprov. Directo</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-traz-resumen-diario">
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">Cargando datos...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <div id="echarts-traz-bar-rotation" style="width: 100%; height: 480px;"></div>
                         </div>
                     </div>
                 </div>
@@ -305,10 +388,10 @@ const ReporteTrazResumenModulo = (function () {
                 return;
             }
 
-            consultarDatosCompletos(desde, hasta, idTipoMaterial);
+            consultarResumenKPIs(desde, hasta, idTipoMaterial);
         });
 
-        // Switch Diario vs Mensual (en memoria)
+        // Switch Diario vs Mensual (actualiza ambos gráficos en memoria)
         principal.off('click', '.btn-gran-traz-res').on('click', '.btn-gran-traz-res', function () {
             const nuevoModo = $(this).data('modo');
             if (nuevoModo === estado.granularidad) return;
@@ -317,19 +400,17 @@ const ReporteTrazResumenModulo = (function () {
             $('.btn-gran-traz-res').removeClass('btn-primary active').addClass('btn-outline-primary');
             $(this).removeClass('btn-outline-primary').addClass('btn-primary active');
 
-            renderizarGraficoEvolucion(estado.evolucionDiaria, estado.granularidad);
+            renderizarGraficoShareDataset(estado.evolucionDiaria, estado.granularidad);
+            renderizarGraficoBarRotation(estado.evolucionDiaria, estado.granularidad);
         });
 
         // Responsividad limpia para ECharts
         $(window).off('resize.trazResumen').on('resize.trazResumen', function () {
-            if (estado.chartEvolucion && !estado.chartEvolucion.isDisposed()) {
-                estado.chartEvolucion.resize();
+            if (estado.chartShareDataset && !estado.chartShareDataset.isDisposed()) {
+                estado.chartShareDataset.resize();
             }
-            if (estado.chartBalanceDona && !estado.chartBalanceDona.isDisposed()) {
-                estado.chartBalanceDona.resize();
-            }
-            if (estado.chartBoxplotSemaforo && !estado.chartBoxplotSemaforo.isDisposed()) {
-                estado.chartBoxplotSemaforo.resize();
+            if (estado.chartBarRotation && !estado.chartBarRotation.isDisposed()) {
+                estado.chartBarRotation.resize();
             }
         });
     };
@@ -362,56 +443,30 @@ const ReporteTrazResumenModulo = (function () {
         $('#btn-filtrar-traz-resumen').trigger('click');
     };
 
-    // 3. CONSULTA EN PARALELO A LA API
-    const consultarDatosCompletos = function (fechaDesde, fechaHasta, idTipoMaterial) {
+    // 3. CONSULTA ÚNICA A LA API (sp_ReporteTrazabilidad_ResumenKPIs)
+    const consultarResumenKPIs = function (fechaDesde, fechaHasta, idTipoMaterial) {
         const btn = $('#btn-filtrar-traz-resumen');
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Cargando...');
 
         const params = { fechaDesde: fechaDesde, fechaHasta: fechaHasta };
         if (idTipoMaterial) params.idTipoMaterial = idTipoMaterial;
 
-        const reqResumen = $.ajax({ type: "GET", url: URL_RESUMEN_KPIS, data: params });
-        const reqAuditoria = $.ajax({ type: "GET", url: URL_AUDITORIA_LOTES, data: params });
-
-        $.when(reqResumen, reqAuditoria)
-            .done(function (resSummary, resAudit) {
-                const dataResumen = resSummary[0] || {};
-                const dataAudit = resAudit[0] || {};
-
-                estado.kpis = dataResumen.Kpis || {};
-                estado.evolucionDiaria = dataResumen.EvolucionDiaria || [];
-
-                const lotes = dataAudit.Lotes || [];
-                const registrosUnitarios = [];
-
-                lotes.forEach(lote => {
-                    const hijos = lote.Clasificaciones || [];
-                    hijos.forEach(c => {
-                        registrosUnitarios.push({
-                            idClasificacion: c.IdClasificacion,
-                            idLote: lote.IdDetalleIngreso,
-                            origen: lote.NombreOrigen || 'Sin Origen',
-                            tipoMaterial: lote.TipoMaterial || 'Sin Tipo',
-                            subtipo: c.Subtipo || 'Sin Subtipo',
-                            pesoUtil: parseFloat(c.PesoUtil || 0),
-                            idEstadoMaterial: c.IdEstadoMaterial,
-                            semaforoEstado: c.SemaforoEstado,
-                            fecha: formatearFechaLegible(c.FechaClasificacion || lote.FechaIngreso, false),
-                            operador: c.OperadorClasificador || 'Sin Operador'
-                        });
-                    });
-                });
-
-                estado.clasificacionesIndividuales = registrosUnitarios;
+        $.ajax({
+            type: "GET",
+            url: URL_RESUMEN_KPIS,
+            data: params
+        })
+            .done(function (dataResumen) {
+                const res = dataResumen || {};
+                estado.kpis = res.Kpis || {};
+                estado.evolucionDiaria = res.EvolucionDiaria || [];
 
                 renderizarKPIs(estado.kpis);
-                renderizarGraficoEvolucion(estado.evolucionDiaria, estado.granularidad);
-                renderizarGraficoBalanceDona(estado.kpis);
-                renderizarGraficoBoxplot(estado.clasificacionesIndividuales);
-                renderizarTablaDiaria(estado.evolucionDiaria);
+                renderizarGraficoShareDataset(estado.evolucionDiaria, estado.granularidad);
+                renderizarGraficoBarRotation(estado.evolucionDiaria, estado.granularidad);
             })
             .fail(function (err) {
-                console.error("Error al obtener datos de Trazabilidad:", err);
+                console.error("Error al obtener ResumenKPIs de Trazabilidad:", err);
                 Swal.fire('Error de conexión', 'No se pudieron obtener los indicadores de trazabilidad desde el servidor.', 'error');
             })
             .always(function () {
@@ -419,37 +474,83 @@ const ReporteTrazResumenModulo = (function () {
             });
     };
 
-    // 4. RENDERIZADO DE TARJETAS KPI
+    // 4. RENDERIZADO DE LAS 3 BANDAS DE TARJETAS KPI
     const renderizarKPIs = function (k) {
-        $('#kpi-traz-bruto').text(`${formatearKg(k.TotalPesoBrutoKg)} kg`);
-        $('#kpi-traz-sub-lotes').text(
-            `${k.TotalLotesIngresados || 0} lotes (${k.LotesPorCamion || 0} camión / ${k.LotesParticulares || 0} part.)`
+        const bruto = parseFloat(k.TotalPesoBrutoKg || 0);
+        const verde = parseFloat(k.TotalPesoVerdeKg || 0);
+        const amarillo = parseFloat(k.TotalPesoAmarilloKg || 0);
+        const rojo = parseFloat(k.TotalPesoRojoKg || 0);
+        const sinClasif = parseFloat(k.DiferenciaSinClasificarKg || 0);
+        const egresado = parseFloat(k.TotalEgresadoPlantaKg || 0);
+        const balance = parseFloat(k.BalanceFlujoRecuperableKg || 0);
+
+        const pctVerde = parseFloat(k.PorcentajeAprovechamientoVerde || 0);
+        const pctRecuperable = parseFloat(k.PorcentajeRecuperableTotal || 0);
+        const pctAmarillo = bruto > 0 ? (amarillo * 100 / bruto) : 0;
+        const pctRojo = bruto > 0 ? (rojo * 100 / bruto) : 0;
+
+        // --- PARTE 1: Bruto y Porcentajes ---
+        $('#kpi-p1-bruto').text(`${formatearKg(bruto)} kg`);
+        $('#kpi-p1-sub-bruto').text(`Sin clasif. / merma: ${formatearKg(sinClasif)} kg`);
+
+        $('#kpi-p1-pct-verde').text(`${formatearPorcentaje(pctVerde)}%`);
+        $('#kpi-p1-sub-verde').text(`Recuperable total (V+A): ${formatearPorcentaje(pctRecuperable)}%`);
+
+        $('#kpi-p1-pct-amarillo').text(`${formatearPorcentaje(pctAmarillo)}%`);
+        $('#kpi-p1-pct-rojo').text(`${formatearPorcentaje(pctRojo)}%`);
+
+        // --- PARTE 2: Flujo de Planta y Descarte ---
+        $('#kpi-p2-egresado').text(`${formatearKg(egresado)} kg`);
+
+        const signoBalance = balance > 0 ? '+' : '';
+        $('#kpi-p2-balance').text(`${signoBalance}${formatearKg(balance)} kg`);
+
+        if (balance >= 0) {
+            $('#card-p2-balance').css({ 'background-color': '#d1fae5', 'border-color': '#059669' });
+            $('#lbl-p2-balance, #kpi-p2-balance').css('color', '#047857');
+            $('#icon-p2-balance').css({ 'background-color': 'rgba(5, 150, 105, 0.16)', 'color': '#047857' });
+            $('#kpi-p2-sub-balance').text('Acumulación neta de stock recuperable');
+        } else {
+            $('#card-p2-balance').css({ 'background-color': '#fef3c7', 'border-color': '#d97706' });
+            $('#lbl-p2-balance, #kpi-p2-balance').css('color', '#b45309');
+            $('#icon-p2-balance').css({ 'background-color': 'rgba(217, 119, 6, 0.16)', 'color': '#b45309' });
+            $('#kpi-p2-sub-balance').text('Despacho superior al ingreso del período');
+        }
+
+        $('#kpi-p2-rojo-descarte').text(`${formatearKg(rojo)} kg`);
+
+        // --- PARTE 3: Lotes y Pesos Físicos en kg ---
+        $('#kpi-p3-lotes').text(formatearEntero(k.TotalLotesIngresados));
+        $('#kpi-p3-sub-lotes').text(
+            `${k.LotesPorCamion || 0} camión / ${k.LotesParticulares || 0} particulares`
         );
 
-        $('#kpi-traz-verde').text(`${formatearKg(k.TotalPesoVerdeKg)} kg`);
-        $('#kpi-traz-sub-aprov').text(
-            `${formatearPorcentaje(k.PorcentajeAprovechamientoVerde)}% directo (${formatearPorcentaje(k.PorcentajeRecuperableTotal)}% incl. Amarillo)`
-        );
-
-        $('#kpi-traz-egresado').text(`${formatearKg(k.TotalEgresadoPlantaKg)} kg`);
-        $('#kpi-traz-sub-tiempo').text(
+        $('#kpi-p3-kg-verde').text(`${formatearKg(verde)} kg`);
+        $('#kpi-p3-sub-tiempo').text(
             `Tiempo medio clasif.: ${formatearPorcentaje(k.PromedioHorasClasificacion)} hs`
         );
 
-        $('#kpi-traz-sin-clasif').text(`${formatearKg(k.DiferenciaSinClasificarKg)} kg`);
-        $('#kpi-traz-sub-semaforo').text(
-            `Rojo: ${formatearKg(k.TotalPesoRojoKg)} kg | Amarillo: ${formatearKg(k.TotalPesoAmarilloKg)} kg`
-        );
+        $('#kpi-p3-kg-amarillo').text(`${formatearKg(amarillo)} kg`);
+        $('#kpi-p3-kg-rojo').text(`${formatearKg(rojo)} kg`);
     };
 
-    // 5. GRÁFICO 1: EVOLUCIÓN CRONOLÓGICA
-    const renderizarGraficoEvolucion = function (listaDiaria, granularidad) {
+    // 5. GRÁFICO 1: SHARE DATASET (TORTA ARRIBA + EVOLUCIÓN DE LÍNEAS ABAJO - SOLO MATERIAL REVISADO)
+    const renderizarGraficoShareDataset = function (listaDiaria, granularidad) {
         if (typeof echarts === 'undefined') return;
 
-        const dom = document.getElementById('echarts-traz-evolucion');
-        const msgSinDatos = $('#msg-sin-datos-traz-evolucion');
+        const dom = document.getElementById('echarts-traz-share-dataset');
+        const msgSinDatos = $('#msg-sin-datos-traz-share');
 
-        if (!listaDiaria || listaDiaria.length === 0) {
+        // Solo incluimos períodos que tengan recepción bruta y material ya revisado/clasificado
+        const conRevisados = (listaDiaria || []).filter(d => {
+            const bruto = parseFloat(d.PesoBrutoKg || 0);
+            const clasificado = parseFloat(d.PesoVerdeKg || 0)
+                + parseFloat(d.PesoAmarilloKg || 0)
+                + parseFloat(d.PesoRojoKg || 0);
+            return bruto > 0 && clasificado > 0;
+        });
+
+        if (conRevisados.length === 0) {
             $(dom).addClass('d-none');
             msgSinDatos.removeClass('d-none');
             return;
@@ -458,7 +559,7 @@ const ReporteTrazResumenModulo = (function () {
         msgSinDatos.addClass('d-none');
         $(dom).removeClass('d-none');
 
-        const agrupado = listaDiaria.reduce((acc, item) => {
+        const agrupado = conRevisados.reduce((acc, item) => {
             const fechaIso = extraerFechaIso(item.Fecha);
             const clave = granularidad === 'mensual' ? fechaIso.substring(0, 7) : fechaIso;
 
@@ -473,439 +574,431 @@ const ReporteTrazResumenModulo = (function () {
         }, {});
 
         const clavesOrdenadas = Object.keys(agrupado).sort();
-        const etiquetasEjeX = clavesOrdenadas.map(c =>
-            granularidad === 'mensual' ? formatearMesLegible(c) : formatearFechaLegible(c, true)
-        );
 
-        const serieBruto = clavesOrdenadas.map(c => Number(agrupado[c].bruto.toFixed(2)));
-        const serieVerde = clavesOrdenadas.map(c => Number(agrupado[c].verde.toFixed(2)));
-        const serieAmarillo = clavesOrdenadas.map(c => Number(agrupado[c].amarillo.toFixed(2)));
-        const serieRojo = clavesOrdenadas.map(c => Number(agrupado[c].rojo.toFixed(2)));
+        const filaFechas = ['Periodo'];
+        const filaPctVerde = ['% Útil (Verde)'];
+        const filaPctAmarillo = ['% Revisión (Amarillo)'];
+        const filaPctRojo = ['% Descarte (Rojo)'];
 
-        if (!estado.chartEvolucion || estado.chartEvolucion.isDisposed()) {
-            estado.chartEvolucion = echarts.init(dom);
+        const detalleKgPorColumna = {};
+
+        clavesOrdenadas.forEach((clave, idx) => {
+            const etiqueta = granularidad === 'mensual'
+                ? formatearMesLegible(clave)
+                : formatearFechaLegible(clave, true);
+
+            const d = agrupado[clave];
+            const revisadoKg = d.verde + d.amarillo + d.rojo;
+
+            const pctV = d.bruto > 0 ? Number(((d.verde * 100) / d.bruto).toFixed(2)) : 0;
+            const pctA = d.bruto > 0 ? Number(((d.amarillo * 100) / d.bruto).toFixed(2)) : 0;
+            const pctR = d.bruto > 0 ? Number(((d.rojo * 100) / d.bruto).toFixed(2)) : 0;
+
+            filaFechas.push(etiqueta);
+            filaPctVerde.push(pctV);
+            filaPctAmarillo.push(pctA);
+            filaPctRojo.push(pctR);
+
+            detalleKgPorColumna[idx + 1] = {
+                etiqueta: etiqueta,
+                brutoKg: d.bruto,
+                revisadoKg: revisadoKg
+            };
+        });
+
+        const datasetSource = [
+            filaFechas,
+            filaPctVerde,
+            filaPctAmarillo,
+            filaPctRojo
+        ];
+
+        const ultimaDimension = clavesOrdenadas.length;
+
+        if (!estado.chartShareDataset || estado.chartShareDataset.isDisposed()) {
+            estado.chartShareDataset = echarts.init(dom);
+        } else {
+            estado.chartShareDataset.off('updateAxisPointer');
         }
 
         const option = {
+            color: ['#198754', '#ffc107', '#dc3545'],
+            legend: {
+                top: 4,
+                left: 'center'
+            },
             tooltip: {
                 trigger: 'axis',
-                axisPointer: { type: 'shadow' }
-            },
-            legend: {
-                top: 0,
-                data: ['Bruto Ingresado', 'Útil (Verde)', 'Revisión (Amarillo)', 'Descarte (Rojo)']
+                showContent: true,
+                formatter: function (params) {
+                    if (!params || params.length === 0) return '';
+                    const colIdx = params[0].dataIndex + 1;
+                    const info = detalleKgPorColumna[colIdx];
+                    let html = `<strong>${params[0].axisValue}</strong>`;
+                    if (info) {
+                        html += `<br/><span class="text-muted small">Bruto: <strong>${formatearKg(info.brutoKg)} kg</strong> | Revisado: <strong>${formatearKg(info.revisadoKg)} kg</strong></span><hr class="my-1"/>`;
+                    }
+                    params.forEach(p => {
+                        if (p.seriesType === 'line') {
+                            const valPct = Array.isArray(p.data) ? p.data[colIdx] : p.value;
+                            html += `${p.marker} ${p.seriesName}: <strong>${formatearPorcentaje(valPct)}%</strong><br/>`;
+                        }
+                    });
+                    return html;
+                }
             },
             toolbox: {
                 show: true,
-                right: 10,
+                right: 12,
                 feature: {
                     saveAsImage: { show: true, title: 'Descargar PNG' }
                 }
             },
-            grid: {
-                top: 48,
-                bottom: 30,
-                left: '3%',
-                right: '3%',
-                containLabel: true
+            dataset: {
+                source: datasetSource
             },
             xAxis: {
                 type: 'category',
-                data: etiquetasEjeX,
+                boundaryGap: false,
                 axisLabel: { fontWeight: 'bold' }
             },
             yAxis: {
                 type: 'value',
-                name: 'Kilogramos (kg)',
+                name: '% sobre Bruto',
+                min: 0,
+                max: 100,
                 axisLabel: {
-                    formatter: val => val.toLocaleString('es-AR') + ' kg'
-                }
-            },
-            series: [
-                {
-                    name: 'Bruto Ingresado',
-                    type: 'bar',
-                    barMaxWidth: 42,
-                    itemStyle: { color: 'rgba(13, 110, 253, 0.75)', borderRadius: [5, 5, 0, 0] },
-                    data: serieBruto
-                },
-                {
-                    name: 'Útil (Verde)',
-                    type: 'line',
-                    smooth: true,
-                    symbolSize: 8,
-                    itemStyle: { color: '#198754' },
-                    lineStyle: { width: 3 },
-                    areaStyle: { color: 'rgba(25, 135, 84, 0.12)' },
-                    data: serieVerde
-                },
-                {
-                    name: 'Revisión (Amarillo)',
-                    type: 'line',
-                    smooth: true,
-                    symbolSize: 7,
-                    itemStyle: { color: '#ffc107' },
-                    lineStyle: { width: 2, type: 'dashed' },
-                    data: serieAmarillo
-                },
-                {
-                    name: 'Descarte (Rojo)',
-                    type: 'line',
-                    smooth: true,
-                    symbolSize: 7,
-                    itemStyle: { color: '#dc3545' },
-                    lineStyle: { width: 2 },
-                    data: serieRojo
-                }
-            ]
-        };
-
-        estado.chartEvolucion.setOption(option, true);
-    };
-
-    // 6. GRÁFICO 2: DONA DE BALANCE DE MASA
-    const renderizarGraficoBalanceDona = function (k) {
-        if (typeof echarts === 'undefined') return;
-
-        const dom = document.getElementById('echarts-traz-balance-dona');
-        const msgSinDatos = $('#msg-sin-datos-traz-dona');
-        const totalBruto = parseFloat(k.TotalPesoBrutoKg || 0);
-
-        if (totalBruto <= 0) {
-            $(dom).addClass('d-none');
-            msgSinDatos.removeClass('d-none');
-            return;
-        }
-
-        msgSinDatos.addClass('d-none');
-        $(dom).removeClass('d-none');
-
-        if (!estado.chartBalanceDona || estado.chartBalanceDona.isDisposed()) {
-            estado.chartBalanceDona = echarts.init(dom);
-        }
-
-        const verde = Number(parseFloat(k.TotalPesoVerdeKg || 0).toFixed(2));
-        const amarillo = Number(parseFloat(k.TotalPesoAmarilloKg || 0).toFixed(2));
-        const rojo = Number(parseFloat(k.TotalPesoRojoKg || 0).toFixed(2));
-        const sinClasif = Number(Math.max(0, parseFloat(k.DiferenciaSinClasificarKg || 0)).toFixed(2));
-
-        const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: function (p) {
-                    return `<strong>${p.name}</strong><br/>Masa: <strong>${formatearKg(p.value)} kg</strong> (${p.percent}%)`;
-                }
-            },
-            legend: {
-                bottom: 0,
-                left: 'center'
-            },
-            toolbox: {
-                show: true,
-                right: 10,
-                feature: {
-                    saveAsImage: { show: true, title: 'Descargar PNG' }
-                }
-            },
-            series: [
-                {
-                    name: 'Balance de Masa',
-                    type: 'pie',
-                    radius: ['44%', '70%'],
-                    center: ['50%', '45%'],
-                    avoidLabelOverlap: true,
-                    itemStyle: {
-                        borderRadius: 6,
-                        borderColor: '#fff',
-                        borderWidth: 2
-                    },
-                    label: {
-                        formatter: '{d}%',
-                        fontWeight: 'bold'
-                    },
-                    data: [
-                        { value: verde, name: 'Útil Directo (Verde)', itemStyle: { color: '#198754' } },
-                        { value: amarillo, name: 'Revisión (Amarillo)', itemStyle: { color: '#ffc107' } },
-                        { value: rojo, name: 'Descarte (Rojo)', itemStyle: { color: '#dc3545' } },
-                        { value: sinClasif, name: 'Sin Clasif. / Merma', itemStyle: { color: '#6c757d' } }
-                    ]
-                }
-            ]
-        };
-
-        estado.chartBalanceDona.setOption(option, true);
-    };
-
-    // 7. GRÁFICO 3: DIAGRAMA DE CAJA Y BIGOTES (BOXPLOT + OUTLIERS) EN JS PURO
-    const calcularCuartil = function (ordenados, q) {
-        const pos = (ordenados.length - 1) * q;
-        const base = Math.floor(pos);
-        const resto = pos - base;
-        if (ordenados[base + 1] !== undefined) {
-            return ordenados[base] + resto * (ordenados[base + 1] - ordenados[base]);
-        }
-        return ordenados[base];
-    };
-
-    const procesarGrupoBoxplot = function (registrosGrupo, indiceCategoria, nombreCategoria, colorHex, colorFill) {
-        if (!registrosGrupo || registrosGrupo.length === 0) {
-            return { boxData: null, outliers: [] };
-        }
-
-        const ordenados = [...registrosGrupo].sort((a, b) => a.pesoUtil - b.pesoUtil);
-        const valores = ordenados.map(r => r.pesoUtil);
-        const n = valores.length;
-
-        const q1 = calcularCuartil(valores, 0.25);
-        const mediana = calcularCuartil(valores, 0.50);
-        const q3 = calcularCuartil(valores, 0.75);
-        const iqr = q3 - q1;
-
-        const limiteInf = q1 - 1.5 * iqr;
-        const limiteSup = q3 + 1.5 * iqr;
-
-        const normales = valores.filter(v => v >= limiteInf && v <= limiteSup);
-        const minBigote = normales.length > 0 ? Math.min(...normales) : valores[0];
-        const maxBigote = normales.length > 0 ? Math.max(...normales) : valores[n - 1];
-
-        const suma = valores.reduce((acc, v) => acc + v, 0);
-        const promedio = suma / n;
-
-        // Detectamos pesajes atípicos (outliers) fuera de los bigotes
-        const outliers = ordenados
-            .filter(r => r.pesoUtil < limiteInf || r.pesoUtil > limiteSup)
-            .map(r => ({
-                value: [indiceCategoria, Number(r.pesoUtil.toFixed(2))],
-                categoria: nombreCategoria,
-                idClasificacion: r.idClasificacion,
-                idLote: r.idLote,
-                subtipo: r.subtipo,
-                origen: r.origen,
-                fecha: r.fecha,
-                itemStyle: {
-                    color: colorHex,
-                    borderColor: '#212529',
-                    borderWidth: 1.5
-                }
-            }));
-
-        return {
-            boxData: {
-                value: [
-                    Number(minBigote.toFixed(2)),
-                    Number(q1.toFixed(2)),
-                    Number(mediana.toFixed(2)),
-                    Number(q3.toFixed(2)),
-                    Number(maxBigote.toFixed(2))
-                ],
-                nombreCategoria: nombreCategoria,
-                n: n,
-                promedio: Number(promedio.toFixed(2)),
-                totalKg: Number(suma.toFixed(2)),
-                minAbs: Number(valores[0].toFixed(2)),
-                maxAbs: Number(valores[n - 1].toFixed(2)),
-                itemStyle: {
-                    color: colorFill,
-                    borderColor: colorHex,
-                    borderWidth: 2.5
-                }
-            },
-            outliers: outliers
-        };
-    };
-
-    const renderizarGraficoBoxplot = function (listaUnitaria) {
-        if (typeof echarts === 'undefined') return;
-
-        const dom = document.getElementById('echarts-traz-boxplot');
-        const msgSinDatos = $('#msg-sin-datos-traz-boxplot');
-
-        const validos = (listaUnitaria || []).filter(r => parseFloat(r.pesoUtil || 0) > 0);
-
-        if (validos.length === 0) {
-            $(dom).addClass('d-none');
-            msgSinDatos.removeClass('d-none');
-            $('#subtitulo-boxplot-semaforo').text('Sin registros individuales de clasificación en este rango.');
-            return;
-        }
-
-        msgSinDatos.addClass('d-none');
-        $(dom).removeClass('d-none');
-
-        const gruposConfig = [
-            { id: 1, nombre: 'Útil (Verde)', borde: '#198754', relleno: 'rgba(25, 135, 84, 0.25)' },
-            { id: 2, nombre: 'Revisión (Amarillo)', borde: '#e0a800', relleno: 'rgba(255, 193, 7, 0.30)' },
-            { id: 3, nombre: 'Descarte (Rojo)', borde: '#dc3545', relleno: 'rgba(220, 53, 69, 0.25)' }
-        ];
-
-        const categorias = gruposConfig.map(g => g.nombre);
-        const seriesBoxplot = [];
-        let todosOutliers = [];
-
-        gruposConfig.forEach((g, idx) => {
-            const regsGrupo = validos.filter(r => r.idEstadoMaterial === g.id);
-            const resultado = procesarGrupoBoxplot(regsGrupo, idx, g.nombre, g.borde, g.relleno);
-
-            if (resultado.boxData) {
-                seriesBoxplot.push(resultado.boxData);
-            } else {
-                // Si una categoría no tiene pesajes en el período, ponemos caja vacía en 0
-                seriesBoxplot.push({
-                    value: [0, 0, 0, 0, 0],
-                    nombreCategoria: g.nombre,
-                    n: 0,
-                    promedio: 0,
-                    totalKg: 0,
-                    minAbs: 0,
-                    maxAbs: 0,
-                    itemStyle: { color: g.relleno, borderColor: g.borde, borderWidth: 1.5 }
-                });
-            }
-
-            todosOutliers = todosOutliers.concat(resultado.outliers);
-        });
-
-        $('#subtitulo-boxplot-semaforo').text(
-            `Distribución estadística calculada sobre ${validos.length} pesajes individuales (${todosOutliers.length} atípicos detectados)`
-        );
-
-        if (!estado.chartBoxplotSemaforo || estado.chartBoxplotSemaforo.isDisposed()) {
-            estado.chartBoxplotSemaforo = echarts.init(dom);
-        }
-
-        const option = {
-            tooltip: {
-                trigger: 'item',
-                axisPointer: { type: 'shadow' },
-                formatter: function (p) {
-                    if (p.seriesType === 'boxplot') {
-                        const d = p.data;
-                        const [minB, q1, med, q3, maxB] = d.value;
-                        if (d.n === 0) {
-                            return `<strong>${d.nombreCategoria}</strong><br/>Sin pesajes registrados en este período.`;
-                        }
-                        return `
-                            <strong>${d.nombreCategoria}</strong> (${d.n} pesajes)<br/>
-                            <hr class="my-1"/>
-                            Bigote Máximo: <strong>${formatearKg(maxB)} kg</strong><br/>
-                            Cuartil 3 (Q3 - 75%): <strong>${formatearKg(q3)} kg</strong><br/>
-                            <span style="color:#0d6efd;">Mediana (Q2 - 50%): <strong>${formatearKg(med)} kg</strong></span><br/>
-                            Cuartil 1 (Q1 - 25%): <strong>${formatearKg(q1)} kg</strong><br/>
-                            Bigote Mínimo: <strong>${formatearKg(minB)} kg</strong><br/>
-                            <hr class="my-1"/>
-                            <small class="text-muted">Promedio: <strong>${formatearKg(d.promedio)} kg</strong> | Total: <strong>${formatearKg(d.totalKg)} kg</strong></small>
-                        `;
-                    } else {
-                        const o = p.data;
-                        return `
-                            <span class="badge bg-dark mb-1">Valor Atípico (Outlier)</span><br/>
-                            <strong>${o.categoria} — Pesaje #${o.idClasificacion}</strong><br/>
-                            Subtipo: <strong>${o.subtipo}</strong><br/>
-                            Peso Registrado: <strong>${formatearKg(o.value[1])} kg</strong><br/>
-                            <small class="text-muted">Lote #${o.idLote} (${o.fecha}) — ${o.origen}</small>
-                        `;
-                    }
-                }
-            },
-            toolbox: {
-                show: true,
-                right: 15,
-                feature: {
-                    saveAsImage: { show: true, title: 'Descargar PNG' }
-                }
-            },
-            grid: {
-                top: 40,
-                bottom: 35,
-                left: '4%',
-                right: '4%',
-                containLabel: true
-            },
-            xAxis: {
-                type: 'category',
-                data: categorias,
-                boundaryGap: true,
-                axisLabel: {
-                    fontWeight: 'bold',
-                    fontSize: 13,
-                    color: '#212529'
-                },
-                splitLine: { show: false }
-            },
-            yAxis: {
-                type: 'value',
-                name: 'Peso por Pesaje (kg)',
-                nameTextStyle: { fontWeight: 'bold' },
-                axisLabel: {
-                    formatter: val => val.toLocaleString('es-AR') + ' kg'
+                    formatter: '{value}%'
                 },
                 splitLine: {
                     lineStyle: { type: 'dashed', color: '#e9ecef' }
                 }
             },
+            // Gráfico de líneas en la mitad inferior (ancho completo)
+            grid: {
+                top: '52%',
+                left: '4%',
+                right: '4%',
+                bottom: '7%',
+                containLabel: true
+            },
             series: [
                 {
-                    name: 'Distribución Cuartiles',
-                    type: 'boxplot',
-                    boxWidth: ['22%', '38%'],
-                    data: seriesBoxplot
+                    type: 'line',
+                    smooth: true,
+                    seriesLayoutBy: 'row',
+                    symbolSize: 7,
+                    lineStyle: { width: 3 },
+                    areaStyle: { opacity: 0.12 },
+                    emphasis: { focus: 'series' }
                 },
                 {
-                    name: 'Pesajes Atípicos',
-                    type: 'scatter',
-                    symbolSize: 11,
-                    data: todosOutliers
+                    type: 'line',
+                    smooth: true,
+                    seriesLayoutBy: 'row',
+                    symbolSize: 7,
+                    lineStyle: { width: 2.5 },
+                    emphasis: { focus: 'series' }
+                },
+                {
+                    type: 'line',
+                    smooth: true,
+                    seriesLayoutBy: 'row',
+                    symbolSize: 7,
+                    lineStyle: { width: 2.5 },
+                    emphasis: { focus: 'series' }
+                },
+                // Gráfico de torta en la mitad superior
+                {
+                    type: 'pie',
+                    id: 'pie-traz-share',
+                    radius: ['20%', '35%'],
+                    center: ['50%', '26%'],
+                    emphasis: {
+                        focus: 'self'
+                    },
+                    itemStyle: {
+                        borderRadius: 5,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        formatter: '{b}: {@[' + ultimaDimension + ']}%',
+                        fontWeight: 'bold',
+                        fontSize: 12
+                    },
+                    encode: {
+                        itemName: 'Periodo',
+                        value: ultimaDimension,
+                        tooltip: ultimaDimension
+                    }
                 }
             ]
         };
 
-        estado.chartBoxplotSemaforo.setOption(option, true);
+        estado.chartShareDataset.setOption(option, true);
+
+        estado.chartShareDataset.on('updateAxisPointer', function (event) {
+            const xAxisInfo = event.axesInfo && event.axesInfo[0];
+            if (xAxisInfo) {
+                const dimension = xAxisInfo.value + 1;
+                estado.chartShareDataset.setOption({
+                    series: {
+                        id: 'pie-traz-share',
+                        label: {
+                            formatter: '{b}: {@[' + dimension + ']}%'
+                        },
+                        encode: {
+                            value: dimension,
+                            tooltip: dimension
+                        }
+                    }
+                });
+            }
+        });
     };
 
-    // 8. TABLA DE AUDITORÍA DIARIA
-    const renderizarTablaDiaria = function (listaDiaria) {
-        const tbody = $('#tbody-traz-resumen-diario').empty();
+    // 6. GRÁFICO 2: BAR LABEL ROTATION (CRUCE DE LOTES Y CLASIFICACIÓN RS2 - SIN EGRESOS)
+    const renderizarGraficoBarRotation = function (listaDiaria, granularidad) {
+        if (typeof echarts === 'undefined') return;
 
-        if (!listaDiaria || listaDiaria.length === 0) {
-            tbody.html(`
-                <tr>
-                    <td colspan="8" class="text-center text-muted py-4">
-                        <i class="fas fa-folder-open me-2"></i>No se encontraron movimientos en el período seleccionado.
-                    </td>
-                </tr>
-            `);
+        const dom = document.getElementById('echarts-traz-bar-rotation');
+        const msgSinDatos = $('#msg-sin-datos-traz-barras');
+
+        // Excluimos fechas que solo tuvieron salidas de planta (sin lotes ni ingresos)
+        const conRecepcion = (listaDiaria || []).filter(item => {
+            return parseInt(item.CantLotes || 0, 10) > 0
+                || parseFloat(item.PesoBrutoKg || 0) > 0
+                || parseFloat(item.PesoVerdeKg || 0) > 0
+                || parseFloat(item.PesoAmarilloKg || 0) > 0
+                || parseFloat(item.PesoRojoKg || 0) > 0;
+        });
+
+        if (conRecepcion.length === 0) {
+            $(dom).addClass('d-none');
+            msgSinDatos.removeClass('d-none');
             return;
         }
 
-        const ordenadaDesc = [...listaDiaria].reverse();
+        msgSinDatos.addClass('d-none');
+        $(dom).removeClass('d-none');
 
-        ordenadaDesc.forEach(reg => {
-            const bruto = parseFloat(reg.PesoBrutoKg || 0);
-            const verde = parseFloat(reg.PesoVerdeKg || 0);
-            const amarillo = parseFloat(reg.PesoAmarilloKg || 0);
-            const rojo = parseFloat(reg.PesoRojoKg || 0);
-            const diff = bruto - (verde + amarillo + rojo);
-            const pctAprov = bruto > 0 ? (verde * 100 / bruto) : 0;
+        const agrupado = conRecepcion.reduce((acc, item) => {
+            const fechaIso = extraerFechaIso(item.Fecha);
+            const clave = granularidad === 'mensual' ? fechaIso.substring(0, 7) : fechaIso;
 
-            const badgeClase = pctAprov >= 70
-                ? 'bg-success bg-opacity-10 text-success border border-success'
-                : (pctAprov >= 40
-                    ? 'bg-warning bg-opacity-10 text-dark border border-warning'
-                    : 'bg-secondary bg-opacity-10 text-secondary border');
+            if (!acc[clave]) {
+                acc[clave] = {
+                    lotes: 0,
+                    bruto: 0,
+                    verde: 0,
+                    amarillo: 0,
+                    rojo: 0
+                };
+            }
+            acc[clave].lotes += parseInt(item.CantLotes || 0, 10);
+            acc[clave].bruto += parseFloat(item.PesoBrutoKg || 0);
+            acc[clave].verde += parseFloat(item.PesoVerdeKg || 0);
+            acc[clave].amarillo += parseFloat(item.PesoAmarilloKg || 0);
+            acc[clave].rojo += parseFloat(item.PesoRojoKg || 0);
+            return acc;
+        }, {});
 
-            tbody.append(`
-                <tr>
-                    <td class="fw-bold">${formatearFechaLegible(reg.Fecha, false)}</td>
-                    <td class="text-center"><span class="badge bg-light text-dark border">${reg.CantLotes}</span></td>
-                    <td class="text-end fw-semibold">${formatearKg(bruto)} kg</td>
-                    <td class="text-end text-success fw-semibold">${formatearKg(verde)} kg</td>
-                    <td class="text-end text-warning fw-semibold">${formatearKg(amarillo)} kg</td>
-                    <td class="text-end text-danger fw-semibold">${formatearKg(rojo)} kg</td>
-                    <td class="text-end text-muted">${formatearKg(diff)} kg</td>
-                    <td class="text-center"><span class="badge ${badgeClase}">${formatearPorcentaje(pctAprov)}%</span></td>
-                </tr>
-            `);
-        });
+        const clavesOrdenadas = Object.keys(agrupado).sort();
+        const etiquetasX = clavesOrdenadas.map(c =>
+            granularidad === 'mensual' ? formatearMesLegible(c) : formatearFechaLegible(c, true)
+        );
+
+        const serieLotes = clavesOrdenadas.map(c => agrupado[c].lotes);
+        const serieBruto = clavesOrdenadas.map(c => Number(agrupado[c].bruto.toFixed(2)));
+        const serieVerde = clavesOrdenadas.map(c => Number(agrupado[c].verde.toFixed(2)));
+        const serieAmarillo = clavesOrdenadas.map(c => Number(agrupado[c].amarillo.toFixed(2)));
+        const serieRojo = clavesOrdenadas.map(c => Number(agrupado[c].rojo.toFixed(2)));
+
+        if (!estado.chartBarRotation || estado.chartBarRotation.isDisposed()) {
+            estado.chartBarRotation = echarts.init(dom);
+        }
+
+        const labelOptionKg = {
+            show: true,
+            rotate: 90,
+            align: 'left',
+            verticalAlign: 'middle',
+            position: 'insideBottom',
+            distance: 10,
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#212529',
+            formatter: function (params) {
+                if (!params.value || params.value <= 0) return '';
+                return `${formatearEntero(params.value)} kg  ${params.seriesName}`;
+            }
+        };
+
+        const labelOptionLotes = {
+            show: true,
+            rotate: 90,
+            align: 'left',
+            verticalAlign: 'middle',
+            position: 'insideBottom',
+            distance: 10,
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#0c4a6e',
+            formatter: function (params) {
+                if (!params.value || params.value <= 0) return '';
+                return `${params.value} lotes  ${params.seriesName}`;
+            }
+        };
+
+        const mostrarZoom = clavesOrdenadas.length > 8;
+        const porcentajeInicioZoom = mostrarZoom
+            ? Math.max(0, Math.round(((clavesOrdenadas.length - 8) / clavesOrdenadas.length) * 100))
+            : 0;
+
+        const option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: function (params) {
+                    if (!params || params.length === 0) return '';
+                    let html = `<strong>${params[0].axisValue}</strong><hr class="my-1"/>`;
+                    params.forEach(p => {
+                        const esLote = p.seriesName === 'Cant. Lotes';
+                        const valorFmt = esLote
+                            ? `${formatearEntero(p.value)} lotes`
+                            : `${formatearKg(p.value)} kg`;
+                        html += `${p.marker} ${p.seriesName}: <strong>${valorFmt}</strong><br/>`;
+                    });
+                    return html;
+                }
+            },
+            legend: {
+                top: 4,
+                data: [
+                    'Cant. Lotes',
+                    'Bruto Ingresado',
+                    'Útil (Verde)',
+                    'Revisión (Amarillo)',
+                    'Descarte (Rojo)'
+                ]
+            },
+            toolbox: {
+                show: true,
+                orient: 'vertical',
+                left: 'right',
+                top: 'center',
+                feature: {
+                    mark: { show: true },
+                    magicType: { show: true, type: ['line', 'bar', 'stack'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true, title: 'Descargar PNG' }
+                }
+            },
+            dataZoom: mostrarZoom ? [
+                {
+                    type: 'slider',
+                    show: true,
+                    start: porcentajeInicioZoom,
+                    end: 100,
+                    height: 20,
+                    bottom: 6
+                },
+                {
+                    type: 'inside',
+                    start: porcentajeInicioZoom,
+                    end: 100
+                }
+            ] : [],
+            grid: {
+                top: 52,
+                left: '4%',
+                right: '6%',
+                bottom: mostrarZoom ? 52 : 30,
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisTick: { show: false },
+                    data: etiquetasX,
+                    axisLabel: { fontWeight: 'bold' }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Masa (kg)',
+                    position: 'left',
+                    axisLabel: {
+                        formatter: val => formatearEntero(val) + ' kg'
+                    },
+                    splitLine: {
+                        lineStyle: { type: 'dashed', color: '#e9ecef' }
+                    }
+                },
+                {
+                    type: 'value',
+                    name: 'Lotes',
+                    position: 'right',
+                    minInterval: 1,
+                    axisLabel: {
+                        formatter: '{value} u.'
+                    },
+                    splitLine: { show: false }
+                }
+            ],
+            series: [
+                {
+                    name: 'Cant. Lotes',
+                    type: 'bar',
+                    yAxisIndex: 1,
+                    barGap: '15%',
+                    itemStyle: { color: '#38bdf8', borderRadius: [4, 4, 0, 0] },
+                    label: labelOptionLotes,
+                    emphasis: { focus: 'series' },
+                    data: serieLotes
+                },
+                {
+                    name: 'Bruto Ingresado',
+                    type: 'bar',
+                    yAxisIndex: 0,
+                    itemStyle: { color: '#0d6efd', borderRadius: [4, 4, 0, 0] },
+                    label: labelOptionKg,
+                    emphasis: { focus: 'series' },
+                    data: serieBruto
+                },
+                {
+                    name: 'Útil (Verde)',
+                    type: 'bar',
+                    yAxisIndex: 0,
+                    itemStyle: { color: '#198754', borderRadius: [4, 4, 0, 0] },
+                    label: labelOptionKg,
+                    emphasis: { focus: 'series' },
+                    data: serieVerde
+                },
+                {
+                    name: 'Revisión (Amarillo)',
+                    type: 'bar',
+                    yAxisIndex: 0,
+                    itemStyle: { color: '#ffc107', borderRadius: [4, 4, 0, 0] },
+                    label: labelOptionKg,
+                    emphasis: { focus: 'series' },
+                    data: serieAmarillo
+                },
+                {
+                    name: 'Descarte (Rojo)',
+                    type: 'bar',
+                    yAxisIndex: 0,
+                    itemStyle: { color: '#dc3545', borderRadius: [4, 4, 0, 0] },
+                    label: labelOptionKg,
+                    emphasis: { focus: 'series' },
+                    data: serieRojo
+                }
+            ]
+        };
+
+        estado.chartBarRotation.setOption(option, true);
     };
 
     // API Pública del Módulo
@@ -913,5 +1006,4 @@ const ReporteTrazResumenModulo = (function () {
         cargarEn: inicializar
     };
 })();
-
 

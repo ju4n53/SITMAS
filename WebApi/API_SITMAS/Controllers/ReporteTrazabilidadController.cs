@@ -18,6 +18,9 @@ namespace API_SITMAS.Controllers
             if (fechaDesde.HasValue && fechaHasta.HasValue && fechaDesde.Value.Date > fechaHasta.Value.Date)
                 return BadRequest("La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.");
 
+            if (idTipoMaterial.HasValue && idTipoMaterial.Value <= 0)
+                return BadRequest("El identificador del tipo de material debe ser mayor a cero.");
+
             try
             {
                 var data = await _repo.ObtenerResumenKPIsAsync(fechaDesde, fechaHasta, idTipoMaterial);
@@ -29,17 +32,20 @@ namespace API_SITMAS.Controllers
             }
         }
 
-        // GET: api/ReportesTrazabilidad/PorMaterial?fechaDesde=2026-10-01&fechaHasta=2026-11-19
+        // GET: api/ReportesTrazabilidad/PorMaterial?fechaDesde=2026-10-01&fechaHasta=2026-11-19&idTipoMaterial=1
         [HttpGet]
         [Route("PorMaterial")]
-        public async Task<IHttpActionResult> GetPorMaterial(DateTime? fechaDesde = null, DateTime? fechaHasta = null)
+        public async Task<IHttpActionResult> GetPorMaterial(DateTime? fechaDesde = null, DateTime? fechaHasta = null, int? idTipoMaterial = null)
         {
             if (fechaDesde.HasValue && fechaHasta.HasValue && fechaDesde.Value.Date > fechaHasta.Value.Date)
                 return BadRequest("La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.");
 
+            if (idTipoMaterial.HasValue && idTipoMaterial.Value < 0)
+                return BadRequest("El identificador del tipo de material no puede ser negativo.");
+
             try
             {
-                var data = await _repo.ObtenerPorMaterialAsync(fechaDesde, fechaHasta);
+                var data = await _repo.ObtenerPorMaterialAsync(fechaDesde, fechaHasta, idTipoMaterial);
                 return Ok(data);
             }
             catch (Exception ex)

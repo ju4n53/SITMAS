@@ -22,17 +22,19 @@ namespace API_SITMAS.Models
         public decimal PorcentajeAprovechamientoVerde { get; set; }
         public decimal PorcentajeRecuperableTotal { get; set; }
         public decimal TotalEgresadoPlantaKg { get; set; }
+        public decimal BalanceFlujoRecuperableKg { get; set; } // Nuevo: (Verde + Amarillo) - Egresado
         public decimal PromedioHorasClasificacion { get; set; }
     }
 
     public class TrazabilidadEvolucionDiariaDTO
     {
-        public DateTime Fecha { get; set; }
+        public DateTime? Fecha { get; set; } // Nullable para evitar DateTime.MinValue en ECharts
         public int CantLotes { get; set; }
         public decimal PesoBrutoKg { get; set; }
         public decimal PesoVerdeKg { get; set; }
         public decimal PesoAmarilloKg { get; set; }
         public decimal PesoRojoKg { get; set; }
+        public decimal PesoEgresadoKg { get; set; } // Nuevo: Flujo diario de salidas de planta
     }
 
     public class TrazabilidadResumenResponseDTO
@@ -253,12 +255,13 @@ namespace API_SITMAS.Models
         private readonly string _connectionString = ConfigurationManager.ConnectionStrings["CadenaSITMAS"].ConnectionString;
 
         // 1. Resumen KPIs y Evolución Diaria
+        // 1. Resumen KPIs y Evolución Diaria (Flujo Entradas/Recuperación vs. Salidas)
         public async Task<TrazabilidadResumenResponseDTO> ObtenerResumenKPIsAsync(DateTime? fechaDesde, DateTime? fechaHasta, int? idTipoMaterial)
         {
             var resultado = new TrazabilidadResumenResponseDTO();
 
             using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_ReporteTrazabilidad_ResumenKPIs", conn))
+            using (var cmd = new SqlCommand("dbo.sp_ReporteTrazabilidad_ResumenKPIs", conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 AddParamNullable(cmd, "@FechaDesde", SqlDbType.Date, fechaDesde?.Date);
@@ -284,23 +287,25 @@ namespace API_SITMAS.Models
                             PorcentajeAprovechamientoVerde = GetDecimal(reader, "PorcentajeAprovechamientoVerde"),
                             PorcentajeRecuperableTotal = GetDecimal(reader, "PorcentajeRecuperableTotal"),
                             TotalEgresadoPlantaKg = GetDecimal(reader, "TotalEgresadoPlantaKg"),
+                            BalanceFlujoRecuperableKg = GetDecimal(reader, "BalanceFlujoRecuperableKg"),
                             PromedioHorasClasificacion = GetDecimal(reader, "PromedioHorasClasificacion")
                         };
                     }
 
-                    // Result Set 2: Serie Diaria
+                    // Result Set 2: Serie Diaria Unificada (Ingresos/Clasificación vs. Salidas)
                     if (await reader.NextResultAsync())
                     {
                         while (await reader.ReadAsync())
                         {
                             resultado.EvolucionDiaria.Add(new TrazabilidadEvolucionDiariaDTO
                             {
-                                Fecha = GetDateTime(reader, "Fecha"),
+                                Fecha = GetDateTimeNullable(reader, "Fecha"),
                                 CantLotes = GetInt(reader, "CantLotes"),
                                 PesoBrutoKg = GetDecimal(reader, "PesoBrutoKg"),
                                 PesoVerdeKg = GetDecimal(reader, "PesoVerdeKg"),
                                 PesoAmarilloKg = GetDecimal(reader, "PesoAmarilloKg"),
-                                PesoRojoKg = GetDecimal(reader, "PesoRojoKg")
+                                PesoRojoKg = GetDecimal(reader, "PesoRojoKg"),
+                                PesoEgresadoKg = GetDecimal(reader, "PesoEgresadoKg")
                             });
                         }
                     }
@@ -311,16 +316,17 @@ namespace API_SITMAS.Models
         }
 
         // 2. Estadísticas por Tipo y Subtipo de Material
-        public async Task<TrazabilidadMaterialResponseDTO> ObtenerPorMaterialAsync(DateTime? fechaDesde, DateTime? fechaHasta)
+        public async Task<TrazabilidadMaterialResponseDTO> ObtenerPorMaterialAsync(DateTime? fechaDesde, DateTime? fechaHasta, int? idTipoMaterial = null)
         {
             var resultado = new TrazabilidadMaterialResponseDTO();
 
             using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_ReporteTrazabilidad_PorMaterial", conn))
+            using (var cmd = new SqlCommand("dbo.sp_ReporteTrazabilidad_PorMaterial", conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 AddParamNullable(cmd, "@FechaDesde", SqlDbType.Date, fechaDesde?.Date);
                 AddParamNullable(cmd, "@FechaHasta", SqlDbType.Date, fechaHasta?.Date);
+                AddParamNullable(cmd, "@IdTipoMaterial", SqlDbType.Int, idTipoMaterial);
 
                 await conn.OpenAsync();
                 using (var reader = await cmd.ExecuteReaderAsync())
