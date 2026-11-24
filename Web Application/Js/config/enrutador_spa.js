@@ -70,6 +70,7 @@ $(document).ready(function () {
         $('#tab-usuarios-crud').trigger('click');
     }
 
+
     // ==========================================
     // RENDERIZADO CONDICIONAL DEL LANDING.HTML POR ROL
     // ==========================================
@@ -93,14 +94,85 @@ $(document).ready(function () {
                 DashboardMantenimientoModulo.cargarEn("panel-graficos");
             }
         }
+        else if (rol === "Direccion") {
+            $("#panel-graficos").removeClass("d-none");
+            if (typeof DashboardDireccionModulo !== "undefined") {
+                DashboardDireccionModulo.cargarEn("panel-graficos");
+            }
+        }
         else if (rol === "Administrador") {
             $("#contenedor-rutas").removeClass("d-none");
             $("#panel-graficos").removeClass("d-none");
-            if (typeof DashboardInstitucionalesModulo !== "undefined") {
-                DashboardInstitucionalesModulo.cargarEn("panel-graficos");
+
+            // Barra rápida para que el Administrador pueda alternar entre los 3 tableros
+            if ($("#admin-selector-dashboards").length === 0) {
+                $("#panel-graficos").before(`
+                    <div class="row mb-3" id="admin-selector-dashboards">
+                        <div class="col-12 d-flex flex-wrap justify-content-end gap-2">
+                            <span class="small fw-bold text-secondary align-self-center me-1">Vista Ejecutiva:</span>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Selector de Dashboard">
+                                <button type="button" class="btn btn-success active" data-vista="direccion">Dirección</button>
+                                <button type="button" class="btn btn-outline-success" data-vista="institucionales">Institucionales</button>
+                                <button type="button" class="btn btn-outline-success" data-vista="mantenimiento">Mantenimiento</button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                $("#admin-selector-dashboards").off("click", "button").on("click", "button", function () {
+                    $("#admin-selector-dashboards button").removeClass("btn-success active").addClass("btn-outline-success");
+                    $(this).removeClass("btn-outline-success").addClass("btn-success active");
+
+                    const vista = $(this).data("vista");
+                    if (vista === "direccion" && typeof DashboardDireccionModulo !== "undefined") {
+                        DashboardDireccionModulo.cargarEn("panel-graficos");
+                    } else if (vista === "institucionales" && typeof DashboardInstitucionalesModulo !== "undefined") {
+                        DashboardInstitucionalesModulo.cargarEn("panel-graficos");
+                    } else if (vista === "mantenimiento" && typeof DashboardMantenimientoModulo !== "undefined") {
+                        DashboardMantenimientoModulo.cargarEn("panel-graficos");
+                    }
+                });
+            }
+
+            if (typeof DashboardDireccionModulo !== "undefined") {
+                DashboardDireccionModulo.cargarEn("panel-graficos");
             }
         }
     }
+
+
+
+    // // ==========================================
+    // // RENDERIZADO CONDICIONAL DEL LANDING.HTML POR ROL
+    // // ==========================================
+    // const sesionString = localStorage.getItem("usuarioSesion");
+    // if (sesionString) {
+    //     const sesionActual = JSON.parse(sesionString);
+    //     const rol = sesionActual.rol;
+
+    //     if (rol === "Operador_Logistica") {
+    //         $("#contenedor-rutas").removeClass("d-none");
+    //     }
+    //     else if (rol === "R_Institucionales") {
+    //         $("#panel-graficos").removeClass("d-none");
+    //         if (typeof DashboardInstitucionalesModulo !== "undefined") {
+    //             DashboardInstitucionalesModulo.cargarEn("panel-graficos");
+    //         }
+    //     }
+    //     else if (rol === "Mantenimiento_Vehicular") {
+    //         $("#panel-graficos").removeClass("d-none");
+    //         if (typeof DashboardMantenimientoModulo !== "undefined") {
+    //             DashboardMantenimientoModulo.cargarEn("panel-graficos");
+    //         }
+    //     }
+    //     else if (rol === "Administrador") {
+    //         $("#contenedor-rutas").removeClass("d-none");
+    //         $("#panel-graficos").removeClass("d-none");
+    //         if (typeof DashboardInstitucionalesModulo !== "undefined") {
+    //             DashboardInstitucionalesModulo.cargarEn("panel-graficos");
+    //         }
+    //     }
+    // }
 
     // ==========================================
     // ENRUTADOR: REPORTES DE LOGÍSTICA

@@ -174,6 +174,112 @@ namespace API_SITMAS.Models
         public string MecanicoNombreCompleto { get; set; }
     }
 
+    // =========================================================================
+    // 3. DTOs DEL DASHBOARD DE DIRECCIÓN / GERENCIA (4 Result Sets)
+    // =========================================================================
+
+    public class DashboardDireccionResponse
+    {
+        public KpisDireccionDto Kpis { get; set; }
+        public List<EvolucionMensualDireccionDto> EvolucionMensual { get; set; }
+        public List<CalidadOrigenDireccionDto> CalidadPorOrigen { get; set; }
+        public List<RendimientoVehiculoDireccionDto> PlanillaFlota { get; set; }
+
+        public DashboardDireccionResponse()
+        {
+            Kpis = new KpisDireccionDto();
+            EvolucionMensual = new List<EvolucionMensualDireccionDto>();
+            CalidadPorOrigen = new List<CalidadOrigenDireccionDto>();
+            PlanillaFlota = new List<RendimientoVehiculoDireccionDto>();
+        }
+    }
+
+    public class KpisDireccionDto
+    {
+        // 1. Logística y Desgaste
+        public decimal TotalKmReales { get; set; }
+        public decimal TotalLitros { get; set; }
+        public decimal GastoCombustible { get; set; }
+        public decimal CostoCombustiblePorKm { get; set; }
+        public int TotalHojasRutaEjecutadas { get; set; }
+        public int MovimientosInternosSinHDR { get; set; }
+        public decimal CostoDesgasteCubiertas { get; set; }
+
+        // 2. Mano de Obra (Horas y Costo Simulado)
+        public decimal HorasChofer { get; set; }
+        public decimal HorasClasificacion { get; set; }
+        public decimal HorasStock { get; set; }
+        public decimal TotalHorasOperativas { get; set; }
+        public decimal CostoManoObraTotal { get; set; }
+
+        // 3. Costo Operativo Integral
+        public decimal CostoOperativoIntegral { get; set; }
+
+        // 4. Embudo de Materiales (Planta y Stock)
+        public decimal PesoBrutoTotal { get; set; }
+        public decimal PesoBrutoCamiones { get; set; }
+        public decimal PesoBrutoParticulares { get; set; }
+        public decimal PesoVerde { get; set; }
+        public decimal PesoAmarillo { get; set; }
+        public decimal PesoUtilAprovechable { get; set; }
+        public decimal PesoRojoDescarte { get; set; }
+        public decimal TotalClasificado { get; set; }
+        public decimal PorcentajeAprovechamiento { get; set; }
+        public decimal PorcentajeDescarteRojo { get; set; }
+        public decimal PesoUtilizadoStock { get; set; }
+        public decimal TasaRotacionStockPct { get; set; }
+
+        // 5. Indicadores Unitarios de Decisión Gerencial ($ / Kg)
+        public decimal CostoCombustiblePorKgUtil { get; set; }
+        public decimal CostoIntegralPorKgUtil { get; set; }
+        public decimal CostoIntegralPorKgUtilizadoEnStock { get; set; }
+
+        // 6. Salud Preventiva de Flota
+        public int ServicesVencidos { get; set; }
+        public int TotalControlesPreventivos { get; set; }
+        public decimal SaludPreventivaFlotaPct { get; set; }
+        public decimal DesgastePromedioCubiertasPct { get; set; }
+    }
+
+    public class EvolucionMensualDireccionDto
+    {
+        public string PeriodoISO { get; set; }
+        public string PeriodoLabel { get; set; }
+        public decimal KmReales { get; set; }
+        public decimal GastoCombustible { get; set; }
+        public decimal KgAprovechables { get; set; }
+        public decimal KgDescarteRojo { get; set; }
+    }
+
+    public class CalidadOrigenDireccionDto
+    {
+        public string NombreOrigen { get; set; }
+        public string Canal { get; set; }
+        public int CantidadEntregas { get; set; }
+        public decimal PesoBrutoTotal { get; set; }
+        public decimal PesoVerde { get; set; }
+        public decimal PesoAmarillo { get; set; }
+        public decimal PesoRojoDescarte { get; set; }
+        public decimal PorcentajeCalidadUtil { get; set; }
+    }
+
+    public class RendimientoVehiculoDireccionDto
+    {
+        public int IdVehiculo { get; set; }
+        public string Patente { get; set; }
+        public string MarcaModelo { get; set; }
+        public int ViajesHDR { get; set; }
+        public decimal KmReales { get; set; }
+        public decimal LitrosConsumidos { get; set; }
+        public decimal GastoCombustible { get; set; }
+        public decimal CostoCubiertasEstimado { get; set; }
+        public decimal KgTransportadosBruto { get; set; }
+        public decimal KgUtilesGenerados { get; set; }
+        public decimal KgDescarteGenerado { get; set; }
+        public decimal CostoCombustiblePorKgUtil { get; set; }
+        public int IntervencionesTallerPeriodo { get; set; }
+        public int CorrectivosUrgenciasPeriodo { get; set; }
+    }
 
     public class DashboardUsuariosRol
     {
@@ -441,6 +547,159 @@ namespace API_SITMAS.Models
 
             return resultado;
         }
+
+
+        public DashboardDireccionResponse ObtenerDashboardDireccion(
+            DateTime? fechaDesde,
+            DateTime? fechaHasta,
+            decimal? valorHoraEmpleado,
+            decimal? costoJuegoCubiertas)
+        {
+            var resultado = new DashboardDireccionResponse();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("dbo.sp_Dashboard_Direccion", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@FechaDesde", SqlDbType.Date).Value = (object)fechaDesde ?? DBNull.Value;
+                    cmd.Parameters.Add("@FechaHasta", SqlDbType.Date).Value = (object)fechaHasta ?? DBNull.Value;
+
+                    var paramHora = cmd.Parameters.Add("@ValorHoraEmpleado", SqlDbType.Decimal);
+                    paramHora.Precision = 12;
+                    paramHora.Scale = 2;
+                    paramHora.Value = valorHoraEmpleado ?? 0m;
+
+                    var paramCubiertas = cmd.Parameters.Add("@CostoJuegoCubiertas", SqlDbType.Decimal);
+                    paramCubiertas.Precision = 12;
+                    paramCubiertas.Scale = 2;
+                    paramCubiertas.Value = costoJuegoCubiertas ?? 0m;
+
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        // -----------------------------------------------------
+                        // RESULT SET 1: KPIs Ejecutivos del Embudo (Fila única)
+                        // -----------------------------------------------------
+                        if (reader.Read())
+                        {
+                            resultado.Kpis = new KpisDireccionDto
+                            {
+                                TotalKmReales = GetDecimalSafe(reader, "TotalKmReales"),
+                                TotalLitros = GetDecimalSafe(reader, "TotalLitros"),
+                                GastoCombustible = GetDecimalSafe(reader, "GastoCombustible"),
+                                CostoCombustiblePorKm = GetDecimalSafe(reader, "CostoCombustiblePorKm"),
+                                TotalHojasRutaEjecutadas = GetIntSafe(reader, "TotalHojasRutaEjecutadas"),
+                                MovimientosInternosSinHDR = GetIntSafe(reader, "MovimientosInternosSinHDR"),
+                                CostoDesgasteCubiertas = GetDecimalSafe(reader, "CostoDesgasteCubiertas"),
+
+                                HorasChofer = GetDecimalSafe(reader, "HorasChofer"),
+                                HorasClasificacion = GetDecimalSafe(reader, "HorasClasificacion"),
+                                HorasStock = GetDecimalSafe(reader, "HorasStock"),
+                                TotalHorasOperativas = GetDecimalSafe(reader, "TotalHorasOperativas"),
+                                CostoManoObraTotal = GetDecimalSafe(reader, "CostoManoObraTotal"),
+
+                                CostoOperativoIntegral = GetDecimalSafe(reader, "CostoOperativoIntegral"),
+
+                                PesoBrutoTotal = GetDecimalSafe(reader, "PesoBrutoTotal"),
+                                PesoBrutoCamiones = GetDecimalSafe(reader, "PesoBrutoCamiones"),
+                                PesoBrutoParticulares = GetDecimalSafe(reader, "PesoBrutoParticulares"),
+                                PesoVerde = GetDecimalSafe(reader, "PesoVerde"),
+                                PesoAmarillo = GetDecimalSafe(reader, "PesoAmarillo"),
+                                PesoUtilAprovechable = GetDecimalSafe(reader, "PesoUtilAprovechable"),
+                                PesoRojoDescarte = GetDecimalSafe(reader, "PesoRojoDescarte"),
+                                TotalClasificado = GetDecimalSafe(reader, "TotalClasificado"),
+                                PorcentajeAprovechamiento = GetDecimalSafe(reader, "PorcentajeAprovechamiento"),
+                                PorcentajeDescarteRojo = GetDecimalSafe(reader, "PorcentajeDescarteRojo"),
+                                PesoUtilizadoStock = GetDecimalSafe(reader, "PesoUtilizadoStock"),
+                                TasaRotacionStockPct = GetDecimalSafe(reader, "TasaRotacionStockPct"),
+
+                                CostoCombustiblePorKgUtil = GetDecimalSafe(reader, "CostoCombustiblePorKgUtil"),
+                                CostoIntegralPorKgUtil = GetDecimalSafe(reader, "CostoIntegralPorKgUtil"),
+                                CostoIntegralPorKgUtilizadoEnStock = GetDecimalSafe(reader, "CostoIntegralPorKgUtilizadoEnStock"),
+
+                                ServicesVencidos = GetIntSafe(reader, "ServicesVencidos"),
+                                TotalControlesPreventivos = GetIntSafe(reader, "TotalControlesPreventivos"),
+                                SaludPreventivaFlotaPct = GetDecimalSafe(reader, "SaludPreventivaFlotaPct"),
+                                DesgastePromedioCubiertasPct = GetDecimalSafe(reader, "DesgastePromedioCubiertasPct")
+                            };
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 2: Evolución Mensual (6 meses)
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.EvolucionMensual.Add(new EvolucionMensualDireccionDto
+                                {
+                                    PeriodoISO = GetStringSafe(reader, "PeriodoISO"),
+                                    PeriodoLabel = GetStringSafe(reader, "PeriodoLabel"),
+                                    KmReales = GetDecimalSafe(reader, "KmReales"),
+                                    GastoCombustible = GetDecimalSafe(reader, "GastoCombustible"),
+                                    KgAprovechables = GetDecimalSafe(reader, "KgAprovechables"),
+                                    KgDescarteRojo = GetDecimalSafe(reader, "KgDescarteRojo")
+                                });
+                            }
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 3: Calidad y Rendimiento por Origen
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.CalidadPorOrigen.Add(new CalidadOrigenDireccionDto
+                                {
+                                    NombreOrigen = GetStringSafe(reader, "NombreOrigen"),
+                                    Canal = GetStringSafe(reader, "Canal"),
+                                    CantidadEntregas = GetIntSafe(reader, "CantidadEntregas"),
+                                    PesoBrutoTotal = GetDecimalSafe(reader, "PesoBrutoTotal"),
+                                    PesoVerde = GetDecimalSafe(reader, "PesoVerde"),
+                                    PesoAmarillo = GetDecimalSafe(reader, "PesoAmarillo"),
+                                    PesoRojoDescarte = GetDecimalSafe(reader, "PesoRojoDescarte"),
+                                    PorcentajeCalidadUtil = GetDecimalSafe(reader, "PorcentajeCalidadUtil")
+                                });
+                            }
+                        }
+
+                        // -----------------------------------------------------
+                        // RESULT SET 4: Planilla Ejecutiva por Vehículo
+                        // -----------------------------------------------------
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                resultado.PlanillaFlota.Add(new RendimientoVehiculoDireccionDto
+                                {
+                                    IdVehiculo = GetIntSafe(reader, "IdVehiculo"),
+                                    Patente = GetStringSafe(reader, "Patente"),
+                                    MarcaModelo = GetStringSafe(reader, "MarcaModelo"),
+                                    ViajesHDR = GetIntSafe(reader, "ViajesHDR"),
+                                    KmReales = GetDecimalSafe(reader, "KmReales"),
+                                    LitrosConsumidos = GetDecimalSafe(reader, "LitrosConsumidos"),
+                                    GastoCombustible = GetDecimalSafe(reader, "GastoCombustible"),
+                                    CostoCubiertasEstimado = GetDecimalSafe(reader, "CostoCubiertasEstimado"),
+                                    KgTransportadosBruto = GetDecimalSafe(reader, "KgTransportadosBruto"),
+                                    KgUtilesGenerados = GetDecimalSafe(reader, "KgUtilesGenerados"),
+                                    KgDescarteGenerado = GetDecimalSafe(reader, "KgDescarteGenerado"),
+                                    CostoCombustiblePorKgUtil = GetDecimalSafe(reader, "CostoCombustiblePorKgUtil"),
+                                    IntervencionesTallerPeriodo = GetIntSafe(reader, "IntervencionesTallerPeriodo"),
+                                    CorrectivosUrgenciasPeriodo = GetIntSafe(reader, "CorrectivosUrgenciasPeriodo")
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return resultado;
+        }
+
 
 
         // =====================================================================

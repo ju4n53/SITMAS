@@ -81,6 +81,45 @@ namespace API_SITMAS.Controllers
         }
 
 
+        /// <summary>
+        /// Obtiene los KPIs del embudo operativo/financiero, series gráficas y rendimiento por unidad para Dirección.
+        /// Ejemplo: GET api/DashboardUsuariosRol/Direccion?fechaDesde=2026-10-01&fechaHasta=2026-11-24&valorHoraEmpleado=4500&costoJuegoCubiertas=2400000
+        /// </summary>
+        [HttpGet]
+        [Route("Direccion")]
+        public IHttpActionResult GetDashboardDireccion(
+            [FromUri] DateTime? fechaDesde = null,
+            [FromUri] DateTime? fechaHasta = null,
+            [FromUri] decimal? valorHoraEmpleado = null,
+            [FromUri] decimal? costoJuegoCubiertas = null)
+        {
+            try
+            {
+                if (fechaDesde.HasValue && fechaHasta.HasValue && fechaDesde.Value.Date > fechaHasta.Value.Date)
+                {
+                    return BadRequest("La fecha 'desde' no puede ser posterior a la fecha 'hasta'.");
+                }
+
+                if ((valorHoraEmpleado.HasValue && valorHoraEmpleado.Value < 0) ||
+                    (costoJuegoCubiertas.HasValue && costoJuegoCubiertas.Value < 0))
+                {
+                    return BadRequest("Los parámetros de simulación de costos no pueden ser negativos.");
+                }
+
+                var data = _dashboardService.ObtenerDashboardDireccion(
+                    fechaDesde,
+                    fechaHasta,
+                    valorHoraEmpleado,
+                    costoJuegoCubiertas);
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(new Exception("Error al obtener el Dashboard de Dirección: " + ex.Message, ex));
+            }
+        }
+
 
 
 
