@@ -94,7 +94,7 @@ $(document).ready(function () {
                 DashboardMantenimientoModulo.cargarEn("panel-graficos");
             }
         }
-        else if (rol === "Direccion") {
+        else if (rol === "Director") {
             $("#panel-graficos").removeClass("d-none");
             if (typeof DashboardDireccionModulo !== "undefined") {
                 DashboardDireccionModulo.cargarEn("panel-graficos");
