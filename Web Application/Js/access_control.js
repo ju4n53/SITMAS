@@ -15,11 +15,11 @@
         localStorage.removeItem("usuarioSesion");
     }
 
-    const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+    const paginaActual = window.location.pathname.split("/").pop() || "../index.html";
 
     if (!sesion || !sesion.rol) {
-        if (paginaActual !== "index.html") {
-            window.location.replace("index.html"); // ajustá a "../index.html" solo si tus vistas viven dentro de /pages/
+        if (paginaActual !== "../index.html") {
+            window.location.replace("../index.html"); // ajustá a "../index.html" solo si tus vistas viven dentro de /pages/
         }
         return; // Corta la ejecución inmediatamente
     }

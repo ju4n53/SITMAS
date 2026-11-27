@@ -787,7 +787,7 @@ const DashboardInstitucionalesModulo = (function () {
         $tfoot.html(`
             <tr>
                 <td class="ps-3">TOTAL PERÍODO</td>
-                <td class="text-center">---</td>
+                <td class="text-center"></td>
                 <td class="text-center">${FormatearEntero(totEntregas)}</td>
                 <td class="text-end">${FormatearDecimal(totBruto)}</td>
                 <td class="text-end text-success">${FormatearDecimal(totVerde)}</td>

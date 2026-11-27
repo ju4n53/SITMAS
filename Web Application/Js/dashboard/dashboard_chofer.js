@@ -49,7 +49,7 @@ $(document).ready(function () {
     choferNombreUsuario = sesionLocal.nombre || "";
     choferRolUsuario = sesionLocal.rol || "";
 
-    if (choferRolUsuario === "Operador_Logistica" || choferRolUsuario === "Administrador") {
+    if (choferRolUsuario === "Operador_Logistica") {
         // Garantizamos que Google Maps SDK esté listo antes de renderizar un posible mapa activo
         if (typeof CargarGoogleMapsSDK === "function") {
             CargarGoogleMapsSDK(() => {
